@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Play, Zap } from 'lucide-react';
 import { AnimatedEnergyFlow } from './EnergyFlowIllustration';
+import { WeatherWidget } from './WeatherWidget';
+import { AuthorityStrip } from './AuthorityStrip';
 import {
   ScrollIndicator,
   HowItWorksSection,
@@ -104,9 +106,14 @@ export function Hero() {
             <a href="#company" className="hover:text-white transition-colors duration-300">Company</a>
           </div>
 
+          {/* Weather Widget — top-right */}
+          <div className="hidden lg:block">
+            <WeatherWidget />
+          </div>
+
           {/* Book a Demo pill */}
           <button
-            className="text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
+            className="text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] lg:hidden"
             style={{
               background: 'rgba(17, 24, 39, 0.88)',
               boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
@@ -298,6 +305,9 @@ export function Hero() {
 
       {/* ===== LIVE STATS ===== */}
       <LiveStatsSection />
+
+      {/* ===== AUTHORITY / TRUST STRIP ===== */}
+      <AuthorityStrip />
 
       {/* ===== COMPLIANCE BADGES ===== */}
       <ComplianceBadgesSection />
