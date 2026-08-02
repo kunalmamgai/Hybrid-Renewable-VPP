@@ -12,6 +12,11 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #0f1a15;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
@@ -20,15 +25,138 @@ html {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(16, 185, 129, 0.25);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(16, 185, 129, 0.4);
 }
 
 /* Selection color */
 ::selection {
-  background: rgba(16, 185, 129, 0.25);
+  background: rgba(16, 185, 129, 0.3);
   color: #064e3b;
+}
+
+/* ─── Glass Card Utilities ─── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.glass-card-strong {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.glass-card-dark {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.glass-card-emerald {
+  background: rgba(6, 95, 70, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.08);
+}
+
+/* ─── Glass Nav ─── */
+.glass-nav {
+  background: rgba(15, 26, 21, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Glass Input ─── */
+.glass-input {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  transition: all 0.2s ease;
+}
+.glass-input:focus {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/* ─── Glass Button ─── */
+.glass-btn {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+}
+.glass-btn:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ─── Page Background ─── */
+.page-bg {
+  background: linear-gradient(
+    135deg,
+    #0f1a15 0%,
+    #1a2e25 30%,
+    #0f2420 60%,
+    #0a1512 100%
+  );
+  position: relative;
+}
+
+.page-bg::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('/hero-bg.png') center / cover no-repeat;
+  opacity: 0.15;
+  z-index: 0;
+}
+
+.page-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Emerald Gradient Text ─── */
+.text-emerald-gradient {
+  background: linear-gradient(135deg, #059669, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Smooth Transitions ─── */
+.transition-glass {
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
+}
+/* ─── SVG Flow Line Animation ─── */
+@keyframes dashMove {
+  0% {
+    stroke-dashoffset: 28;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.flow-line {
+  animation-play-state: running;
 }

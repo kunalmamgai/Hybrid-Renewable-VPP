@@ -2,6 +2,7 @@
  * Live Energy Flow — animated flow diagram showing real-time energy routing.
  * solar + wind → battery → buildings → grid/export
  * Uses React Flow for the node-based visualization.
+ * Glass-morphism style matching the landing page aesthetic.
  */
 import React, { useState, useEffect } from 'react';
 import ReactFlow, {
@@ -12,60 +13,62 @@ import ReactFlow, {
   NodeTypes,
   ConnectionLineType,
 } from 'reactflow';
-import { Sun, Wind, Battery, Zap, Home, Warehouse } from 'lucide-react';
+import { Sun, Wind, Battery, Zap, Home } from 'lucide-react';
 import 'reactflow/dist/style.css';
 import { useVppWebSocket } from '../../hooks/useVppWebSocket';
 import type { BuildingTwin } from '../../types';
 
-// Custom node component for energy sources
+// Custom node component for energy sources — glass style
 function EnergySourceNode({ data }: { data: any }) {
   const { icon: Icon, label, value, color } = data;
   return (
-    <div className={`bg-white rounded-xl p-3 shadow-lg border-2 ${color} min-w-[80px] text-center`}>
+    <div className={`glass-card-strong rounded-2xl p-3 min-w-[90px] text-center`}>
       <div className="flex justify-center mb-1">{Icon && <Icon size={20} />}</div>
-      <div className="text-xs font-semibold text-gray-700">{label}</div>
-      <div className="text-lg font-bold text-gray-900">{value.toFixed(1)}</div>
-      <div className="text-xs text-gray-500">kW</div>
+      <div className="text-[10px] font-bold text-vpp-navy-muted uppercase tracking-wider">{label}</div>
+      <div className="text-lg font-bold text-vpp-navy mt-0.5">{value.toFixed(1)}</div>
+      <div className="text-[10px] text-vpp-navy-muted">kW</div>
     </div>
   );
 }
 
-// Custom node for buildings
+// Custom node for buildings — glass style
 function BuildingNode({ data }: { data: any }) {
   const { label, value, tier, soc } = data;
   return (
     <div
-      className={`rounded-xl p-3 shadow-lg border-2 text-center min-w-[90px] ${
+      className={`glass-card-strong rounded-2xl p-3 text-center min-w-[100px] ${
         tier === 'critical'
-          ? 'border-vpp-blue bg-vpp-blue/5'
-          : 'border-gray-300 bg-gray-50'
+          ? 'border-vpp-blue/40'
+          : 'border-white/40'
       }`}
     >
-      <Home size={20} className="mx-auto mb-1" />
-      <div className="text-xs font-semibold text-gray-700">{label}</div>
-      <div className="text-sm font-bold text-gray-900">{value.toFixed(1)} kW</div>
-      <div className={`text-xs mt-1 px-1 py-0.5 rounded-full ${
-        tier === 'critical' ? 'bg-vpp-blue/10 text-vpp-blue' : 'bg-gray-100 text-gray-600'
+      <Home size={20} className="mx-auto mb-1 text-vpp-navy-muted" />
+      <div className="text-[10px] font-bold text-vpp-navy-muted uppercase tracking-wider">{label}</div>
+      <div className="text-sm font-bold text-vpp-navy mt-0.5">{value.toFixed(1)} kW</div>
+      <div className={`text-[9px] font-bold mt-1.5 px-2 py-0.5 rounded-full inline-block tracking-wider ${
+        tier === 'critical' ? 'bg-vpp-blue/15 text-vpp-blue' : 'bg-vpp-navy-muted/10 text-vpp-navy-muted'
       }`}>
         {tier === 'critical' ? 'CRITICAL' : 'NON-CRIT'}
       </div>
       {soc !== undefined && (
-        <div className="text-xs text-vpp-blue mt-1">{soc.toFixed(0)}% SoC</div>
+        <div className="text-[10px] text-vpp-blue mt-1.5 font-semibold">{soc.toFixed(0)}% SoC</div>
       )}
     </div>
   );
 }
 
-// Custom node for battery
+// Custom node for battery — glass style
 function BatteryNode({ data }: { data: any }) {
   const { soc, power } = data;
   return (
-    <div className="bg-white rounded-xl p-3 shadow-lg border-2 border-vpp-blue text-center min-w-[80px]">
+    <div className="glass-card-strong rounded-2xl p-3 border-vpp-blue/30 text-center min-w-[90px]">
       <Battery size={24} className="mx-auto mb-1 text-vpp-blue" />
-      <div className="text-xs font-semibold text-gray-700">BATTERY</div>
-      <div className="text-lg font-bold text-gray-900">{soc.toFixed(0)}%</div>
-      <div className="text-xs text-gray-500">{power > 0 ? `↓${power.toFixed(1)}` : power < 0 ? `↑${Math.abs(power).toFixed(1)}` : 'IDLE'} kW</div>
-      <div className="text-xs text-gray-500">SOC / 5min</div>
+      <div className="text-[10px] font-bold text-vpp-navy-muted uppercase tracking-wider">BATTERY</div>
+      <div className="text-lg font-bold text-vpp-navy mt-0.5">{soc.toFixed(0)}%</div>
+      <div className="text-[10px] text-vpp-navy-muted mt-0.5">
+        {power > 0 ? `↓${power.toFixed(1)}` : power < 0 ? `↑${Math.abs(power).toFixed(1)}` : 'IDLE'} kW
+      </div>
+      <div className="text-[9px] text-vpp-navy-muted/60">SOC / 5min</div>
     </div>
   );
 }
@@ -129,13 +132,13 @@ const generateNodes = (buildings: BuildingTwin[]): Node[] => {
 const generateEdges = (buildings: BuildingTwin[]): Edge[] => {
   const edges: Edge[] = [
     { id: 'solar-battery', source: 'solar', target: 'battery', animated: true, style: { stroke: '#f59e0b', strokeWidth: 3 } },
-    { id: 'wind-battery', source: 'wind', target: 'battery', animated: true, style: { stroke: '#0d9488', strokeWidth: 3 } },
+    { id: 'wind-battery', source: 'wind', target: 'battery', animated: true, style: { stroke: '#14b8a6', strokeWidth: 3 } },
   ];
 
   buildings.forEach((b) => {
     edges.push(
       { id: `solar-${b.building_id}`, source: 'solar', target: b.building_id, animated: true, style: { stroke: '#f59e0b', strokeWidth: 2, strokeDasharray: '5,5' } },
-      { id: `wind-${b.building_id}`, source: 'wind', target: b.building_id, animated: true, style: { stroke: '#0d9488', strokeWidth: 2, strokeDasharray: '5,5' } },
+      { id: `wind-${b.building_id}`, source: 'wind', target: b.building_id, animated: true, style: { stroke: '#14b8a6', strokeWidth: 2, strokeDasharray: '5,5' } },
       { id: `battery-${b.building_id}`, source: 'battery', target: b.building_id, animated: false, style: { stroke: '#3b82f6', strokeWidth: 2 } },
       { id: `building-${b.building_id}-grid`, source: b.building_id, target: 'grid', animated: true, style: { stroke: '#10b981', strokeWidth: 2 }, label: 'export', labelStyle: { fill: '#10b981', fontSize: 10 } },
     );
@@ -237,10 +240,10 @@ export function LiveEnergyFlow() {
   }, [buildings]);
 
   return (
-    <div className="h-screen bg-grid-100">
+    <div className="page-bg h-screen">
       <div className="max-w-7xl mx-auto px-6 py-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Live Energy Flow</h1>
-        <p className="text-sm text-gray-600 mb-4">
+        <h1 className="text-2xl font-bold text-white mb-2 drop-shadow-md">Live Energy Flow</h1>
+        <p className="text-sm text-white/50 mb-4">
           Real-time energy routing: Solar + Wind → Battery → Buildings → Grid/Export
         </p>
       </div>
@@ -254,9 +257,13 @@ export function LiveEnergyFlow() {
           connectionLineType={ConnectionLineType.SmoothStep}
           fitView
           attributionPosition="bottom-left"
+          proOptions={{ hideAttribution: true }}
         >
-          <Background gap={16} />
-          <Controls />
+          <Background gap={16} color="rgba(255,255,255,0.05)" />
+          <Controls
+            className="glass-card !rounded-xl !border-0"
+            showInteractive={false}
+          />
         </ReactFlow>
       </div>
     </div>

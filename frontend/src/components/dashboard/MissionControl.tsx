@@ -2,6 +2,7 @@
  * Mission Control — the home screen.
  * Shows: today's savings, solar/wind/battery/grid mix, carbon saved, top recommendation,
  * live scenario indicator, and quick controls.
+ * Glass-morphism style matching the landing page aesthetic.
  */
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -16,7 +17,6 @@ import {
   Activity,
   Cloud,
   Shield,
-  Play,
   RefreshCw,
   Loader2,
 } from 'lucide-react';
@@ -27,11 +27,11 @@ import { useDecisionStats, useExportStats } from '../../hooks/useDigitalTwin';
 import { getScenarios, switchScenario, forceCycle } from '../../services/apiClient';
 import type { BuildingTwin } from '../../types';
 
-const scenarioBadges: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
-  mvp_day: { icon: <Sun size={14} />, label: 'Normal Day', color: 'bg-amber-100 text-amber-700' },
-  cloudy_still_afternoon: { icon: <Cloud size={14} />, label: 'Cloudy Afternoon', color: 'bg-gray-100 text-gray-600' },
-  wind_fills_solar_gap: { icon: <Wind size={14} />, label: 'Wind Fills Gap', color: 'bg-teal-100 text-teal-700' },
-  shortfall_protects_hostel: { icon: <Shield size={14} />, label: 'Shortfall — Hostel Protected', color: 'bg-blue-100 text-blue-700' },
+const scenarioBadges: Record<string, { icon: React.ReactNode; label: string; activeColor: string }> = {
+  mvp_day: { icon: <Sun size={14} />, label: 'Normal Day', activeColor: 'bg-vpp-amber/20 text-vpp-amber border-vpp-amber/30' },
+  cloudy_still_afternoon: { icon: <Cloud size={14} />, label: 'Cloudy Afternoon', activeColor: 'bg-vpp-navy-muted/20 text-vpp-navy-muted border-vpp-navy-muted/30' },
+  wind_fills_solar_gap: { icon: <Wind size={14} />, label: 'Wind Fills Gap', activeColor: 'bg-vpp-teal/20 text-vpp-teal border-vpp-teal/30' },
+  shortfall_protects_hostel: { icon: <Shield size={14} />, label: 'Shortfall — Hostel Protected', activeColor: 'bg-vpp-blue/20 text-vpp-blue border-vpp-blue/30' },
 };
 
 export function MissionControl() {
@@ -92,20 +92,20 @@ export function MissionControl() {
   };
 
   return (
-    <div className="min-h-screen bg-grid-100">
+    <div className="page-bg min-h-screen">
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Mission Control</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-              <span className="text-sm text-gray-600">
+            <h1 className="text-2xl font-bold text-white drop-shadow-md">Mission Control</h1>
+            <div className="flex items-center gap-2 mt-1.5">
+              <div className={`w-2 h-2 rounded-full ${connected ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
+              <span className="text-sm text-white/60">
                 {connected ? 'Connected' : 'Connecting...'} | Cycle #{cycleCount}
               </span>
               {currentScenario && (
-                <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${
-                  scenarioBadges[currentScenario]?.color || 'bg-gray-100 text-gray-600'
+                <span className={`ml-2 px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wider border ${
+                  scenarioBadges[currentScenario]?.activeColor || 'bg-white/10 text-white/60 border-white/15'
                 }`}>
                   {scenarioBadges[currentScenario]?.icon} {scenarioName || currentScenario}
                 </span>
@@ -118,7 +118,8 @@ export function MissionControl() {
             <button
               onClick={handleForceCycle}
               disabled={actionLoading === 'force_cycle'}
-              className="px-3 py-1.5 bg-vpp-green text-white rounded-lg text-sm font-medium hover:bg-vpp-green/90 disabled:opacity-50 flex items-center gap-1.5 transition-all"
+              className="px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all duration-200 disabled:opacity-50
+                         bg-vpp-emerald text-white hover:bg-vpp-emerald-light shadow-emerald-glow hover:shadow-emerald-glow-lg disabled:shadow-none"
             >
               {actionLoading === 'force_cycle' ? (
                 <Loader2 size={14} className="animate-spin" />
@@ -138,10 +139,10 @@ export function MissionControl() {
                 key={id}
                 onClick={() => handleSwitchScenario(id)}
                 disabled={actionLoading === `scenario_${id}`}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1 ${
+                className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 ${
                   currentScenario === id
-                    ? 'bg-vpp-blue text-white shadow-sm'
-                    : 'bg-white text-gray-600 border border-gray-200 hover:border-vpp-blue/30'
+                    ? 'bg-white/15 text-white backdrop-blur-sm border border-white/20 shadow-sm'
+                    : 'glass-card text-white/70 hover:text-white hover:bg-white/20'
                 } disabled:opacity-50`}
               >
                 {actionLoading === `scenario_${id}` ? (
@@ -157,12 +158,12 @@ export function MissionControl() {
 
         {/* Emergency Alert */}
         {reliability?.emergency_mode && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 animate-pulse">
-            <p className="font-semibold text-red-700 flex items-center gap-2">
+          <div className="glass-card-dark border-red-400/40 rounded-2xl p-4 mb-6 animate-pulse">
+            <p className="font-bold text-red-300 flex items-center gap-2">
               <Shield size={18} />
               EMERGENCY MODE — Critical Load Protection Activated
             </p>
-            <p className="text-sm text-gray-700 mt-1">
+            <p className="text-sm text-white/70 mt-1.5">
               {reliability.shortfall_predicted_kwh.toFixed(0)} kWh shortfall predicted.
               Non-critical loads will be shed first. Reserve floor: {reliability.reserve_floor_pct}%
             </p>
@@ -171,12 +172,12 @@ export function MissionControl() {
 
         {/* Top Recommendation */}
         {latestDecisions.length > 0 && !reliability?.emergency_mode && (
-          <div className="bg-vpp-green/10 border border-vpp-green/30 rounded-xl p-4 mb-6">
-            <p className="font-semibold text-vpp-green flex items-center gap-2">
+          <div className="glass-card-emerald rounded-2xl p-4 mb-6">
+            <p className="font-bold text-vpp-emerald flex items-center gap-2 text-sm">
               <Activity size={16} /> Top Recommendation
             </p>
-            <p className="text-sm text-gray-700 mt-1">{latestDecisions[0].action}</p>
-            <p className="text-xs text-gray-600 mt-2">
+            <p className="text-sm text-white/80 mt-1.5 font-medium">{latestDecisions[0].action}</p>
+            <p className="text-xs text-white/50 mt-2">
               Confidence: {latestDecisions[0].confidence_pct}% |
               Savings: INR{latestDecisions[0].expected_savings_inr.toFixed(1)} |
               Carbon: {latestDecisions[0].expected_carbon_reduction_kg.toFixed(2)} kg CO₂
@@ -186,13 +187,13 @@ export function MissionControl() {
 
         {/* Energy Mix Meters */}
         {campusTotals && (
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-8">
             <EnergyMeter
               type="solar"
               value={campusTotals.solar * 12}
               label="SOLAR"
               unit="kW"
-              icon={<Sun className="text-amber-400" size={20} />}
+              icon={<Sun className="text-vpp-amber" size={20} />}
               trend={campusTotals.solar > 0 ? 'up' : 'neutral'}
             />
             <EnergyMeter
@@ -208,7 +209,7 @@ export function MissionControl() {
               value={campusTotals.demand * 12}
               label="DEMAND"
               unit="kW"
-              icon={<Zap className="text-gray-500" size={20} />}
+              icon={<Zap className="text-vpp-navy-muted" size={20} />}
             />
             <EnergyMeter
               type="grid_import"
@@ -223,7 +224,7 @@ export function MissionControl() {
               value={campusTotals.gridExport * 12}
               label="GRID EXPORT"
               unit="kW"
-              icon={<TrendingUp className="text-vpp-green" size={20} />}
+              icon={<TrendingUp className="text-vpp-emerald" size={20} />}
               trend={campusTotals.gridExport > 0 ? 'up' : 'neutral'}
             />
             <EnergyMeter
@@ -238,54 +239,54 @@ export function MissionControl() {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-xl p-4 shadow">
-            <div className="flex items-center gap-2 text-vpp-green">
+          <div className="glass-card rounded-2xl p-5">
+            <div className="flex items-center gap-2 text-vpp-emerald">
               <IndianRupee size={18} />
-              <span className="font-semibold">Cost Savings</span>
+              <span className="font-bold text-sm">Cost Savings</span>
             </div>
-            <p className="text-2xl font-bold mt-2">
+            <p className="text-2xl font-bold text-vpp-navy mt-2">
               INR{(decisionStats?.total_savings_inr || 0).toFixed(1)}
             </p>
-            <p className="text-xs text-gray-500 mt-1">Lifetime savings logged</p>
+            <p className="text-[10px] text-vpp-navy-muted mt-1.5 uppercase tracking-wider">Lifetime savings logged</p>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow">
+          <div className="glass-card rounded-2xl p-5">
             <div className="flex items-center gap-2 text-vpp-teal">
               <Leaf size={18} />
-              <span className="font-semibold">Carbon Saved</span>
+              <span className="font-bold text-sm">Carbon Saved</span>
             </div>
-            <p className="text-2xl font-bold mt-2">
+            <p className="text-2xl font-bold text-vpp-navy mt-2">
               {(decisionStats?.total_carbon_reduction_kg || 0).toFixed(1)} kg CO₂
             </p>
-            <p className="text-xs text-gray-500 mt-1">Emission factor: 0.74 kg/kWh</p>
+            <p className="text-[10px] text-vpp-navy-muted mt-1.5 uppercase tracking-wider">Emission factor: 0.74 kg/kWh</p>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow">
+          <div className="glass-card rounded-2xl p-5">
             <div className="flex items-center gap-2 text-vpp-blue">
               <Activity size={18} />
-              <span className="font-semibold">Decisions</span>
+              <span className="font-bold text-sm">Decisions</span>
             </div>
-            <p className="text-2xl font-bold mt-2">{decisionStats?.total_decisions || 0}</p>
-            <p className="text-xs text-gray-500 mt-1">AI decisions logged</p>
+            <p className="text-2xl font-bold text-vpp-navy mt-2">{decisionStats?.total_decisions || 0}</p>
+            <p className="text-[10px] text-vpp-navy-muted mt-1.5 uppercase tracking-wider">AI decisions logged</p>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow">
+          <div className="glass-card rounded-2xl p-5">
             <div className="flex items-center gap-2 text-vpp-amber">
               <BarChart3 size={18} />
-              <span className="font-semibold">Self-Consumption</span>
+              <span className="font-bold text-sm">Self-Consumption</span>
             </div>
-            <p className="text-2xl font-bold mt-2">
+            <p className="text-2xl font-bold text-vpp-navy mt-2">
               {(exportStats?.renewable_self_consumption_pct || 0).toFixed(1)}%
             </p>
-            <p className="text-xs text-gray-500 mt-1">Of renewable energy used on-site</p>
+            <p className="text-[10px] text-vpp-navy-muted mt-1.5 uppercase tracking-wider">Of renewable energy used on-site</p>
           </div>
         </div>
 
         {/* Recent Decisions */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">Recent AI Decisions</h2>
+          <h2 className="text-lg font-bold text-white mb-4 drop-shadow-sm">Recent AI Decisions</h2>
           {latestDecisions.length === 0 ? (
-            <div className="bg-white rounded-xl p-8 text-center shadow">
-              <BarChart3 className="mx-auto text-gray-300" size={48} />
-              <p className="text-gray-500 mt-2">Waiting for first decision...</p>
-              <p className="text-xs text-gray-400 mt-1">
+            <div className="glass-card rounded-2xl p-8 text-center">
+              <BarChart3 className="mx-auto text-white/20" size={48} />
+              <p className="text-white/60 mt-2 font-medium">Waiting for first decision...</p>
+              <p className="text-xs text-white/40 mt-1">
                 The AI decision loop runs every 10 seconds. Click "Force Cycle" to trigger one now.
               </p>
             </div>
@@ -300,31 +301,31 @@ export function MissionControl() {
 
         {/* Building Criticality Tiers */}
         {buildings.length > 0 && (
-          <div className="bg-white rounded-xl shadow p-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">Building Criticality</h2>
+          <div className="glass-card rounded-2xl p-5">
+            <h2 className="text-lg font-bold text-vpp-navy mb-3">Building Criticality</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {buildings.map((b: BuildingTwin) => (
                 <div
                   key={b.building_id}
-                  className={`p-3 rounded-lg border ${
+                  className={`p-3.5 rounded-xl border transition-all ${
                     b.criticality_tier === 'critical'
-                      ? 'border-vpp-blue bg-vpp-blue/5'
-                      : 'border-gray-200 bg-gray-50'
+                      ? 'border-vpp-blue/30 bg-vpp-blue/10'
+                      : 'border-white/20 bg-white/5'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-sm">{b.building_id.replace('_', ' ')}</span>
+                    <span className="font-semibold text-sm text-vpp-navy">{b.building_id.replace('_', ' ')}</span>
                     <span
-                      className={`text-xs px-2 py-0.5 rounded-full ${
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider ${
                         b.criticality_tier === 'critical'
-                          ? 'bg-vpp-blue/10 text-vpp-blue'
-                          : 'bg-gray-100 text-gray-600'
+                          ? 'bg-vpp-blue/15 text-vpp-blue'
+                          : 'bg-vpp-navy-muted/10 text-vpp-navy-muted'
                       }`}
                     >
                       {b.criticality_tier === 'critical' ? 'CRITICAL' : 'NON-CRITICAL'}
                     </span>
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">SoC: {b.battery_soc_pct.toFixed(0)}%</div>
+                  <div className="text-xs text-vpp-navy-muted mt-1.5">SoC: {b.battery_soc_pct.toFixed(0)}%</div>
                 </div>
               ))}
             </div>

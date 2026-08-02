@@ -1,10 +1,10 @@
 /**
  * AI Decision Center — history of all AI decisions with filtering and search.
- * Shows: timeline of decisions, each with confidence %, reason, alternative, savings, carbon.
+ * Glass-morphism style matching the landing page aesthetic.
  */
 import { useState, useMemo, useEffect } from 'react';
 import { DecisionCard } from '../common/DecisionCard';
-import { Search, Filter, BarChart3, CheckCircle, AlertTriangle, Battery, TrendingUp } from 'lucide-react';
+import { Search, BarChart3, CheckCircle, AlertTriangle, Battery, TrendingUp } from 'lucide-react';
 import { useDecisions } from '../../hooks/useDecisions';
 import type { Decision } from '../../types';
 
@@ -40,11 +40,11 @@ export function AIDecisionCenter() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-grid-100 p-6">
+      <div className="page-bg min-h-screen p-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">AI Decision Center</h1>
+          <h1 className="text-2xl font-bold text-white mb-4 drop-shadow-md">AI Decision Center</h1>
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-vpp-blue"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-vpp-emerald"></div>
           </div>
         </div>
       </div>
@@ -53,11 +53,11 @@ export function AIDecisionCenter() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-grid-100 p-6">
+      <div className="page-bg min-h-screen p-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">AI Decision Center</h1>
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-            Error loading decisions: {error}
+          <h1 className="text-2xl font-bold text-white mb-4 drop-shadow-md">AI Decision Center</h1>
+          <div className="glass-card-dark border-red-400/30 rounded-2xl p-4">
+            <p className="text-red-300">Error loading decisions: {error}</p>
           </div>
         </div>
       </div>
@@ -65,14 +65,14 @@ export function AIDecisionCenter() {
   }
 
   return (
-    <div className="min-h-screen bg-grid-100 p-6">
+    <div className="page-bg min-h-screen p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">AI Decision Center</h1>
+          <h1 className="text-2xl font-bold text-white drop-shadow-md">AI Decision Center</h1>
           <button
             onClick={refetch}
-            className="px-3 py-1.5 text-sm bg-vpp-blue text-white rounded-lg hover:bg-vpp-blue/90 transition-colors"
+            className="px-4 py-2 text-sm font-semibold bg-vpp-emerald text-white rounded-xl hover:bg-vpp-emerald-light transition-all duration-200 shadow-emerald-glow"
           >
             Refresh
           </button>
@@ -81,20 +81,20 @@ export function AIDecisionCenter() {
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" size={16} />
             <input
               type="text"
               placeholder="Search decisions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-grid-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-vpp-blue"
+              className="glass-input w-full pl-10 pr-3 py-2.5 rounded-xl text-sm text-vpp-navy placeholder:text-vpp-navy-muted/50 focus:outline-none"
             />
           </div>
 
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="px-3 py-2 border border-grid-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-vpp-blue text-sm"
+            className="glass-input px-4 py-2.5 rounded-xl text-sm text-vpp-navy focus:outline-none"
           >
             <option value="all">All Types</option>
             <option value="dispatch">Dispatch</option>
@@ -107,7 +107,7 @@ export function AIDecisionCenter() {
           <select
             value={confidenceFilter}
             onChange={(e) => setConfidenceFilter(e.target.value as any)}
-            className="px-3 py-2 border border-grid-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-vpp-blue text-sm"
+            className="glass-input px-4 py-2.5 rounded-xl text-sm text-vpp-navy focus:outline-none"
           >
             <option value="all">All Confidence</option>
             <option value="high">High (80%+)</option>
@@ -117,7 +117,7 @@ export function AIDecisionCenter() {
         </div>
 
         {/* Filters Summary */}
-        <div className="flex items-center gap-2 mb-4 text-xs text-gray-500">
+        <div className="flex items-center gap-2 mb-4 text-xs text-white/50">
           <span>{filtered.length} decisions found</span>
           {searchTerm && <span>• Search: "{searchTerm}"</span>}
           {typeFilter !== 'all' && <span>• Type: {typeFilter}</span>}
@@ -126,9 +126,9 @@ export function AIDecisionCenter() {
 
         {/* Decision List */}
         {filtered.length === 0 ? (
-          <div className="bg-white rounded-xl p-8 text-center shadow">
-            <BarChart3 className="mx-auto text-gray-300" size={48} />
-            <p className="text-gray-500 mt-2">No decisions match your filters</p>
+          <div className="glass-card rounded-2xl p-8 text-center">
+            <BarChart3 className="mx-auto text-white/20" size={48} />
+            <p className="text-white/50 mt-2 font-medium">No decisions match your filters</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -139,13 +139,13 @@ export function AIDecisionCenter() {
         )}
 
         {/* Decision Type Legend */}
-        <div className="mt-6 bg-white rounded-xl p-4 shadow">
-          <h3 className="font-semibold text-gray-700 mb-3 text-sm">Decision Types</h3>
+        <div className="mt-6 glass-card rounded-2xl p-4">
+          <h3 className="font-bold text-vpp-navy mb-3 text-sm">Decision Types</h3>
           <div className="flex flex-wrap gap-4">
             {Object.entries(typeIcons).map(([type, Icon]) => (
               <div key={type} className="flex items-center gap-2">
-                <Icon size={16} className="text-gray-500" />
-                <span className="text-sm text-gray-600 capitalize">{type}</span>
+                <Icon size={16} className="text-vpp-navy-muted" />
+                <span className="text-sm text-vpp-navy-muted capitalize">{type}</span>
               </div>
             ))}
           </div>
