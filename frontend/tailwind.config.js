@@ -17,6 +17,13 @@ module.exports = {
         'vpp-red': '#ef4444',
         'vpp-teal': '#14b8a6',
         'vpp-blue': '#3b82f6',
+        // Hero-inspired palette
+        'hero-green-deep': '#0f281e',
+        'hero-green-vibrant': '#2d6a4f',
+        'hero-sunset-orange': '#ff9f1c',
+        'hero-sunset-peach': '#ffbf69',
+        'hero-sky-teal': '#76c7b7',
+        'hero-sunlight': '#fdf0d5',
         // Frosted glass surfaces
         'glass': 'rgba(255, 255, 255, 0.72)',
         'glass-strong': 'rgba(255, 255, 255, 0.88)',

@@ -93,6 +93,36 @@ function RevealSection({ children, className = '', delay = 0 }: {
   );
 }
 
+// ─── Background Glow Accent ───
+export function BackgroundGlow({ color = 'emerald', size = '300px', top = '0%', left = '0%', opacity = 0.15, blur = '80px', animate = true }) {
+  const colorMap = {
+    emerald: 'bg-emerald-500',
+    teal: 'bg-teal-500',
+    blue: 'bg-blue-500',
+    amber: 'bg-amber-500',
+    orange: 'bg-hero-sunset-orange',
+    peach: 'bg-hero-sunset-peach',
+    sky: 'bg-hero-sky-teal',
+    sunlight: 'bg-hero-sunlight',
+  };
+  
+  return (
+    <div 
+      className={`absolute pointer-events-none rounded-full ${colorMap[color as keyof typeof colorMap]} ${animate ? 'animate-pulse' : ''}`}
+      style={{
+        width: size,
+        height: size,
+        top,
+        left,
+        opacity,
+        filter: `blur(${blur})`,
+        zIndex: 0,
+        transition: 'all 1s ease-out'
+      }}
+    />
+  );
+}
+
 // ═══════════════════════════════════════════════════════════════
 // EXPORTED COMPONENTS
 // ═══════════════════════════════════════════════════════════════
@@ -135,15 +165,20 @@ export function HowItWorksSection() {
   ];
 
   return (
-    <section className="relative py-24 px-6">
-      {/* Subtle gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a1512] to-[#0f1a15]" />
+    <section className="relative py-24 px-6 overflow-hidden">
+      {/* Seamless transition background from hero bottom */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#1b4332]/40 via-[#0f281e] to-[#0a1512]" />
+      
+      {/* Background Accents: Sunset & Lush Green mix */}
+      <BackgroundGlow color="orange" size="500px" top="-20%" left="-10%" opacity={0.1} blur="120px" />
+      <BackgroundGlow color="emerald" size="400px" top="30%" left="70%" opacity={0.08} />
+      <BackgroundGlow color="sunlight" size="300px" top="60%" left="20%" opacity={0.05} blur="100px" />
 
       <div className="relative max-w-6xl mx-auto">
         <RevealSection className="text-center mb-16">
-          <span className="text-[10px] font-bold text-vpp-emerald uppercase tracking-[0.25em]">How It Works</span>
+          <span className="text-[10px] font-bold text-hero-sunset-peach uppercase tracking-[0.25em]">How It Works</span>
           <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-3 tracking-tight">
-            From Weather to <span className="text-emerald-gradient">Smart Dispatch</span>
+            From Weather to <span className="text-sunset-gradient">Smart Dispatch</span>
           </h2>
           <p className="text-white/50 mt-4 max-w-xl mx-auto text-sm leading-relaxed">
             Three steps from raw weather data to optimized energy decisions across your entire campus.
@@ -153,9 +188,9 @@ export function HowItWorksSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {steps.map((step, i) => (
             <RevealSection key={i} delay={i * 200}>
-              <div className={`relative glass-card rounded-2xl p-6 border ${step.borderColor} hover:border-white/30 transition-all duration-300 group`}>
+              <div className={`relative glass-card-warm rounded-2xl p-6 border ${step.borderColor} hover:border-hero-sunset-orange/40 transition-all duration-300 group`}>
                 {/* Step number */}
-                <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full bg-[#0f1a15] border border-white/15 flex items-center justify-center">
+                <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full bg-hero-green-deep border border-hero-sunlight/20 flex items-center justify-center">
                   <span className="text-xs font-bold text-white/60">{i + 1}</span>
                 </div>
                 {/* Icon */}
@@ -215,23 +250,27 @@ export function LiveStatsSection() {
   ];
 
   return (
-    <section className="relative py-20 px-6">
-      {/* Darker background strip */}
+    <section className="relative py-20 px-6 overflow-hidden">
+      {/* Deep atmospheric green background */}
       <div className="absolute inset-0 bg-[#0a1512]" />
-      <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-emerald-500/5" />
+      <div className="absolute inset-0 bg-gradient-to-r from-hero-green-vibrant/5 via-transparent to-hero-green-vibrant/5" />
+      
+      {/* Background Accents: Sky Teal & Deep Green */}
+      <BackgroundGlow color="sky" size="600px" top="-10%" left="40%" opacity={0.07} blur="150px" />
+      <BackgroundGlow color="emerald" size="400px" top="40%" left="-10%" opacity={0.05} />
 
       <div className="relative max-w-6xl mx-auto">
         <RevealSection className="text-center mb-12">
-          <span className="text-[10px] font-bold text-vpp-emerald uppercase tracking-[0.25em]">Live Performance</span>
+          <span className="text-[10px] font-bold text-hero-sky-teal uppercase tracking-[0.25em]">Live Performance</span>
           <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-3 tracking-tight">
-            Numbers That <span className="text-emerald-gradient">Speak</span>
+            Numbers That <span className="text-sunset-gradient">Speak</span>
           </h2>
         </RevealSection>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {stats.map((stat, i) => (
             <RevealSection key={i} delay={i * 150}>
-              <div className="glass-card rounded-2xl p-6 text-center group hover:shadow-emerald-glow-lg transition-all duration-300">
+              <div className="glass-card rounded-2xl p-6 text-center group hover:shadow-hero-sunset-orange/10 transition-all duration-300 border border-hero-green-vibrant/20 hover:border-hero-sunset-peach/30">
                 <div className="flex items-center justify-center mb-3">
                   {stat.icon}
                 </div>
@@ -267,14 +306,18 @@ export function ComplianceBadgesSection() {
   ];
 
   return (
-    <section className="relative py-16 px-6">
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0a1512] to-[#0f1a15]" />
+    <section className="relative py-16 px-6 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0a1512] to-[#0f281e]" />
+      
+      {/* Background Accents: Sunset Peach & Green */}
+      <BackgroundGlow color="peach" size="300px" top="-5%" left="60%" opacity={0.08} blur="90px" />
+      <BackgroundGlow color="emerald" size="250px" top="50%" left="10%" opacity={0.06} />
 
       <div className="relative max-w-5xl mx-auto">
         <RevealSection className="text-center mb-10">
-          <span className="text-[10px] font-bold text-vpp-emerald uppercase tracking-[0.25em]">Built for India</span>
+          <span className="text-[10px] font-bold text-hero-sunlight uppercase tracking-[0.25em]">Built for India</span>
           <h2 className="text-2xl md:text-3xl font-extrabold text-white mt-3 tracking-tight">
-            Compliance & <span className="text-emerald-gradient">Standards</span>
+            Compliance & <span className="text-sunset-gradient">Standards</span>
           </h2>
         </RevealSection>
 
@@ -300,16 +343,21 @@ export function ComplianceBadgesSection() {
 
 export function CTAFooter() {
   return (
-    <section className="relative py-24 px-6">
-      <div className="absolute inset-0 bg-[#0f1a15]" />
-      <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/10 to-transparent" />
+    <section className="relative py-24 px-6 overflow-hidden">
+      <div className="absolute inset-0 bg-[#0f281e]" />
+      <div className="absolute inset-0 bg-gradient-to-t from-hero-sunset-orange/10 to-transparent" />
+      
+      {/* Background Accents: Vibrant Sunset & Energy Green */}
+      <BackgroundGlow color="orange" size="600px" top="20%" left="-20%" opacity={0.15} blur="130px" />
+      <BackgroundGlow color="sunlight" size="500px" top="-10%" left="50%" opacity={0.1} blur="110px" />
+      <BackgroundGlow color="emerald" size="400px" top="60%" left="70%" opacity={0.08} />
 
       <div className="relative max-w-3xl mx-auto text-center">
         <RevealSection>
-          <span className="text-[10px] font-bold text-vpp-emerald uppercase tracking-[0.25em]">Get Started</span>
+          <span className="text-[10px] font-bold text-hero-sunset-orange uppercase tracking-[0.25em]">Get Started</span>
           <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-4 tracking-tight leading-tight">
             Ready to Put Your Campus<br />
-            on <span className="text-emerald-gradient">Autopilot</span>?
+            on <span className="text-sunset-gradient">Autopilot</span>?
           </h2>
           <p className="text-white/50 mt-4 max-w-lg mx-auto text-sm leading-relaxed">
             Schedule a live demo and see the AI optimize your solar, wind, and battery in real-time.
@@ -317,9 +365,9 @@ export function CTAFooter() {
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <button
-              className="text-white px-8 py-3.5 rounded-full text-sm font-semibold flex items-center gap-2 transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shadow-emerald-glow-lg"
+              className="text-white px-8 py-3.5 rounded-full text-sm font-semibold flex items-center gap-2 transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shadow-lg"
               style={{
-                background: 'linear-gradient(135deg, #059669, #10b981)',
+                background: '#0f172a', // Deep navy/black from hero image
               }}
             >
               Book a Demo

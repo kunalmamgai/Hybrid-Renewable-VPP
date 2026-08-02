@@ -14,7 +14,7 @@ html {
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #0f1a15;
+  background-color: #0f281e; /* Deep green from hero image */
 }
 
 /* Custom scrollbar */
@@ -40,11 +40,19 @@ body {
 
 /* ─── Glass Card Utilities ─── */
 .glass-card {
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.08); /* Darker glass to blend with deep greens */
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(255, 255, 255, 0.02);
+}
+
+.glass-card-warm {
+  background: rgba(255, 253, 245, 0.1); /* Subtle warm sunlight tint */
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 176, 136, 0.2); /* Peach border tint */
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
 .glass-card-strong {
@@ -138,6 +146,13 @@ body {
 /* ─── Emerald Gradient Text ─── */
 .text-emerald-gradient {
   background: linear-gradient(135deg, #059669, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-sunset-gradient {
+  background: linear-gradient(135deg, #ff9f1c, #ffbf69);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

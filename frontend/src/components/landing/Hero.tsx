@@ -10,6 +10,7 @@ import {
   LiveStatsSection,
   ComplianceBadgesSection,
   CTAFooter,
+  BackgroundGlow,
 } from './LandingSections';
 
 // --- Live feed message sequence ---
@@ -84,6 +85,11 @@ export function Hero() {
 
         {/* Soft overlay for text legibility */}
         <div className="absolute inset-0 bg-gradient-to-b from-[rgba(15,40,30,0.25)] via-transparent to-[rgba(0,0,0,0.18)]" />
+        
+        {/* Parallax Accents: Sunset & Sky mix */}
+        <BackgroundGlow color="orange" size="600px" top="-10%" left="50%" opacity={0.15} blur="120px" />
+        <BackgroundGlow color="sky" size="400px" top="10%" left="-5%" opacity={0.1} blur="100px" />
+        <BackgroundGlow color="sunlight" size="500px" top="40%" left="70%" opacity={0.08} blur="110px" />
 
         {/* Nav Bar */}
         <nav className="relative z-20 flex items-center justify-between px-6 md:px-10 lg:px-14 py-5 animate-[fadeSlideUp_0.6s_ease-out_both]">
@@ -159,7 +165,7 @@ export function Hero() {
             <button
               className="text-white px-8 py-3.5 rounded-full text-sm font-semibold flex items-center gap-2 transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
               style={{
-                background: 'rgba(17, 24, 39, 0.9)',
+                background: '#0f172a', // Deep navy/black from image
                 boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
               }}
             >
@@ -284,12 +290,17 @@ export function Hero() {
 
       {/* ===== ANIMATED ENERGY FLOW ILLUSTRATION ===== */}
       <section className="relative py-20 px-6 overflow-hidden"
-               style={{ background: 'linear-gradient(180deg, #0f1a15 0%, #0a1512 100%)' }}>
+               style={{ background: 'linear-gradient(180deg, #1b4332 0%, #0f281e 100%)' }}>
+        
+        {/* Background Accents: Transitioning from Hero bottom */}
+        <BackgroundGlow color="orange" size="450px" top="-10%" left="60%" opacity={0.1} blur="110px" />
+        <BackgroundGlow color="emerald" size="500px" top="40%" left="-10%" opacity={0.07} blur="120px" />
+
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12 animate-[fadeSlideUp_0.8s_ease-out_0.3s_both]">
             <span className="text-[10px] font-bold text-vpp-emerald uppercase tracking-[0.25em]">System Overview</span>
             <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-3 tracking-tight">
-              How Energy <span className="text-emerald-gradient">Flows</span>
+              How Energy <span className="text-sunset-gradient">Flows</span>
             </h2>
             <p className="text-white/40 mt-3 text-sm max-w-md mx-auto">
               Solar and wind feed the AI core, which optimizes battery dispatch and protects critical buildings in real-time.
