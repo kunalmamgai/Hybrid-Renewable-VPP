@@ -14,7 +14,8 @@ html {
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #0f281e; /* Deep green from hero image */
+  background: radial-gradient(circle at top, rgba(217, 119, 6, 0.12), transparent 40%), #0a0d0f;
+  color: #f8f0e2;
 }
 
 /* Custom scrollbar */
@@ -25,63 +26,55 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(16, 185, 129, 0.25);
+  background: rgba(217, 119, 6, 0.32);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(16, 185, 129, 0.4);
+  background: rgba(217, 119, 6, 0.5);
 }
 
 /* Selection color */
 ::selection {
-  background: rgba(16, 185, 129, 0.3);
-  color: #064e3b;
+  background: rgba(217, 119, 6, 0.28);
+  color: #fff6e6;
 }
 
-/* ─── Glass Card Utilities ─── */
-.glass-card {
-  background: rgba(255, 255, 255, 0.08); /* Darker glass to blend with deep greens */
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(255, 255, 255, 0.02);
-}
-
-.glass-card-warm {
-  background: rgba(255, 253, 245, 0.1); /* Subtle warm sunlight tint */
+/* ─── Standardized VPP Glass System ─── */
+.vpp-glass {
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 176, 136, 0.2); /* Peach border tint */
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
 }
 
-.glass-card-strong {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.04);
+.vpp-glass:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(217, 119, 6, 0.2); /* vpp-accent-gold */
 }
 
-.glass-card-dark {
-  background: rgba(15, 23, 42, 0.65);
+.vpp-glass-warm {
+  background: rgba(217, 119, 6, 0.04);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(217, 119, 6, 0.15);
+  border-radius: 1.25rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
 }
 
-.glass-card-emerald {
-  background: rgba(6, 95, 70, 0.12);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.08);
+.vpp-glass-dark {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 1.25rem;
 }
 
 /* ─── Glass Nav ─── */
 .glass-nav {
-  background: rgba(15, 26, 21, 0.6);
+  background: rgba(18, 14, 10, 0.62);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -118,10 +111,10 @@ body {
 .page-bg {
   background: linear-gradient(
     135deg,
-    #0f1a15 0%,
-    #1a2e25 30%,
-    #0f2420 60%,
-    #0a1512 100%
+    #1c150f 0%,
+    #302417 32%,
+    #18120d 64%,
+    #090b0d 100%
   );
   position: relative;
 }
@@ -134,7 +127,7 @@ body {
   right: 0;
   bottom: 0;
   background: url('/hero-bg.png') center / cover no-repeat;
-  opacity: 0.15;
+  opacity: 0.1;
   z-index: 0;
 }
 
@@ -145,14 +138,14 @@ body {
 
 /* ─── Emerald Gradient Text ─── */
 .text-emerald-gradient {
-  background: linear-gradient(135deg, #059669, #10b981);
+  background: linear-gradient(135deg, #d97706, #f3e1bf);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .text-sunset-gradient {
-  background: linear-gradient(135deg, #ff9f1c, #ffbf69);
+  background: linear-gradient(135deg, #d97706, #f5d08a 45%, #fff2d8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

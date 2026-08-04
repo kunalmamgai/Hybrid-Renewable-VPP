@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Landing-page-inspired palette
+        // Core VPP Palette (Rajasthan DTE Govt Project)
         'vpp-emerald': '#059669',
         'vpp-emerald-light': '#10b981',
         'vpp-emerald-dark': '#065f46',
@@ -14,16 +14,26 @@ module.exports = {
         'vpp-navy-muted': '#334155',
         'vpp-amber': '#f59e0b',
         'vpp-amber-light': '#fbbf24',
-        'vpp-red': '#ef4444',
         'vpp-teal': '#14b8a6',
         'vpp-blue': '#3b82f6',
-        // Hero-inspired palette
-        'hero-green-deep': '#0f281e',
-        'hero-green-vibrant': '#2d6a4f',
+        
+        // Unified Landing Theme (Sunset to Forest Green)
         'hero-sunset-orange': '#ff9f1c',
         'hero-sunset-peach': '#ffbf69',
-        'hero-sky-teal': '#76c7b7',
         'hero-sunlight': '#fdf0d5',
+        
+        'desert-transition-dune': '#2d2317',
+        'desert-transition-sand': '#7a5d3a',
+        'desert-transition-tan': '#c8a676',
+        'desert-transition-amber': '#d97706',
+        
+        'vpp-deep-forest': '#0f281e',
+        'vpp-deep-night': '#0a0d0f',
+        'vpp-deep-teal': '#0d1f1a',
+        
+        'vpp-accent-gold': '#d97706',
+        'vpp-accent-orange': '#ff9f1c',
+        'vpp-accent-teal': '#14b8a6',
         // Frosted glass surfaces
         'glass': 'rgba(255, 255, 255, 0.72)',
         'glass-strong': 'rgba(255, 255, 255, 0.88)',

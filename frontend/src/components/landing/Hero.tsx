@@ -6,6 +6,8 @@ import { WeatherWidget } from './WeatherWidget';
 import { AuthorityStrip } from './AuthorityStrip';
 import {
   ScrollIndicator,
+  DesertTransitionBand,
+  RevealSection,
   HowItWorksSection,
   LiveStatsSection,
   ComplianceBadgesSection,
@@ -84,11 +86,19 @@ export function Hero() {
         />
 
         {/* Soft overlay for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[rgba(15,40,30,0.25)] via-transparent to-[rgba(0,0,0,0.18)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,240,210,0.22),_transparent_36%),linear-gradient(180deg,rgba(18,12,8,0.1),rgba(16,15,14,0.16)_58%,rgba(14,12,10,0.28)_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-b from-transparent via-[#20160f]/32 to-[#0f1012]" />
+        <div
+          className="absolute inset-x-0 bottom-0 h-40 pointer-events-none"
+          style={{
+            background: 'linear-gradient(180deg, rgba(15, 16, 18, 0) 0%, rgba(112, 72, 28, 0.18) 44%, rgba(16, 16, 18, 0.88) 100%)',
+            clipPath: 'polygon(0 38%, 12% 28%, 24% 40%, 37% 22%, 50% 36%, 63% 18%, 78% 34%, 89% 26%, 100% 36%, 100% 100%, 0 100%)',
+          }}
+        />
         
         {/* Parallax Accents: Sunset & Sky mix */}
-        <BackgroundGlow color="orange" size="600px" top="-10%" left="50%" opacity={0.15} blur="120px" />
-        <BackgroundGlow color="sky" size="400px" top="10%" left="-5%" opacity={0.1} blur="100px" />
+        <BackgroundGlow color="orange" size="600px" top="-10%" left="50%" opacity={0.16} blur="120px" />
+        <BackgroundGlow color="sky" size="380px" top="10%" left="-5%" opacity={0.09} blur="100px" />
         <BackgroundGlow color="sunlight" size="500px" top="40%" left="70%" opacity={0.08} blur="110px" />
 
         {/* Nav Bar */}
@@ -165,8 +175,8 @@ export function Hero() {
             <button
               className="text-white px-8 py-3.5 rounded-full text-sm font-semibold flex items-center gap-2 transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
               style={{
-                background: '#0f172a', // Deep navy/black from image
-                boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
+                background: 'linear-gradient(135deg, #1f120b, #0d1012)',
+                boxShadow: '0 10px 24px rgba(0,0,0,0.28)',
               }}
             >
               Book a Demo
@@ -175,7 +185,7 @@ export function Hero() {
             <button
               className="text-white/90 px-8 py-3.5 rounded-full text-sm font-semibold flex items-center gap-2 transition-all duration-300 hover:border-white/60 hover:bg-white/[0.06] hover:text-white"
               style={{
-                border: '2px solid rgba(255,255,255,0.3)',
+                border: '1.5px solid rgba(255, 237, 208, 0.28)',
                 backdropFilter: 'blur(2px)',
               }}
             >
@@ -189,10 +199,10 @@ export function Hero() {
         <div
           className="absolute bottom-8 right-6 md:bottom-10 md:right-10 z-20 w-72 md:w-80 rounded-[20px] border transition-all duration-600 pointer-events-none"
           style={{
-            background: 'rgba(255, 255, 255, 0.94)',
+            background: 'rgba(255, 244, 223, 0.93)',
             backdropFilter: 'blur(20px)',
-            borderColor: 'rgba(255,255,255,0.5)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.06)',
+            borderColor: 'rgba(248, 215, 173, 0.72)',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.14), 0 1px 3px rgba(0,0,0,0.06)',
             opacity: isFading ? 0 : 1,
             transform: isFading ? 'scale(0.95) translateY(10px)' : 'scale(1) translateY(0)',
           }}
@@ -203,7 +213,7 @@ export function Hero() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
             </span>
-            <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-[0.2em]">
+            <span className="text-[10px] font-bold text-[#b45309] uppercase tracking-[0.2em]">
               Live
             </span>
             <span className="text-[10px] text-gray-400 ml-auto tracking-wide">
@@ -221,21 +231,21 @@ export function Hero() {
                   className="rounded-xl px-3.5 py-2.5 text-[11.5px] leading-relaxed"
                   style={{
                     background: isAi
-                      ? 'rgba(236, 253, 245, 0.9)'
-                      : 'rgba(249, 250, 251, 0.8)',
+                      ? 'rgba(255, 247, 230, 0.95)'
+                      : 'rgba(250, 245, 235, 0.86)',
                     border: isAi
-                      ? '1px solid rgba(167, 243, 208, 0.6)'
-                      : '1px solid rgba(229, 231, 235, 0.6)',
-                    color: isAi ? '#065f46' : '#4b5563',
+                      ? '1px solid rgba(245, 208, 138, 0.5)'
+                      : '1px solid rgba(222, 197, 159, 0.58)',
+                    color: isAi ? '#7c2d12' : '#5b5047',
                     boxShadow: isAi
-                      ? '0 1px 4px rgba(16, 185, 129, 0.08)'
+                      ? '0 1px 4px rgba(217, 119, 6, 0.08)'
                       : 'none',
                     animation: 'bubbleIn 0.45s ease-out both',
                     animationDelay: `${i * 0.12}s`,
                   }}
                 >
                   {isAi && (
-                    <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider mr-1.5">
+                    <span className="text-[9px] font-bold text-[#b45309] uppercase tracking-wider mr-1.5">
                       AI
                     </span>
                   )}
@@ -250,8 +260,8 @@ export function Hero() {
             <button
               className="w-full text-white py-2 rounded-xl text-[11px] font-semibold tracking-wide transition-all duration-300 hover:shadow-md active:scale-[0.98] pointer-events-auto"
               style={{
-                background: 'linear-gradient(135deg, #059669, #10b981)',
-                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)',
+                background: 'linear-gradient(135deg, #b45309, #d97706)',
+                boxShadow: '0 2px 8px rgba(180, 83, 9, 0.22)',
               }}
             >
               View Full Reasoning
@@ -274,40 +284,34 @@ export function Hero() {
 
         {/* Scroll indicator */}
         <ScrollIndicator />
-
-        {/* Hero CSS Animations */}
-        <style>{`
-          @keyframes bubbleIn {
-            0% { opacity: 0; transform: translateY(12px) scale(0.96); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-          }
-          @keyframes fadeSlideUp {
-            0% { opacity: 0; transform: translateY(24px); }
-            100% { opacity: 1; transform: translateY(0); }
-          }
-        `}</style>
       </section>
 
-      {/* ===== ANIMATED ENERGY FLOW ILLUSTRATION ===== */}
-      <section className="relative py-20 px-6 overflow-hidden"
-               style={{ background: 'linear-gradient(180deg, #1b4332 0%, #0f281e 100%)' }}>
-        
-        {/* Background Accents: Transitioning from Hero bottom */}
-        <BackgroundGlow color="orange" size="450px" top="-10%" left="60%" opacity={0.1} blur="110px" />
-        <BackgroundGlow color="emerald" size="500px" top="40%" left="-10%" opacity={0.07} blur="120px" />
+      {/* ===== DESERT TRANSITION BAND ===== */}
+      <DesertTransitionBand />
 
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12 animate-[fadeSlideUp_0.8s_ease-out_0.3s_both]">
-            <span className="text-[10px] font-bold text-vpp-emerald uppercase tracking-[0.25em]">System Overview</span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-3 tracking-tight">
+      {/* ===== SYSTEM OVERVIEW (HOW ENERGY FLOWS) ===== */}
+      <section className="relative py-32 px-6 overflow-hidden bg-vpp-deep-forest">
+        {/* Blended Transition from Desert */}
+        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#7a5d3a]/20 to-transparent" />
+        
+        {/* Background Accents */}
+        <BackgroundGlow color="orange" size="450px" top="-10%" left="60%" opacity={0.1} blur="110px" />
+        <BackgroundGlow color="sunlight" size="500px" top="40%" left="-10%" opacity={0.05} blur="120px" />
+
+        <div className="max-w-6xl mx-auto">
+          <RevealSection className="text-center mb-16">
+            <span className="text-[10px] font-bold text-vpp-accent-gold uppercase tracking-[0.25em]">System Overview</span>
+            <h2 className="text-3xl md:text-5xl font-extrabold text-white mt-4 tracking-tight leading-tight">
               How Energy <span className="text-sunset-gradient">Flows</span>
             </h2>
-            <p className="text-white/40 mt-3 text-sm max-w-md mx-auto">
+            <p className="text-white/50 mt-6 text-base font-light max-w-xl mx-auto leading-relaxed">
               Solar and wind feed the AI core, which optimizes battery dispatch and protects critical buildings in real-time.
             </p>
-          </div>
+          </RevealSection>
 
-          <AnimatedEnergyFlow />
+          <div className="relative z-10">
+            <AnimatedEnergyFlow />
+          </div>
         </div>
       </section>
 
