@@ -10,17 +10,13 @@ import {
   Menu,
   X,
 } from 'lucide-react';
-import { AnimatedEnergyFlow } from './EnergyFlowIllustration';
 import { WeatherWidget } from './WeatherWidget';
 import { MediaShowcase } from './MediaShowcase';
 import { AuthorityStrip } from './AuthorityStrip';
 import {
   ScrollIndicator,
-  DesertTransitionBand,
-  RevealSection,
   HowItWorksSection,
   LiveStatsSection,
-  ComplianceBadgesSection,
   CTAFooter,
   BackgroundGlow,
 } from './LandingSections';
@@ -36,7 +32,15 @@ export function Hero() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen">
+    <div className="relative min-h-screen">
+      {/* One continuous surface — fixed page background spanning every section */}
+      <div
+        className="fixed inset-0 -z-10"
+        style={{
+          background:
+            'linear-gradient(180deg, #0f1012 0%, #0f281e 16%, #0a0d0f 42%, #0d1f1a 66%, #101712 100%)',
+        }}
+      />
       {/* ===== HERO SECTION ===== */}
       <section className="relative min-h-screen flex flex-col overflow-hidden">
         {/* Full-bleed hero image */}
@@ -215,49 +219,17 @@ export function Hero() {
         <ScrollIndicator />
       </section>
 
-      {/* ===== DESERT TRANSITION BAND ===== */}
-      <DesertTransitionBand />
-
-      {/* ===== SYSTEM OVERVIEW (HOW ENERGY FLOWS) ===== */}
-      <section className="relative py-32 px-6 overflow-hidden bg-vpp-deep-forest">
-        {/* Blended Transition from Desert */}
-        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#7a5d3a]/20 to-transparent" />
-
-        {/* Background Accents */}
-        <BackgroundGlow color="orange" size="450px" top="-10%" left="60%" opacity={0.1} blur="110px" />
-        <BackgroundGlow color="sunlight" size="500px" top="40%" left="-10%" opacity={0.05} blur="120px" />
-
-        <div className="max-w-6xl mx-auto">
-          <RevealSection className="text-center mb-16">
-            <span className="text-[10px] font-bold text-vpp-accent-gold uppercase tracking-[0.25em]">System Overview</span>
-            <h2 className="text-3xl md:text-5xl font-extrabold text-white mt-4 tracking-tight leading-tight">
-              How Energy <span className="text-sunset-gradient">Flows</span>
-            </h2>
-            <p className="text-white/50 mt-6 text-base font-light max-w-xl mx-auto leading-relaxed">
-              Solar and wind feed the AI core, which optimizes battery dispatch and protects critical buildings in real-time.
-            </p>
-          </RevealSection>
-
-          <div className="relative z-10">
-            <AnimatedEnergyFlow />
-          </div>
-        </div>
-      </section>
+      {/* ===== IN THE FIELD (PROBLEM IN CONTEXT) ===== */}
+      <MediaShowcase />
 
       {/* ===== HOW IT WORKS ===== */}
       <HowItWorksSection />
-
-      {/* ===== IN THE FIELD (PROBLEM IN CONTEXT) ===== */}
-      <MediaShowcase />
 
       {/* ===== LIVE STATS ===== */}
       <LiveStatsSection />
 
       {/* ===== AUTHORITY / TRUST STRIP ===== */}
       <AuthorityStrip />
-
-      {/* ===== COMPLIANCE BADGES ===== */}
-      <ComplianceBadgesSection />
 
       {/* ===== CTA FOOTER ===== */}
       <CTAFooter />

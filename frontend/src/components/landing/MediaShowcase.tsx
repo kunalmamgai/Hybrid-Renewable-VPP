@@ -43,10 +43,7 @@ export function MediaShowcase() {
   };
 
   return (
-    <section className="relative py-24 px-6 overflow-hidden">
-      <div className="absolute inset-0 bg-vpp-deep-night" />
-      <div className="absolute inset-0 bg-gradient-to-b from-vpp-deep-forest via-vpp-deep-night to-vpp-deep-night" />
-
+    <section className="relative py-20 px-6 overflow-hidden">
       <BackgroundGlow color="orange" size="550px" top="10%" left="60%" opacity={0.08} blur="150px" />
       <BackgroundGlow color="emerald" size="500px" top="50%" left="-10%" opacity={0.06} blur="160px" />
 
@@ -117,35 +114,40 @@ export function MediaShowcase() {
             </div>
           </RevealSection>
 
-          {/* ─── Photo cards ─── */}
-          <div className="lg:col-span-2 grid gap-6">
-            {mediaCards.map((card, i) => (
-              <RevealSection key={card.label} delay={0.15 * (i + 1)}>
-                <div className="glass-media-card group relative overflow-hidden rounded-2xl h-36 md:h-40">
-                  <img
-                    src={card.src}
-                    alt={card.alt}
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  {/* Forest tint overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0b1410]/90 via-[#0b1410]/20 to-transparent" />
+          {/* ─── Photo cards — one seamless panel, hairline dividers ─── */}
+          <div className="lg:col-span-2">
+            <RevealSection delay={0.15}>
+              <div className="vpp-sheet overflow-hidden rounded-2xl">
+                {mediaCards.map((card, i) => (
+                  <div
+                    key={card.label}
+                    className={`group relative overflow-hidden h-32 md:h-[8.4rem] ${i > 0 ? 'border-t border-white/10' : ''}`}
+                  >
+                    <img
+                      src={card.src}
+                      alt={card.alt}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    {/* Forest tint overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0b1410]/90 via-[#0b1410]/20 to-transparent" />
 
-                  <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {card.icon}
-                      <span className="text-sm font-bold text-white">{card.label}</span>
+                    <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {card.icon}
+                        <span className="text-sm font-bold text-white">{card.label}</span>
+                      </div>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold text-amber-200 bg-vpp-accent-gold/15 border border-vpp-accent-gold/30">
+                        {card.stat}
+                      </span>
                     </div>
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold text-amber-200 bg-vpp-accent-gold/15 border border-vpp-accent-gold/30">
-                      {card.stat}
+                    <span className="absolute top-3 right-4 text-[10px] text-white/45 font-light tracking-wide">
+                      {card.caption}
                     </span>
                   </div>
-                  <span className="absolute top-3 right-4 text-[10px] text-white/45 font-light tracking-wide">
-                    {card.caption}
-                  </span>
-                </div>
-              </RevealSection>
-            ))}
+                ))}
+              </div>
+            </RevealSection>
           </div>
         </div>
       </div>

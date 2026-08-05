@@ -89,11 +89,11 @@ export function WeatherWidget() {
     <div
       className="relative z-30 w-56 md:w-64 rounded-2xl border overflow-hidden transition-all duration-500"
       style={{
-        background: 'rgba(15, 26, 21, 0.55)',
+        background: 'rgba(15, 26, 21, 0.45)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+        borderColor: 'rgba(255, 255, 255, 0.06)',
+        boxShadow: '0 24px 64px rgba(0, 0, 0, 0.25)',
       }}
     >
       {/* Header */}

@@ -40,13 +40,10 @@ const stats = [
 
 export function AuthorityStrip() {
   return (
-    <section className="relative py-24 px-6 overflow-hidden bg-vpp-deep-night">
-      {/* Background Accents */}
-      <div className="absolute inset-0 bg-gradient-to-b from-vpp-deep-night via-vpp-deep-teal to-vpp-deep-night opacity-50" />
-      
+    <section className="relative py-20 px-6 overflow-hidden">
       <div className="relative max-w-6xl mx-auto">
         {/* Header */}
-        <RevealSection className="text-center mb-16">
+        <RevealSection className="text-center mb-10">
           <span className="text-[10px] font-bold text-vpp-accent-gold uppercase tracking-[0.25em]">
             Trusted Technology
           </span>
@@ -55,42 +52,38 @@ export function AuthorityStrip() {
           </h2>
         </RevealSection>
 
-        {/* Authority badges — horizontal strip */}
-        <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
-          {authorityItems.map((item, i) => (
-            <RevealSection key={i} delay={i * 0.08}>
-              <div className="vpp-glass px-6 py-4 flex items-center gap-4 group">
-                <span className="text-white/30 group-hover:text-vpp-accent-gold transition-colors duration-300">
-                  {item.icon}
-                </span>
-                <div>
-                  <span className="text-xs font-bold text-white block group-hover:text-vpp-accent-gold transition-colors duration-300">{item.label}</span>
-                  <span className="text-[10px] text-white/30 font-light">{item.sub}</span>
-                </div>
+        {/* Trust marquee — inline, no boxes */}
+        <RevealSection>
+          <div className="flex flex-wrap items-center justify-center gap-x-9 gap-y-5">
+            {authorityItems.map((item, i) => (
+              <div key={i} className="flex items-center gap-2.5 text-white/60 hover:text-amber-200 transition-colors duration-300">
+                <span className="text-vpp-accent-gold/80">{item.icon}</span>
+                <span className="text-xs font-semibold text-white/85 whitespace-nowrap">{item.label}</span>
+                <span className="hidden xl:block text-[10px] text-white/35 font-light">{item.sub}</span>
               </div>
-            </RevealSection>
-          ))}
-        </div>
+            ))}
+          </div>
+        </RevealSection>
 
-        {/* Stats strip */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-          {stats.map((stat, i) => (
-            <RevealSection key={i} delay={0.4 + i * 0.08}>
-              <div className="vpp-glass p-6 text-center group">
+        {/* Stats — one connected strip */}
+        <RevealSection delay={0.15} className="mt-14">
+          <div className="vpp-sheet grid grid-cols-2 md:grid-cols-6 gap-px overflow-hidden">
+            {stats.map((stat) => (
+              <div key={stat.label} className="bg-[#0f1613]/80 p-6 text-center group">
                 <div className="flex items-center justify-center mb-3 text-white/20 group-hover:text-vpp-accent-gold transition-colors duration-300">
                   {stat.icon}
                 </div>
-                <div className="text-2xl font-extrabold text-white tracking-tight">{stat.value}</div>
+                <div className="text-xl md:text-2xl font-extrabold text-white tracking-tight">{stat.value}</div>
                 <div className="text-[10px] text-white/30 mt-2 uppercase tracking-widest font-bold">
                   {stat.label}
                 </div>
               </div>
-            </RevealSection>
-          ))}
-        </div>
+            ))}
+          </div>
+        </RevealSection>
 
         {/* Bottom quote / testimonial */}
-        <RevealSection delay={1.2} className="mt-20 text-center">
+        <RevealSection delay={0.3} className="mt-16 text-center">
           <div className="max-w-3xl mx-auto relative">
             <div className="text-6xl text-vpp-accent-gold/10 absolute -top-10 -left-4 font-serif italic">"</div>
             <p className="text-white/60 text-lg md:text-xl italic leading-relaxed font-light">
