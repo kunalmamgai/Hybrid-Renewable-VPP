@@ -1,6 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Play, Zap } from 'lucide-react';
+import {
+  ChevronRight,
+  Play,
+  Zap,
+  LayoutDashboard,
+  Activity,
+  Sparkles,
+  Menu,
+  X,
+} from 'lucide-react';
 import { AnimatedEnergyFlow } from './EnergyFlowIllustration';
 import { WeatherWidget } from './WeatherWidget';
 import { AuthorityStrip } from './AuthorityStrip';
@@ -15,65 +24,15 @@ import {
   BackgroundGlow,
 } from './LandingSections';
 
-// --- Live feed message sequence ---
-const FEED_MESSAGES = [
-  { type: 'system', text: 'Cloudy conditions forecast for 3 PM' },
-  { type: 'system', text: 'Wind speed rising to 7 m/s' },
-  { type: 'ai', text: 'Pre-charging battery to 92% now — confidence 96%' },
-  { type: 'system', text: 'Solar generation dropping, battery discharging' },
-  { type: 'ai', text: 'Grid import minimized — 84% renewable self-consumption' },
-  { type: 'system', text: 'Demand peak expected at 6:15 PM' },
-  { type: 'ai', text: 'Reserve mode activated for critical loads' },
-] as const;
-
-// Display window: how many messages visible at once (max 3)
-const MAX_VISIBLE = 3;
-
-type MessageType = (typeof FEED_MESSAGES)[number];
+// Landing nav links — map straight to real dashboard routes
+const navLinks = [
+  { to: '/dashboard', label: 'Platform', icon: LayoutDashboard },
+  { to: '/energy-flow', label: 'Live Demo', icon: Activity },
+  { to: '/decisions', label: 'Impact', icon: Sparkles },
+];
 
 export function Hero() {
-  const [messages, setMessages] = useState<MessageType[]>([]);
-  const [queueIndex, setQueueIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-
-  // Add a new message from the queue with staggered timing
-  useEffect(() => {
-    if (isPaused) return;
-
-    const delay = messages.length === 0 ? 800 : 1400;
-    const timer = setTimeout(() => {
-      const nextIdx = queueIndex % FEED_MESSAGES.length;
-      setMessages((prev) => {
-        const next = [...prev, FEED_MESSAGES[nextIdx]];
-        return next;
-      });
-      setQueueIndex((prev) => prev + 1);
-    }, delay);
-
-    return () => clearTimeout(timer);
-  }, [queueIndex, isPaused, messages.length]);
-
-  // When we have enough messages, pause then cycle
-  useEffect(() => {
-    if (messages.length >= FEED_MESSAGES.length) {
-      const pauseTimer = setTimeout(() => {
-        setIsPaused(true);
-        const fadeTimer = setTimeout(() => {
-          setMessages([]);
-          setQueueIndex(0);
-          setIsPaused(false);
-        }, 600);
-        return () => clearTimeout(fadeTimer);
-      }, 5000);
-      return () => clearTimeout(pauseTimer);
-    }
-  }, [messages.length]);
-
-  // Keep only the last MAX_VISIBLE messages for the card
-  const visibleMessages = messages.slice(-MAX_VISIBLE);
-
-  // Track whether we should show fade-out class
-  const isFading = messages.length >= FEED_MESSAGES.length && isPaused;
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen">
@@ -95,48 +54,99 @@ export function Hero() {
             clipPath: 'polygon(0 38%, 12% 28%, 24% 40%, 37% 22%, 50% 36%, 63% 18%, 78% 34%, 89% 26%, 100% 36%, 100% 100%, 0 100%)',
           }}
         />
-        
+
         {/* Parallax Accents: Sunset & Sky mix */}
         <BackgroundGlow color="orange" size="600px" top="-10%" left="50%" opacity={0.16} blur="120px" />
         <BackgroundGlow color="sky" size="380px" top="10%" left="-5%" opacity={0.09} blur="100px" />
         <BackgroundGlow color="sunlight" size="500px" top="40%" left="70%" opacity={0.08} blur="110px" />
 
-        {/* Nav Bar */}
-        <nav className="relative z-20 flex items-center justify-between px-6 md:px-10 lg:px-14 py-5 animate-[fadeSlideUp_0.6s_ease-out_both]">
-          {/* Logo */}
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-md"
-                 style={{ background: 'rgba(5, 150, 105, 0.85)' }}>
-              <Zap className="text-white" size={17} />
+        {/* Nav Bar — floating forest-glass pill */}
+        <nav className="relative z-30 mt-4 px-4 sm:px-6">
+          <div className="relative max-w-7xl mx-auto">
+            <div className="glass-nav-hero flex items-center justify-between gap-3 px-4 sm:px-5 py-3 animate-[fadeSlideUp_0.6s_ease-out_both]">
+              {/* Logo */}
+              <Link to="/dashboard" className="flex items-center gap-2.5 shrink-0">
+                <div
+                  className="w-9 h-9 rounded-full flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, #d97706, #f59e0b)',
+                    boxShadow: '0 0 18px rgba(217, 119, 6, 0.35)',
+                  }}
+                >
+                  <Zap className="text-white" size={17} />
+                </div>
+                <span className="font-bold text-white text-lg tracking-tight drop-shadow-md whitespace-nowrap">
+                  Hybrid <span className="text-sunset-gradient">VPP</span>
+                </span>
+              </Link>
+
+              {/* Nav links */}
+              <div className="hidden lg:flex items-center gap-1">
+                {navLinks.map(({ to, label, icon: Icon }) => (
+                  <Link
+                    key={to}
+                    to={to}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-[0.1em] text-white/85 hover:text-amber-200 hover:bg-white/10 transition-all duration-300"
+                  >
+                    <Icon size={15} className="text-vpp-accent-gold/90" />
+                    {label}
+                  </Link>
+                ))}
+              </div>
+
+              {/* Right side */}
+              <div className="flex items-center gap-2.5 shrink-0">
+                <button
+                  className="hidden lg:inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
+                  style={{
+                    background: 'linear-gradient(135deg, #d97706, #f59e0b)',
+                    boxShadow: '0 6px 20px rgba(217, 119, 6, 0.35)',
+                  }}
+                >
+                  Book a Demo
+                  <ChevronRight size={16} />
+                </button>
+
+                {/* Mobile menu toggle */}
+                <button
+                  onClick={() => setMenuOpen((o) => !o)}
+                  aria-label="Toggle navigation menu"
+                  aria-expanded={menuOpen}
+                  className="lg:hidden p-2 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200"
+                >
+                  {menuOpen ? <X size={20} /> : <Menu size={20} />}
+                </button>
+              </div>
             </div>
-            <span className="font-bold text-white text-lg tracking-tight drop-shadow-md">
-              Hybrid VPP
-            </span>
-          </div>
 
-          {/* Nav links */}
-          <div className="hidden md:flex items-center gap-8 text-[11px] text-white/75 font-semibold uppercase tracking-[0.18em]">
-            <Link to="/dashboard" className="hover:text-white transition-colors duration-300">Platform</Link>
-            <Link to="/energy-flow" className="hover:text-white transition-colors duration-300">Live Demo</Link>
-            <Link to="/decisions" className="hover:text-white transition-colors duration-300">Impact</Link>
-            <a href="#company" className="hover:text-white transition-colors duration-300">Company</a>
+            {/* Mobile dropdown */}
+            {menuOpen && (
+              <div className="glass-nav-panel absolute left-0 right-0 top-full z-40 mt-2 p-2">
+                {navLinks.map(({ to, label, icon: Icon }) => (
+                  <Link
+                    key={to}
+                    to={to}
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold uppercase tracking-[0.1em] text-white/85 hover:text-amber-200 hover:bg-white/10 transition-all duration-200"
+                  >
+                    <Icon size={16} className="text-vpp-accent-gold/90" />
+                    {label}
+                  </Link>
+                ))}
+                <button
+                  onClick={() => setMenuOpen(false)}
+                  className="mt-2 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-white transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                  style={{
+                    background: 'linear-gradient(135deg, #d97706, #f59e0b)',
+                    boxShadow: '0 6px 20px rgba(217, 119, 6, 0.35)',
+                  }}
+                >
+                  Book a Demo
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            )}
           </div>
-
-          {/* Weather Widget — top-right */}
-          <div className="hidden lg:block">
-            <WeatherWidget />
-          </div>
-
-          {/* Book a Demo pill */}
-          <button
-            className="text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] lg:hidden"
-            style={{
-              background: 'rgba(17, 24, 39, 0.88)',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
-            }}
-          >
-            Book a Demo
-          </button>
         </nav>
 
         {/* Main Hero Content */}
@@ -195,91 +205,9 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Floating Live Feed Card */}
-        <div
-          className="absolute bottom-8 right-6 md:bottom-10 md:right-10 z-20 w-72 md:w-80 rounded-[20px] border transition-all duration-600 pointer-events-none"
-          style={{
-            background: 'rgba(255, 244, 223, 0.93)',
-            backdropFilter: 'blur(20px)',
-            borderColor: 'rgba(248, 215, 173, 0.72)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.14), 0 1px 3px rgba(0,0,0,0.06)',
-            opacity: isFading ? 0 : 1,
-            transform: isFading ? 'scale(0.95) translateY(10px)' : 'scale(1) translateY(0)',
-          }}
-        >
-          {/* Live indicator */}
-          <div className="flex items-center gap-2 px-4 pt-4 pb-1">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
-            </span>
-            <span className="text-[10px] font-bold text-[#b45309] uppercase tracking-[0.2em]">
-              Live
-            </span>
-            <span className="text-[10px] text-gray-400 ml-auto tracking-wide">
-              VPP Dispatch
-            </span>
-          </div>
-
-          {/* Reasoning bubbles */}
-          <div className="px-4 pb-3 space-y-2 min-h-[105px]">
-            {visibleMessages.map((msg, i) => {
-              const isAi = msg.type === 'ai';
-              return (
-                <div
-                  key={`${queueIndex}-${i}`}
-                  className="rounded-xl px-3.5 py-2.5 text-[11.5px] leading-relaxed"
-                  style={{
-                    background: isAi
-                      ? 'rgba(255, 247, 230, 0.95)'
-                      : 'rgba(250, 245, 235, 0.86)',
-                    border: isAi
-                      ? '1px solid rgba(245, 208, 138, 0.5)'
-                      : '1px solid rgba(222, 197, 159, 0.58)',
-                    color: isAi ? '#7c2d12' : '#5b5047',
-                    boxShadow: isAi
-                      ? '0 1px 4px rgba(217, 119, 6, 0.08)'
-                      : 'none',
-                    animation: 'bubbleIn 0.45s ease-out both',
-                    animationDelay: `${i * 0.12}s`,
-                  }}
-                >
-                  {isAi && (
-                    <span className="text-[9px] font-bold text-[#b45309] uppercase tracking-wider mr-1.5">
-                      AI
-                    </span>
-                  )}
-                  {msg.text}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Card footer */}
-          <div className="px-4 pb-4">
-            <button
-              className="w-full text-white py-2 rounded-xl text-[11px] font-semibold tracking-wide transition-all duration-300 hover:shadow-md active:scale-[0.98] pointer-events-auto"
-              style={{
-                background: 'linear-gradient(135deg, #b45309, #d97706)',
-                boxShadow: '0 2px 8px rgba(180, 83, 9, 0.22)',
-              }}
-            >
-              View Full Reasoning
-            </button>
-          </div>
-        </div>
-
-        {/* Floating Logo Badge */}
-        <div
-          className="absolute bottom-8 right-[21rem] md:right-[23rem] z-20 w-11 h-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg pointer-events-auto"
-          style={{
-            background: 'rgba(255, 255, 255, 0.88)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.6)',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-          }}
-        >
-          <Zap className="text-emerald-600" size={18} />
+        {/* Live Weather — bottom-right */}
+        <div className="absolute bottom-8 right-6 md:bottom-10 md:right-10 z-20">
+          <WeatherWidget />
         </div>
 
         {/* Scroll indicator */}
@@ -293,7 +221,7 @@ export function Hero() {
       <section className="relative py-32 px-6 overflow-hidden bg-vpp-deep-forest">
         {/* Blended Transition from Desert */}
         <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#7a5d3a]/20 to-transparent" />
-        
+
         {/* Background Accents */}
         <BackgroundGlow color="orange" size="450px" top="-10%" left="60%" opacity={0.1} blur="110px" />
         <BackgroundGlow color="sunlight" size="500px" top="40%" left="-10%" opacity={0.05} blur="120px" />
