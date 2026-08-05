@@ -125,6 +125,27 @@ body {
   }
 }
 
+/* ─── Media Cards (landing media showcase) ─── */
+.glass-media-card {
+  background: rgba(11, 20, 16, 0.55);
+  border: 1px solid rgba(217, 119, 6, 0.22);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.glass-video-frame {
+  background: rgba(11, 20, 16, 0.6);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45), 0 0 40px rgba(217, 119, 6, 0.08);
+}
+
+.play-badge {
+  background: rgba(10, 17, 14, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(217, 119, 6, 0.4);
+  box-shadow: 0 0 24px rgba(217, 119, 6, 0.35);
+}
+
 /* ─── Glass Input ─── */
 .glass-input {
   background: rgba(255, 255, 255, 0.6);

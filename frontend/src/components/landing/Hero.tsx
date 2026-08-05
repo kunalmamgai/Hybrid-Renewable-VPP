@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { AnimatedEnergyFlow } from './EnergyFlowIllustration';
 import { WeatherWidget } from './WeatherWidget';
+import { MediaShowcase } from './MediaShowcase';
 import { AuthorityStrip } from './AuthorityStrip';
 import {
   ScrollIndicator,
@@ -245,6 +246,9 @@ export function Hero() {
 
       {/* ===== HOW IT WORKS ===== */}
       <HowItWorksSection />
+
+      {/* ===== IN THE FIELD (PROBLEM IN CONTEXT) ===== */}
+      <MediaShowcase />
 
       {/* ===== LIVE STATS ===== */}
       <LiveStatsSection />
