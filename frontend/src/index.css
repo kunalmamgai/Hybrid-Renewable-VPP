@@ -72,12 +72,35 @@ body {
   border-radius: 1.25rem;
 }
 
-/* ─── Glass Nav ─── */
+/* ─── Glass Nav (forest-green glass + gold hairline, matching sunset-to-forest theme) ─── */
 .glass-nav {
-  background: rgba(18, 14, 10, 0.62);
+  background: rgba(11, 20, 16, 0.68);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(217, 119, 6, 0.18);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile dropdown panel */
+.glass-nav-panel {
+  background: rgba(10, 17, 14, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+  border-radius: 1rem;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  animation: navPanelIn 0.2s ease-out both;
+}
+
+@keyframes navPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ─── Glass Input ─── */

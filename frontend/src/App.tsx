@@ -67,19 +67,24 @@ function AppRoutes() {
   const config = routeConfigs[location.pathname] || { needsNav: false };
 
   return (
-    <AnimatedRoute>
-      {config.needsNav ? (
-        <>
-          <NavBar />
-          {location.pathname === '/dashboard' && <MissionControl />}
-          {location.pathname === '/energy-flow' && <LiveEnergyFlow />}
-          {location.pathname === '/decisions' && <AIDecisionCenter />}
-          {location.pathname === '/settings' && <FacilitiesSettings />}
-        </>
-      ) : (
-        <Hero />
-      )}
-    </AnimatedRoute>
+    <>
+      {/* NavBar stays outside AnimatedRoute so sticky positioning works
+          (a transformed ancestor breaks position: sticky) and it does not
+          re-animate on every route change. */}
+      {config.needsNav && <NavBar />}
+      <AnimatedRoute>
+        {config.needsNav ? (
+          <>
+            {location.pathname === '/dashboard' && <MissionControl />}
+            {location.pathname === '/energy-flow' && <LiveEnergyFlow />}
+            {location.pathname === '/decisions' && <AIDecisionCenter />}
+            {location.pathname === '/settings' && <FacilitiesSettings />}
+          </>
+        ) : (
+          <Hero />
+        )}
+      </AnimatedRoute>
+    </>
   );
 }
 
