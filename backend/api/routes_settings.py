@@ -39,7 +39,6 @@ class BuildingTierUpdate(BaseModel):
 
 
 class VnmSharingRuleUpdate(BaseModel):
-    building_id: str
     sharing_ratio: float
 
 
@@ -82,8 +81,11 @@ async def update_alert_threshold(
     return {
         "id": threshold.id,
         "name": threshold.name,
+        "description": threshold.description,
         "threshold_value": threshold.threshold_value,
+        "unit": threshold.unit,
         "active": threshold.active,
+        "severity": threshold.severity,
     }
 
 

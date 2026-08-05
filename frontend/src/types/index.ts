@@ -236,5 +236,5 @@ export interface ScenariosResponse {
 export interface ForceCycleResponse {
   cycle_number: number;
   timestamp: string;
-  decision?: Decision;
+  decision?: FullCycleResult;
 }

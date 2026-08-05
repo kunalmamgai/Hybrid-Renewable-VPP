@@ -35,7 +35,7 @@ const scenarioBadges: Record<string, { icon: React.ReactNode; label: string; act
 };
 
 export function MissionControl() {
-  const { buildings, latestDecisions, latestCycle, connected, cycleCount, reliability } = useVppWebSocket();
+  const { buildings, latestDecisions, connected, cycleCount, reliability } = useVppWebSocket();
   const { stats: decisionStats } = useDecisionStats();
   const { stats: exportStats } = useExportStats();
 

@@ -3,13 +3,7 @@
  * Connects to the backend's /ws endpoint and dispatches
  * messages to registered callbacks.
  */
-import type {
-  WebSocketMessage,
-  BuildingTwin,
-  Decision,
-  FullCycleResult,
-  ReliabilityStatus,
-} from '../types';
+import type { WebSocketMessage } from '../types';
 
 export type MessageHandler = (msg: WebSocketMessage) => void;
 
@@ -34,7 +28,6 @@ class VppWebSocketClient {
 
     this.ws.onopen = () => {
       this.reconnectAttempts = 0;
-      this.dispatch({ type: 'health', adapter: { status: 'connected' } } as WebSocketMessage);
     };
 
     this.ws.onmessage = (event) => {

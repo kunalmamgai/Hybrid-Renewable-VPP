@@ -77,6 +77,32 @@ class SchedulerService:
         """Graceful shutdown."""
         await self.stop()
 
+    async def _persist_decision_logs(self, decisions: list[dict]) -> None:
+        """Helper to log decisions to the database."""
+        if not self.db_session_factory:
+            return
+        try:
+            async with self.db_session_factory() as session:
+                for d in decisions:
+                    log = DecisionLog(
+                        decision_id=d["decision_id"],
+                        timestamp=datetime.fromisoformat(d["timestamp"]),
+                        decision_type=d["decision_type"],
+                        action=d["action"],
+                        confidence_pct=d["confidence_pct"],
+                        reason=d["reason"],
+                        alternative_considered=d["alternative_considered"],
+                        expected_savings_inr=d["expected_savings_inr"],
+                        expected_carbon_reduction_kg=d["expected_carbon_reduction_kg"],
+                        building_id=d.get("building_id"),
+                        battery_soc_after_pct=d["battery_soc_after_pct"],
+                        context_json=json.dumps(d.get("context", {})),
+                    )
+                    session.add(log)
+                await session.commit()
+        except Exception as e:
+            logger.warning(f"Decision log persist failed: {e}")
+
     async def _run_loop(self) -> None:
         """Main 5-minute loop: read → update twin → [Phase 1: decide] → broadcast."""
         await asyncio.sleep(1)  # Brief startup delay
@@ -103,28 +129,7 @@ class SchedulerService:
 
                     # Persist decision logs to DB
                     if decision and decision.get("decisions"):
-                        if self.db_session_factory:
-                            try:
-                                async with self.db_session_factory() as session:
-                                    for d in decision["decisions"]:
-                                        log = DecisionLog(
-                                            decision_id=d["decision_id"],
-                                            timestamp=datetime.fromisoformat(d["timestamp"]),
-                                            decision_type=d["decision_type"],
-                                            action=d["action"],
-                                            confidence_pct=d["confidence_pct"],
-                                            reason=d["reason"],
-                                            alternative_considered=d["alternative_considered"],
-                                            expected_savings_inr=d["expected_savings_inr"],
-                                            expected_carbon_reduction_kg=d["expected_carbon_reduction_kg"],
-                                            building_id=d.get("building_id"),
-                                            battery_soc_after_pct=d["battery_soc_after_pct"],
-                                            context_json=json.dumps(d.get("context", {})),
-                                        )
-                                        session.add(log)
-                                    await session.commit()
-                            except Exception as e:
-                                logger.warning(f"Decision log persist failed: {e}")
+                        await self._persist_decision_logs(decision["decisions"])
 
                     if decision:
                         await self.manager.send_to_all({
@@ -189,28 +194,7 @@ class SchedulerService:
             
             # Persist decision logs to DB
             if decision and decision.get("decisions"):
-                if self.db_session_factory:
-                    try:
-                        async with self.db_session_factory() as session:
-                            for d in decision["decisions"]:
-                                log = DecisionLog(
-                                    decision_id=d["decision_id"],
-                                    timestamp=datetime.fromisoformat(d["timestamp"]),
-                                    decision_type=d["decision_type"],
-                                    action=d["action"],
-                                    confidence_pct=d["confidence_pct"],
-                                    reason=d["reason"],
-                                    alternative_considered=d["alternative_considered"],
-                                    expected_savings_inr=d["expected_savings_inr"],
-                                    expected_carbon_reduction_kg=d["expected_carbon_reduction_kg"],
-                                    building_id=d.get("building_id"),
-                                    battery_soc_after_pct=d["battery_soc_after_pct"],
-                                    context_json=json.dumps(d.get("context", {})),
-                                )
-                                session.add(log)
-                            await session.commit()
-                    except Exception as e:
-                        logger.warning(f"Decision log persist failed in force_cycle: {e}")
+                await self._persist_decision_logs(decision["decisions"])
 
             if decision:
                 await self.manager.send_to_all({

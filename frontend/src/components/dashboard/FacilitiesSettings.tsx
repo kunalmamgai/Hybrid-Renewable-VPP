@@ -415,16 +415,16 @@ function TiersTab({
                   </td>
                   <td className="py-3 px-2">
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider ${
-                      tier.current_tier === 'critical'
+                      tier.tier === 'critical'
                         ? 'bg-vpp-blue/15 text-vpp-blue'
                         : 'bg-vpp-navy-muted/10 text-vpp-navy-muted'
                     }`}>
-                      {tier.current_tier === 'critical' ? 'CRITICAL' : 'NON-CRITICAL'}
+                      {tier.tier === 'critical' ? 'CRITICAL' : 'NON-CRITICAL'}
                     </span>
                   </td>
                   <td className="py-3 px-2">
                     <select
-                      defaultValue={tier.current_tier}
+                      defaultValue={tier.tier}
                       id={`tier-select-${tier.building_id}`}
                       className="glass-input px-3 py-1.5 rounded-xl text-xs text-vpp-navy focus:outline-none"
                     >
@@ -436,7 +436,7 @@ function TiersTab({
                     <button
                       onClick={() => {
                         const el = document.getElementById(`tier-select-${tier.building_id}`) as HTMLSelectElement;
-                        onSave(tier.building_id, el?.value || tier.current_tier);
+                        onSave(tier.building_id, el?.value || tier.tier);
                       }}
                       disabled={isSaving}
                       className="px-3 py-1.5 bg-vpp-emerald text-white rounded-xl text-xs font-semibold hover:bg-vpp-emerald-light disabled:opacity-50 flex items-center gap-1 ml-auto transition-all"

@@ -4,8 +4,6 @@
  * and key differentiators in a horizontal scrolling strip.
  * Standardized to VPP Glass system.
  */
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
 import {
   Shield,
   Globe,

@@ -70,19 +70,8 @@ export function useVppWebSocket() {
 
     ws.connect();
 
-    const unsubDecision = ws.subscribe('decision', (msg: WebSocketMessage) => {
-      const decision = msg.data as Decision;
-      if (decision) {
-        setState(prev => ({
-          ...prev,
-          latestDecisions: [decision, ...prev.latestDecisions.slice(0, 9)],
-        }));
-      }
-    });
-
     return () => {
       unsubAll();
-      unsubDecision();
       ws.disconnect();
     };
   }, []);
