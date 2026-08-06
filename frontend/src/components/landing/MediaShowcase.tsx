@@ -10,7 +10,7 @@ import { RevealSection, BackgroundGlow } from './LandingSections';
 
 const mediaCards = [
   {
-    src: '/assets/solar-sunset.jpg',
+    src: '/assets/solar-sunset.webp',
     alt: 'Solar panels at golden hour',
     icon: <Sun size={14} className="text-amber-300" />,
     label: 'Solar PV',
@@ -18,7 +18,7 @@ const mediaCards = [
     caption: 'Peak yield at golden hour',
   },
   {
-    src: '/assets/wind-sunset.jpg',
+    src: '/assets/wind-sunset.webp',
     alt: 'Wind turbines at dusk',
     icon: <Wind size={14} className="text-teal-300" />,
     label: 'Wind',
@@ -26,7 +26,7 @@ const mediaCards = [
     caption: 'Night gusts fill the gap',
   },
   {
-    src: '/assets/battery-storage.jpg',
+    src: '/assets/battery-storage.webp',
     alt: 'Battery storage racks',
     icon: <Battery size={14} className="text-emerald-300" />,
     label: 'Storage',
@@ -68,9 +68,9 @@ export function MediaShowcase() {
             <div className="glass-video-frame relative overflow-hidden rounded-2xl aspect-video group">
               <video
                 ref={videoRef}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover brightness-[1.04] saturate-[1.12]"
                 src="/assets/field-video.mp4"
-                poster="/assets/solar-sunset.jpg"
+                poster="/assets/solar-sunset.webp"
                 autoPlay
                 muted
                 loop
@@ -79,7 +79,7 @@ export function MediaShowcase() {
               />
 
               {/* Forest tint overlay — keeps footage on-theme */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0b1410]/85 via-transparent to-[#0b1410]/20 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0b1410]/60 via-transparent to-[#0b1410]/10 pointer-events-none" />
 
               {/* Live footage chip */}
               <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0b1410]/70 backdrop-blur-md border border-white/10">
@@ -127,10 +127,10 @@ export function MediaShowcase() {
                       src={card.src}
                       alt={card.alt}
                       loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="absolute inset-0 w-full h-full object-cover brightness-[1.05] saturate-[1.12] transition-transform duration-700 group-hover:scale-105"
                     />
                     {/* Forest tint overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0b1410]/90 via-[#0b1410]/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0b1410]/60 via-[#0b1410]/15 to-transparent" />
 
                     <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
                       <div className="flex items-center gap-2">

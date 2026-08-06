@@ -25,11 +25,12 @@ import { DecisionCard } from '../common/DecisionCard';
 import { useVppData } from '../../context/VppDataContext';
 import { useDecisionStats, useExportStats } from '../../hooks/useDigitalTwin';
 import { getScenarios, switchScenario, forceCycle } from '../../services/apiClient';
+import { inrCompact, inrFull, grouped, carbonShort, carbonFull } from '../../lib/format';
 import type { BuildingTwin } from '../../types';
 
 const scenarioBadges: Record<string, { icon: React.ReactNode; label: string; activeColor: string }> = {
   mvp_day: { icon: <Sun size={14} />, label: 'Normal Day', activeColor: 'bg-vpp-amber/20 text-vpp-amber border-vpp-amber/30' },
-  cloudy_still_afternoon: { icon: <Cloud size={14} />, label: 'Cloudy Afternoon', activeColor: 'bg-vpp-navy-muted/20 text-vpp-navy-muted border-vpp-navy-muted/30' },
+  cloudy_still_afternoon: { icon: <Cloud size={14} />, label: 'Cloudy Afternoon', activeColor: 'bg-white/10 text-white/70 border-white/20' },
   wind_fills_solar_gap: { icon: <Wind size={14} />, label: 'Wind Fills Gap', activeColor: 'bg-vpp-teal/20 text-vpp-teal border-vpp-teal/30' },
   shortfall_protects_hostel: { icon: <Shield size={14} />, label: 'Shortfall — Hostel Protected', activeColor: 'bg-vpp-blue/20 text-vpp-blue border-vpp-blue/30' },
 };
@@ -215,7 +216,7 @@ export function MissionControl() {
               value={campusTotals.demand * 12}
               label="DEMAND"
               unit="kW"
-              icon={<Zap className="text-vpp-navy-muted" size={20} />}
+              icon={<Zap className="text-vpp-amber" size={20} />}
             />
             <EnergyMeter
               type="grid_import"
@@ -245,43 +246,69 @@ export function MissionControl() {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="glass-card rounded-2xl p-5">
-            <div className="flex items-center gap-2 text-vpp-emerald">
-              <IndianRupee size={18} />
-              <span className="font-bold text-sm">Cost Savings</span>
+          <div
+            className="stat-card p-5"
+            style={{ ['--glow' as string]: 'rgba(16, 185, 129, 0.2)', ['--chip' as string]: 'rgba(16, 185, 129, 0.14)', ['--chip-border' as string]: 'rgba(16, 185, 129, 0.32)' } as React.CSSProperties}
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="stat-icon-chip text-vpp-emerald">
+                <IndianRupee size={18} />
+              </span>
+              <span className="font-bold text-sm text-white/90">Cost Savings</span>
             </div>
-            <p className="text-2xl font-bold text-vpp-navy mt-2">
-              INR{(decisionStats?.total_savings_inr || 0).toFixed(1)}
+            <p className="text-3xl font-bold text-vpp-cream font-display mt-3 tabular-nums tracking-tight">
+              {inrCompact(decisionStats?.total_savings_inr || 0)}
             </p>
-            <p className="text-[10px] text-vpp-navy-muted mt-1.5 uppercase tracking-wider">Lifetime savings logged</p>
-          </div>
-          <div className="glass-card rounded-2xl p-5">
-            <div className="flex items-center gap-2 text-vpp-teal">
-              <Leaf size={18} />
-              <span className="font-bold text-sm">Carbon Saved</span>
-            </div>
-            <p className="text-2xl font-bold text-vpp-navy mt-2">
-              {(decisionStats?.total_carbon_reduction_kg || 0).toFixed(1)} kg CO₂
+            <p className="text-[10px] text-white/50 mt-2 uppercase tracking-wider">
+              {inrFull(decisionStats?.total_savings_inr || 0)} lifetime
             </p>
-            <p className="text-[10px] text-vpp-navy-muted mt-1.5 uppercase tracking-wider">Emission factor: 0.74 kg/kWh</p>
           </div>
-          <div className="glass-card rounded-2xl p-5">
-            <div className="flex items-center gap-2 text-vpp-blue">
-              <Activity size={18} />
-              <span className="font-bold text-sm">Decisions</span>
+          <div
+            className="stat-card p-5"
+            style={{ ['--glow' as string]: 'rgba(45, 212, 191, 0.2)', ['--chip' as string]: 'rgba(45, 212, 191, 0.14)', ['--chip-border' as string]: 'rgba(45, 212, 191, 0.32)' } as React.CSSProperties}
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="stat-icon-chip text-vpp-teal">
+                <Leaf size={18} />
+              </span>
+              <span className="font-bold text-sm text-white/90">Carbon Saved</span>
             </div>
-            <p className="text-2xl font-bold text-vpp-navy mt-2">{decisionStats?.total_decisions || 0}</p>
-            <p className="text-[10px] text-vpp-navy-muted mt-1.5 uppercase tracking-wider">AI decisions logged</p>
+            <p className="text-3xl font-bold text-vpp-cream font-display mt-3 tabular-nums tracking-tight">
+              {carbonShort(decisionStats?.total_carbon_reduction_kg || 0)}
+            </p>
+            <p className="text-[10px] text-white/50 mt-2 uppercase tracking-wider">
+              {carbonFull(decisionStats?.total_carbon_reduction_kg || 0)} CO₂ saved
+            </p>
           </div>
-          <div className="glass-card rounded-2xl p-5">
-            <div className="flex items-center gap-2 text-vpp-amber">
-              <BarChart3 size={18} />
-              <span className="font-bold text-sm">Self-Consumption</span>
+          <div
+            className="stat-card p-5"
+            style={{ ['--glow' as string]: 'rgba(96, 165, 250, 0.2)', ['--chip' as string]: 'rgba(96, 165, 250, 0.14)', ['--chip-border' as string]: 'rgba(96, 165, 250, 0.32)' } as React.CSSProperties}
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="stat-icon-chip text-vpp-blue">
+                <Activity size={18} />
+              </span>
+              <span className="font-bold text-sm text-white/90">Decisions</span>
             </div>
-            <p className="text-2xl font-bold text-vpp-navy mt-2">
+            <p className="text-3xl font-bold text-vpp-cream font-display mt-3 tabular-nums tracking-tight">
+              {grouped(decisionStats?.total_decisions || 0)}
+            </p>
+            <p className="text-[10px] text-white/50 mt-2 uppercase tracking-wider">AI decisions logged</p>
+          </div>
+          <div
+            className="stat-card p-5"
+            style={{ ['--glow' as string]: 'rgba(217, 119, 6, 0.24)', ['--chip' as string]: 'rgba(217, 119, 6, 0.16)', ['--chip-border' as string]: 'rgba(217, 119, 6, 0.36)' } as React.CSSProperties}
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="stat-icon-chip text-vpp-amber">
+                <BarChart3 size={18} />
+              </span>
+              <span className="font-bold text-sm text-white/90">Self-Consumption</span>
+            </div>
+            <p className="text-3xl font-bold text-vpp-cream font-display mt-3 tabular-nums tracking-tight">
               {(exportStats?.renewable_self_consumption_pct || 0).toFixed(1)}%
             </p>
-            <p className="text-[10px] text-vpp-navy-muted mt-1.5 uppercase tracking-wider">Of renewable energy used on-site</p>
+            <p className="text-[10px] text-white/50 mt-2 uppercase tracking-wider">Of renewable energy used on-site</p>
           </div>
         </div>
 
@@ -289,7 +316,7 @@ export function MissionControl() {
         <div className="mb-6">
           <h2 className="text-lg font-bold text-white mb-4 drop-shadow-sm">Recent AI Decisions</h2>
           {latestDecisions.length === 0 ? (
-            <div className="glass-card rounded-2xl p-8 text-center">
+            <div className="vpp-card p-8 text-center">
               <BarChart3 className="mx-auto text-white/20" size={48} />
               <p className="text-white/60 mt-2 font-medium">Waiting for first decision...</p>
               <p className="text-xs text-white/40 mt-1">
@@ -304,11 +331,9 @@ export function MissionControl() {
             </div>
           )}
         </div>
-
-        {/* Building Criticality Tiers */}
         {buildings.length > 0 && (
-          <div className="glass-card rounded-2xl p-5">
-            <h2 className="text-lg font-bold text-vpp-navy mb-3">Building Criticality</h2>
+          <div className="vpp-card p-5">
+            <h2 className="text-lg font-bold text-vpp-cream mb-3 font-display">Building Criticality</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {buildings.map((b: BuildingTwin) => (
                 <div
@@ -316,22 +341,22 @@ export function MissionControl() {
                   className={`p-3.5 rounded-xl border transition-all ${
                     b.criticality_tier === 'critical'
                       ? 'border-vpp-blue/30 bg-vpp-blue/10'
-                      : 'border-white/20 bg-white/5'
+                      : 'border-white/15 bg-white/5'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-sm text-vpp-navy">{b.building_id.replace('_', ' ')}</span>
+                    <span className="font-semibold text-sm text-vpp-cream">{b.building_id.replace('_', ' ')}</span>
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider ${
                         b.criticality_tier === 'critical'
                           ? 'bg-vpp-blue/15 text-vpp-blue'
-                          : 'bg-vpp-navy-muted/10 text-vpp-navy-muted'
+                          : 'bg-white/10 text-white/60'
                       }`}
                     >
                       {b.criticality_tier === 'critical' ? 'CRITICAL' : 'NON-CRITICAL'}
                     </span>
                   </div>
-                  <div className="text-xs text-vpp-navy-muted mt-1.5">SoC: {b.battery_soc_pct.toFixed(0)}%</div>
+                  <div className="text-xs text-white/60 mt-1.5">SoC: {b.battery_soc_pct.toFixed(0)}%</div>
                 </div>
               ))}
             </div>

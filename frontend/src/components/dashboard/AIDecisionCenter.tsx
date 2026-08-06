@@ -81,20 +81,20 @@ export function AIDecisionCenter() {
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" size={16} />
             <input
               type="text"
               placeholder="Search decisions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="glass-input w-full pl-10 pr-3 py-2.5 rounded-xl text-sm text-vpp-navy placeholder:text-vpp-navy-muted/50 focus:outline-none"
+              className="glass-input w-full pl-10 pr-3 py-2.5 rounded-xl text-sm text-white focus:outline-none"
             />
           </div>
 
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="glass-input px-4 py-2.5 rounded-xl text-sm text-vpp-navy focus:outline-none"
+            className="glass-input px-4 py-2.5 rounded-xl text-sm text-white focus:outline-none"
           >
             <option value="all">All Types</option>
             <option value="dispatch">Dispatch</option>
@@ -107,7 +107,7 @@ export function AIDecisionCenter() {
           <select
             value={confidenceFilter}
             onChange={(e) => setConfidenceFilter(e.target.value as any)}
-            className="glass-input px-4 py-2.5 rounded-xl text-sm text-vpp-navy focus:outline-none"
+            className="glass-input px-4 py-2.5 rounded-xl text-sm text-white focus:outline-none"
           >
             <option value="all">All Confidence</option>
             <option value="high">High (80%+)</option>
@@ -126,7 +126,7 @@ export function AIDecisionCenter() {
 
         {/* Decision List */}
         {filtered.length === 0 ? (
-          <div className="glass-card rounded-2xl p-8 text-center">
+          <div className="vpp-card p-8 text-center">
             <BarChart3 className="mx-auto text-white/20" size={48} />
             <p className="text-white/50 mt-2 font-medium">No decisions match your filters</p>
           </div>
@@ -139,13 +139,13 @@ export function AIDecisionCenter() {
         )}
 
         {/* Decision Type Legend */}
-        <div className="mt-6 glass-card rounded-2xl p-4">
-          <h3 className="font-bold text-vpp-navy mb-3 text-sm">Decision Types</h3>
+        <div className="mt-6 vpp-card p-4">
+          <h3 className="font-bold text-vpp-cream mb-3 text-sm font-display">Decision Types</h3>
           <div className="flex flex-wrap gap-4">
             {Object.entries(typeIcons).map(([type, Icon]) => (
               <div key={type} className="flex items-center gap-2">
-                <Icon size={16} className="text-vpp-navy-muted" />
-                <span className="text-sm text-vpp-navy-muted capitalize">{type}</span>
+                <Icon size={16} className="text-white/50" />
+                <span className="text-sm text-white/60 capitalize">{type}</span>
               </div>
             ))}
           </div>

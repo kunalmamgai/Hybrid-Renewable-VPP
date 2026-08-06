@@ -105,6 +105,74 @@ body {
   transition: all 0.2s ease;
 }
 
+/* ─── VPP Card — warm dark glass, gold hairline (sunset-to-forest theme) ─── */
+.vpp-card {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.06), rgba(15, 23, 18, 0.28));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(217, 119, 6, 0.18);
+  border-radius: 1.25rem;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28);
+  transition: all 0.25s ease;
+}
+
+.vpp-card:hover {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(15, 23, 18, 0.46));
+  border-color: rgba(217, 119, 6, 0.34);
+  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.34), 0 0 24px rgba(217, 119, 6, 0.08);
+}
+
+/* ─── Stat Card — deeper contrast surface with per-metric accent glow ─── */
+.stat-card {
+  --glow: rgba(16, 185, 129, 0.18);
+  --chip: rgba(16, 185, 129, 0.14);
+  --chip-border: rgba(16, 185, 129, 0.3);
+  position: relative;
+  background:
+    radial-gradient(60% 80% at 92% -8%, var(--glow), transparent 55%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(10, 14, 11, 0.72));
+  border: 1px solid rgba(217, 119, 6, 0.24);
+  border-radius: 1.25rem;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 18px 48px rgba(0, 0, 0, 0.32);
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.stat-card:hover {
+  background:
+    radial-gradient(60% 80% at 92% -8%, var(--glow), transparent 58%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.09), rgba(10, 14, 11, 0.82));
+  border-color: rgba(217, 119, 6, 0.34);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 22px 56px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--chip-border), transparent 70%);
+  opacity: 0.5;
+}
+
+.stat-icon-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.65rem;
+  flex-shrink: 0;
+  background: var(--chip);
+  border: 1px solid var(--chip-border);
+}
+
 .glass-card-strong {
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -191,18 +259,27 @@ body {
   box-shadow: 0 0 24px rgba(217, 119, 6, 0.35);
 }
 
-/* ─── Glass Input ─── */
+/* ─── Glass Input (dark theme) ─── */
 .glass-input {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.07);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(217, 119, 6, 0.18);
+  color: #f8f0e2;
   transition: all 0.2s ease;
 }
+.glass-input::placeholder {
+  color: rgba(248, 240, 226, 0.45);
+}
 .glass-input:focus {
-  background: rgba(255, 255, 255, 0.85);
-  border-color: rgba(16, 185, 129, 0.5);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(217, 119, 6, 0.45);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.18);
+  outline: none;
+}
+.glass-input option {
+  background: #0f1613;
+  color: #f8f0e2;
 }
 
 /* ─── Glass Button ─── */
@@ -237,7 +314,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('/hero-bg.png') center / cover no-repeat;
+  background: url('/hero-bg.jpg') center / cover no-repeat;
   opacity: 0.1;
   z-index: 0;
 }

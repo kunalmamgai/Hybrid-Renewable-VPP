@@ -26,7 +26,7 @@ const FacilitiesSettings = lazy(() =>
 function PageFallback() {
   return (
     <div className="flex items-center justify-center min-h-[50vh]">
-      <div className="animate-pulse text-sm text-vpp-navy-muted">Loading…</div>
+      <div className="animate-pulse text-sm text-white/50">Loading…</div>
     </div>
   );
 }

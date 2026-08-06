@@ -16,17 +16,18 @@ import ReactFlow, {
 import { Sun, Wind, Battery, Zap, Home } from 'lucide-react';
 import 'reactflow/dist/style.css';
 import { useVppData } from '../../context/VppDataContext';
+import FlowErrorBoundary from './FlowErrorBoundary';
 import type { BuildingTwin } from '../../types';
 
 // Custom node component for energy sources — glass style
 const EnergySourceNode = React.memo(function EnergySourceNode({ data }: { data: any }) {
   const { icon: Icon, label, value } = data;
   return (
-    <div className={`glass-card-strong rounded-2xl p-3 min-w-[90px] text-center`}>
+    <div className={`glass-card-strong rounded-2xl p-3 min-w-[90px] text-center border-vpp-accent-gold/20`}>
       <div className="flex justify-center mb-1">{Icon && <Icon size={20} />}</div>
-      <div className="text-[10px] font-bold text-vpp-navy-muted uppercase tracking-wider">{label}</div>
-      <div className="text-lg font-bold text-vpp-navy mt-0.5">{value.toFixed(1)}</div>
-      <div className="text-[10px] text-vpp-navy-muted">kW</div>
+      <div className="text-[10px] font-bold text-white/50 uppercase tracking-wider">{label}</div>
+      <div className="text-lg font-bold text-vpp-cream font-display mt-0.5">{Number(value ?? 0).toFixed(1)}</div>
+      <div className="text-[10px] text-white/45">kW</div>
     </div>
   );
 });
@@ -42,16 +43,16 @@ const BuildingNode = React.memo(function BuildingNode({ data }: { data: any }) {
           : 'border-white/40'
       }`}
     >
-      <Home size={20} className="mx-auto mb-1 text-vpp-navy-muted" />
-      <div className="text-[10px] font-bold text-vpp-navy-muted uppercase tracking-wider">{label}</div>
-      <div className="text-sm font-bold text-vpp-navy mt-0.5">{value.toFixed(1)} kW</div>
+      <Home size={20} className="mx-auto mb-1 text-vpp-amber" />
+      <div className="text-[10px] font-bold text-white/50 uppercase tracking-wider">{label}</div>
+      <div className="text-sm font-bold text-vpp-cream font-display mt-0.5">{Number(value ?? 0).toFixed(1)} kW</div>
       <div className={`text-[9px] font-bold mt-1.5 px-2 py-0.5 rounded-full inline-block tracking-wider ${
-        tier === 'critical' ? 'bg-vpp-blue/15 text-vpp-blue' : 'bg-vpp-navy-muted/10 text-vpp-navy-muted'
+        tier === 'critical' ? 'bg-vpp-blue/15 text-vpp-blue' : 'bg-white/10 text-white/60'
       }`}>
         {tier === 'critical' ? 'CRITICAL' : 'NON-CRIT'}
       </div>
       {soc !== undefined && (
-        <div className="text-[10px] text-vpp-blue mt-1.5 font-semibold">{soc.toFixed(0)}% SoC</div>
+        <div className="text-[10px] text-vpp-blue mt-1.5 font-semibold">{Number(soc ?? 0).toFixed(0)}% SoC</div>
       )}
     </div>
   );
@@ -60,15 +61,16 @@ const BuildingNode = React.memo(function BuildingNode({ data }: { data: any }) {
 // Custom node for battery — glass style
 const BatteryNode = React.memo(function BatteryNode({ data }: { data: any }) {
   const { soc, power } = data;
+  const powerKw = Number(power ?? 0);
   return (
     <div className="glass-card-strong rounded-2xl p-3 border-vpp-blue/30 text-center min-w-[90px]">
       <Battery size={24} className="mx-auto mb-1 text-vpp-blue" />
-      <div className="text-[10px] font-bold text-vpp-navy-muted uppercase tracking-wider">BATTERY</div>
-      <div className="text-lg font-bold text-vpp-navy mt-0.5">{soc.toFixed(0)}%</div>
-      <div className="text-[10px] text-vpp-navy-muted mt-0.5">
-        {power > 0 ? `↓${power.toFixed(1)}` : power < 0 ? `↑${Math.abs(power).toFixed(1)}` : 'IDLE'} kW
+      <div className="text-[10px] font-bold text-white/50 uppercase tracking-wider">BATTERY</div>
+      <div className="text-lg font-bold text-vpp-cream font-display mt-0.5">{Number(soc ?? 0).toFixed(0)}%</div>
+      <div className="text-[10px] text-white/45 mt-0.5">
+        {powerKw > 0 ? `↓${powerKw.toFixed(1)}` : powerKw < 0 ? `↑${Math.abs(powerKw).toFixed(1)}` : 'IDLE'} kW
       </div>
-      <div className="text-[9px] text-vpp-navy-muted/60">SOC / 5min</div>
+      <div className="text-[9px] text-white/30">SOC / 5min</div>
     </div>
   );
 });
@@ -79,86 +81,78 @@ const nodeTypes: NodeTypes = {
   battery: BatteryNode,
 };
 
-const generateNodes = (buildings: BuildingTwin[]): Node[] => {
-  const nodes: Node[] = [
-    // Solar node
-    {
-      id: 'solar',
-      type: 'energySource',
-      position: { x: 100, y: 200 },
-      data: { icon: Sun, label: 'SOLAR', value: 0, color: 'border-amber-400' },
+// Static skeleton of the flow graph — rendered immediately, before any
+// live data arrives, so the canvas is never blank.
+const STATIC_NODES: Node[] = [
+  {
+    id: 'solar',
+    type: 'energySource',
+    position: { x: 100, y: 200 },
+    data: { icon: Sun, label: 'SOLAR', value: 0, color: 'border-amber-400' },
+  },
+  {
+    id: 'wind',
+    type: 'energySource',
+    position: { x: 100, y: 320 },
+    data: { icon: Wind, label: 'WIND', value: 0, color: 'border-teal-400' },
+  },
+  {
+    id: 'battery',
+    type: 'battery',
+    position: { x: 300, y: 260 },
+    data: { soc: 50, power: 0 },
+  },
+  {
+    id: 'grid',
+    type: 'energySource',
+    position: { x: 700, y: 260 },
+    data: { icon: Zap, label: 'GRID', value: 0, color: 'border-amber-500' },
+  },
+];
+
+const STATIC_EDGES: Edge[] = [
+  { id: 'solar-battery', source: 'solar', target: 'battery', animated: true, style: { stroke: '#f59e0b', strokeWidth: 3 } },
+  { id: 'wind-battery', source: 'wind', target: 'battery', animated: true, style: { stroke: '#14b8a6', strokeWidth: 3 } },
+];
+
+const generateBuildingNodes = (buildings: BuildingTwin[]): Node[] =>
+  buildings.map((b, i) => ({
+    id: b.building_id,
+    type: 'building',
+    position: { x: 500 + i * 200, y: 100 + (i % 2) * 200 },
+    data: {
+      label: b.name || b.building_id.replace('_', ' '),
+      value: 0,
+      tier: b.criticality_tier,
+      soc: b.battery_soc_pct,
     },
-    // Wind node
-    {
-      id: 'wind',
-      type: 'energySource',
-      position: { x: 100, y: 320 },
-      data: { icon: Wind, label: 'WIND', value: 0, color: 'border-teal-400' },
-    },
-    // Battery node
-    {
-      id: 'battery',
-      type: 'battery',
-      position: { x: 300, y: 260 },
-      data: { soc: 50, power: 0 },
-    },
-    // Grid node
-    {
-      id: 'grid',
-      type: 'energySource',
-      position: { x: 700, y: 260 },
-      data: { icon: Zap, label: 'GRID', value: 0, color: 'border-amber-500' },
-    },
-  ];
+  }));
 
-  // Building nodes in a row
-  buildings.forEach((b, i) => {
-    nodes.push({
-      id: b.building_id,
-      type: 'building',
-      position: { x: 500 + i * 200, y: 100 + (i % 2) * 200 },
-      data: {
-        label: b.name || b.building_id.replace('_', ' '),
-        value: 0,
-        tier: b.criticality_tier,
-        soc: b.battery_soc_pct,
-      },
-    });
-  });
-
-  return nodes;
-};
-
-const generateEdges = (buildings: BuildingTwin[]): Edge[] => {
-  const edges: Edge[] = [
-    { id: 'solar-battery', source: 'solar', target: 'battery', animated: true, style: { stroke: '#f59e0b', strokeWidth: 3 } },
-    { id: 'wind-battery', source: 'wind', target: 'battery', animated: true, style: { stroke: '#14b8a6', strokeWidth: 3 } },
-  ];
-
-  buildings.forEach((b) => {
-    edges.push(
-      { id: `solar-${b.building_id}`, source: 'solar', target: b.building_id, animated: true, style: { stroke: '#f59e0b', strokeWidth: 2, strokeDasharray: '5,5' } },
-      { id: `wind-${b.building_id}`, source: 'wind', target: b.building_id, animated: true, style: { stroke: '#14b8a6', strokeWidth: 2, strokeDasharray: '5,5' } },
-      { id: `battery-${b.building_id}`, source: 'battery', target: b.building_id, animated: false, style: { stroke: '#3b82f6', strokeWidth: 2 } },
-      { id: `building-${b.building_id}-grid`, source: b.building_id, target: 'grid', animated: true, style: { stroke: '#10b981', strokeWidth: 2 }, label: 'export', labelStyle: { fill: '#10b981', fontSize: 10 } },
-    );
-  });
-
-  return edges;
-};
+const generateBuildingEdges = (buildings: BuildingTwin[]): Edge[] =>
+  buildings.flatMap((b) => [
+    { id: `solar-${b.building_id}`, source: 'solar', target: b.building_id, animated: true, style: { stroke: '#f59e0b', strokeWidth: 2, strokeDasharray: '5,5' } },
+    { id: `wind-${b.building_id}`, source: 'wind', target: b.building_id, animated: true, style: { stroke: '#14b8a6', strokeWidth: 2, strokeDasharray: '5,5' } },
+    { id: `battery-${b.building_id}`, source: 'battery', target: b.building_id, animated: false, style: { stroke: '#3b82f6', strokeWidth: 2 } },
+    { id: `building-${b.building_id}-grid`, source: b.building_id, target: 'grid', animated: true, style: { stroke: '#10b981', strokeWidth: 2 }, label: 'export', labelStyle: { fill: '#10b981', fontSize: 10 } },
+  ]);
 
 export function LiveEnergyFlow() {
   const { buildings } = useVppData();
 
-  const [nodes, setNodes] = useState<Node[]>([]);
-  const [edges, setEdges] = useState<Edge[]>([]);
+  const [nodes, setNodes] = useState<Node[]>(STATIC_NODES);
+  const [edges, setEdges] = useState<Edge[]>(STATIC_EDGES);
 
-  // Initialize nodes and edges
+  // Append building nodes/edges once live data arrives
   useEffect(() => {
-    if (buildings.length > 0) {
-      setNodes(generateNodes(buildings));
-      setEdges(generateEdges(buildings));
-    }
+    if (buildings.length === 0) return;
+    setNodes((nds) => {
+      const existing = new Set(nds.map((n) => n.id));
+      return [...nds, ...generateBuildingNodes(buildings).filter((n) => !existing.has(n.id))];
+    });
+    setEdges((eds) => {
+      const existing = new Set(eds.map((e) => e.id));
+      return [...eds, ...generateBuildingEdges(buildings).filter((e) => !existing.has(e.id))];
+    });
   }, [buildings]);
 
   // Update node data with live values
@@ -246,25 +240,33 @@ export function LiveEnergyFlow() {
         <p className="text-sm text-white/50 mb-4">
           Real-time energy routing: Solar + Wind → Battery → Buildings → Grid/Export
         </p>
+        {buildings.length === 0 && (
+          <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full text-xs text-vpp-amber bg-white/5 border border-white/10">
+            <span className="w-1.5 h-1.5 rounded-full bg-vpp-amber animate-pulse" />
+            Waiting for live data…
+          </div>
+        )}
       </div>
 
       <div className="h-[calc(100vh-120px)] w-full">
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          nodeTypes={nodeTypes}
-          connectionLineStyle={{ stroke: '#94a3b8', strokeWidth: 2 }}
-          connectionLineType={ConnectionLineType.SmoothStep}
-          fitView
-          attributionPosition="bottom-left"
-          proOptions={{ hideAttribution: true }}
-        >
-          <Background gap={16} color="rgba(255,255,255,0.05)" />
-          <Controls
-            className="glass-card !rounded-xl !border-0"
-            showInteractive={false}
-          />
-        </ReactFlow>
+        <FlowErrorBoundary>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            nodeTypes={nodeTypes}
+            connectionLineStyle={{ stroke: '#94a3b8', strokeWidth: 2 }}
+            connectionLineType={ConnectionLineType.SmoothStep}
+            fitView
+            attributionPosition="bottom-left"
+            proOptions={{ hideAttribution: true }}
+          >
+            <Background gap={16} color="rgba(255,255,255,0.05)" />
+            <Controls
+              className="glass-card !rounded-xl !border-0"
+              showInteractive={false}
+            />
+          </ReactFlow>
+        </FlowErrorBoundary>
       </div>
     </div>
   );

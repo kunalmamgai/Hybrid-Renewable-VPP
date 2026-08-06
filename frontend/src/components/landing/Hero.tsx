@@ -46,12 +46,12 @@ export function Hero() {
         {/* Full-bleed hero image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/hero-bg.png)' }}
+          style={{ backgroundImage: 'url(/hero-bg.jpg)' }}
         />
 
         {/* Soft overlay for text legibility */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,240,210,0.22),_transparent_36%),linear-gradient(180deg,rgba(18,12,8,0.1),rgba(16,15,14,0.16)_58%,rgba(14,12,10,0.28)_100%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-b from-transparent via-[#20160f]/32 to-[#0f1012]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,235,190,0.26),_transparent_38%),linear-gradient(180deg,rgba(18,12,8,0.08),rgba(16,15,14,0.12)_58%,rgba(14,12,10,0.22)_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-b from-transparent via-[#20160f]/26 to-[#0f1012]" />
         <div
           className="absolute inset-x-0 bottom-0 h-40 pointer-events-none"
           style={{
@@ -61,9 +61,9 @@ export function Hero() {
         />
 
         {/* Parallax Accents: Sunset & Sky mix */}
-        <BackgroundGlow color="orange" size="600px" top="-10%" left="50%" opacity={0.16} blur="120px" />
-        <BackgroundGlow color="sky" size="380px" top="10%" left="-5%" opacity={0.09} blur="100px" />
-        <BackgroundGlow color="sunlight" size="500px" top="40%" left="70%" opacity={0.08} blur="110px" />
+        <BackgroundGlow color="orange" size="620px" top="-10%" left="50%" opacity={0.2} blur="120px" />
+        <BackgroundGlow color="sky" size="380px" top="10%" left="-5%" opacity={0.12} blur="100px" />
+        <BackgroundGlow color="sunlight" size="520px" top="40%" left="70%" opacity={0.1} blur="110px" />
 
         {/* Nav Bar — floating forest-glass pill */}
         <nav className="relative z-30 mt-4 px-4 sm:px-6">

@@ -3,7 +3,12 @@ module.exports = {
   content: ['./index.html', './src/**/*.{ts,tsx,js,jsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        display: ['Sora', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+      },
       colors: {
+        'vpp-cream': '#f8f0e2',
         // Core VPP Palette (Rajasthan DTE Govt Project)
         'vpp-emerald': '#059669',
         'vpp-emerald-light': '#10b981',

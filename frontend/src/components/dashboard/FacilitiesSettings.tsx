@@ -213,7 +213,7 @@ export function FacilitiesSettings() {
         )}
 
         {/* Tab Navigation */}
-        <div className="flex gap-1 mb-6 glass-card p-1 rounded-2xl">
+        <div className="flex gap-1 mb-6 vpp-card p-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -231,7 +231,7 @@ export function FacilitiesSettings() {
         </div>
 
         {/* Tab Content */}
-        <div className="glass-card rounded-2xl p-6">
+        <div className="vpp-card p-6">
           {activeTab === 'thresholds' && (
             <ThresholdTab
               thresholds={thresholds}
@@ -292,11 +292,11 @@ function ThresholdTab({
 
   return (
     <div>
-      <h2 className="text-lg font-bold text-vpp-navy mb-2 flex items-center gap-2">
+      <h2 className="text-lg font-bold text-vpp-cream mb-2 flex items-center gap-2">
         <AlertTriangle size={18} className="text-vpp-amber" />
         Alert Thresholds
       </h2>
-      <p className="text-sm text-vpp-navy-muted mb-6">
+      <p className="text-sm text-white/60 mb-6">
         Set the thresholds that trigger alerts. The system will warn when battery SoC drops below the warning level,
         and enter emergency mode when it falls below the critical level.
       </p>
@@ -307,24 +307,24 @@ function ThresholdTab({
           return (
             <div
               key={t.id}
-              className={`border rounded-xl p-4 transition-all ${
+              className={`vpp-card p-4 ${
                 t.severity === 'critical'
-                  ? 'border-red-200/50 bg-red-50/20'
-                  : 'border-white/20 bg-white/10'
+                  ? 'border-red-500/30'
+                  : 'border-vpp-amber/20'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <span className="font-bold text-vpp-navy">{t.name}</span>
+                  <span className="font-bold text-vpp-cream">{t.name}</span>
                   {t.description && (
-                    <p className="text-xs text-vpp-navy-muted mt-0.5">{t.description}</p>
+                    <p className="text-xs text-white/60 mt-0.5">{t.description}</p>
                   )}
                 </div>
                 <span
                   className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full tracking-wider ${
                     t.severity === 'critical'
-                      ? 'bg-red-100/50 text-red-600'
-                      : 'bg-amber-100/50 text-amber-600'
+                      ? 'bg-red-400/15 text-red-300'
+                      : 'bg-vpp-amber/15 text-vpp-amber'
                   }`}
                 >
                   {t.severity}
@@ -335,11 +335,11 @@ function ThresholdTab({
                   type="number"
                   defaultValue={t.threshold_value}
                   id={`threshold-${t.id}`}
-                  className="glass-input w-24 px-3 py-1.5 rounded-xl text-sm text-vpp-navy focus:outline-none"
+                  className="glass-input w-24 px-3 py-1.5 rounded-xl text-sm text-vpp-cream focus:outline-none"
                   step={0.5}
                 />
-                <span className="text-sm text-vpp-navy-muted">{t.unit}</span>
-                <label className="flex items-center gap-1.5 text-sm text-vpp-navy-muted ml-auto">
+                <span className="text-sm text-white/60">{t.unit}</span>
+                <label className="flex items-center gap-1.5 text-sm text-white/60 ml-auto">
                   <input
                     type="checkbox"
                     defaultChecked={t.active}
@@ -390,11 +390,11 @@ function TiersTab({
 
   return (
     <div>
-      <h2 className="text-lg font-bold text-vpp-navy mb-2 flex items-center gap-2">
+      <h2 className="text-lg font-bold text-vpp-cream mb-2 flex items-center gap-2">
         <BarChart3 size={18} className="text-vpp-blue" />
         Building Criticality Tiers
       </h2>
-      <p className="text-sm text-vpp-navy-muted mb-6">
+      <p className="text-sm text-white/60 mb-6">
         During a power shortfall, the system sheds non-critical loads first and protects critical buildings
         (labs, hostels) using the battery reserve floor.
       </p>
@@ -403,10 +403,10 @@ function TiersTab({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-white/20">
-              <th className="text-left py-3 px-2 text-[10px] font-bold text-vpp-navy-muted uppercase tracking-wider">Building</th>
-              <th className="text-left py-3 px-2 text-[10px] font-bold text-vpp-navy-muted uppercase tracking-wider">Current Tier</th>
-              <th className="text-left py-3 px-2 text-[10px] font-bold text-vpp-navy-muted uppercase tracking-wider">New Tier</th>
-              <th className="text-right py-3 px-2 text-[10px] font-bold text-vpp-navy-muted uppercase tracking-wider">Action</th>
+              <th className="text-left py-3 px-2 text-[10px] font-bold text-white/60 uppercase tracking-wider">Building</th>
+              <th className="text-left py-3 px-2 text-[10px] font-bold text-white/60 uppercase tracking-wider">Current Tier</th>
+              <th className="text-left py-3 px-2 text-[10px] font-bold text-white/60 uppercase tracking-wider">New Tier</th>
+              <th className="text-right py-3 px-2 text-[10px] font-bold text-white/60 uppercase tracking-wider">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -415,13 +415,13 @@ function TiersTab({
               return (
                 <tr key={tier.building_id} className="border-b border-white/10">
                   <td className="py-3 px-2">
-                    <span className="font-semibold text-vpp-navy">{tier.building_id.replace(/_/g, ' ')}</span>
+                    <span className="font-semibold text-vpp-cream">{tier.building_id.replace(/_/g, ' ')}</span>
                   </td>
                   <td className="py-3 px-2">
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider ${
                       tier.tier === 'critical'
                         ? 'bg-vpp-blue/15 text-vpp-blue'
-                        : 'bg-vpp-navy-muted/10 text-vpp-navy-muted'
+                        : 'bg-white/10 text-white/60'
                     }`}>
                       {tier.tier === 'critical' ? 'CRITICAL' : 'NON-CRITICAL'}
                     </span>
@@ -430,7 +430,7 @@ function TiersTab({
                     <select
                       defaultValue={tier.tier}
                       id={`tier-select-${tier.building_id}`}
-                      className="glass-input px-3 py-1.5 rounded-xl text-xs text-vpp-navy focus:outline-none"
+                      className="glass-input px-3 py-1.5 rounded-xl text-xs text-vpp-cream focus:outline-none"
                     >
                       <option value="critical">Critical</option>
                       <option value="non_critical">Non-Critical</option>
@@ -458,18 +458,18 @@ function TiersTab({
 
       {/* Tier Legend */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div className="glass-card rounded-xl p-3 flex items-center gap-3">
+        <div className="vpp-card rounded-xl p-3 flex items-center gap-3">
           <div className="w-3 h-3 rounded-full bg-vpp-blue/40"></div>
           <div>
-            <span className="text-xs font-bold text-vpp-navy">Critical</span>
-            <p className="text-[10px] text-vpp-navy-muted">Never shed — labs, hostels protected by reserve floor</p>
+            <span className="text-xs font-bold text-vpp-cream">Critical</span>
+            <p className="text-[10px] text-white/60">Never shed — labs, hostels protected by reserve floor</p>
           </div>
         </div>
-        <div className="glass-card rounded-xl p-3 flex items-center gap-3">
-          <div className="w-3 h-3 rounded-full bg-vpp-navy-muted/30"></div>
+        <div className="vpp-card rounded-xl p-3 flex items-center gap-3">
+          <div className="w-3 h-3 rounded-full bg-white/30"></div>
           <div>
-            <span className="text-xs font-bold text-vpp-navy">Non-Critical</span>
-            <p className="text-[10px] text-vpp-navy-muted">Sheddable during shortfalls to protect critical loads</p>
+            <span className="text-xs font-bold text-vpp-cream">Non-Critical</span>
+            <p className="text-[10px] text-white/60">Sheddable during shortfalls to protect critical loads</p>
           </div>
         </div>
       </div>
@@ -499,11 +499,11 @@ function VnmTab({
 
   return (
     <div>
-      <h2 className="text-lg font-bold text-vpp-navy mb-2 flex items-center gap-2">
+      <h2 className="text-lg font-bold text-vpp-cream mb-2 flex items-center gap-2">
         <Zap size={18} className="text-vpp-emerald" />
         VNM/GNM Sharing Rules
       </h2>
-      <p className="text-sm text-vpp-navy-muted mb-6">
+      <p className="text-sm text-white/60 mb-6">
         Per RERC Third Amendment Regulations, 2025 — Virtual Net Metering credits are allocated
         proportionally to participating buildings. Adjust the sharing ratio per building.
       </p>
@@ -512,10 +512,10 @@ function VnmTab({
         {rules.map((r) => {
           const isSaving = saving[`vnm_${r.building_id}`];
           return (
-            <div key={r.building_id} className="glass-card rounded-xl p-4">
+            <div key={r.building_id} className="vpp-card rounded-xl p-4">
               <div className="flex items-center justify-between mb-3">
-                <span className="font-bold text-vpp-navy">{r.building_id.replace(/_/g, ' ')}</span>
-                <span className="text-[10px] text-vpp-navy-muted font-medium tracking-wider">
+                <span className="font-bold text-vpp-cream">{r.building_id.replace(/_/g, ' ')}</span>
+                <span className="text-[10px] text-white/60 font-medium tracking-wider">
                   {r.rerc_rule_reference || 'RERC 2025'}
                 </span>
               </div>
@@ -594,19 +594,19 @@ function ScenariosTab({
   }
 
   const scenarioDescriptions: Record<string, { icon: React.ReactNode; color: string; activeColor: string }> = {
-    mvp_day: { icon: <SunIcon size={24} />, color: 'border-amber-300/40 bg-amber-50/10', activeColor: 'border-vpp-emerald bg-vpp-emerald/10' },
-    cloudy_still_afternoon: { icon: <CloudIcon size={24} />, color: 'border-white/20 bg-white/5', activeColor: 'border-vpp-emerald bg-vpp-emerald/10' },
-    wind_fills_solar_gap: { icon: <WindIcon size={24} />, color: 'border-vpp-teal/30 bg-teal-50/10', activeColor: 'border-vpp-emerald bg-vpp-emerald/10' },
-    shortfall_protects_hostel: { icon: <ShieldIcon size={24} />, color: 'border-vpp-blue/30 bg-blue-50/10', activeColor: 'border-vpp-emerald bg-vpp-emerald/10' },
+    mvp_day: { icon: <SunIcon size={24} />, color: 'border-vpp-amber/30 bg-vpp-amber/5', activeColor: 'border-vpp-emerald bg-vpp-emerald/10' },
+    cloudy_still_afternoon: { icon: <CloudIcon size={24} />, color: 'border-white/15 bg-white/5', activeColor: 'border-vpp-emerald bg-vpp-emerald/10' },
+    wind_fills_solar_gap: { icon: <WindIcon size={24} />, color: 'border-vpp-teal/30 bg-vpp-teal/5', activeColor: 'border-vpp-emerald bg-vpp-emerald/10' },
+    shortfall_protects_hostel: { icon: <ShieldIcon size={24} />, color: 'border-vpp-blue/30 bg-vpp-blue/5', activeColor: 'border-vpp-emerald bg-vpp-emerald/10' },
   };
 
   return (
     <div>
-      <h2 className="text-lg font-bold text-vpp-navy mb-2 flex items-center gap-2">
+      <h2 className="text-lg font-bold text-vpp-cream mb-2 flex items-center gap-2">
         <Play size={18} className="text-vpp-emerald" />
         Demo Scenarios
       </h2>
-      <p className="text-sm text-vpp-navy-muted mb-6">
+      <p className="text-sm text-white/60 mb-6">
         Switch between pre-configured weather and demand scenarios to demonstrate the system's
         decision-making under different conditions. Each scenario changes cloud cover, wind speed, and demand.
       </p>
@@ -632,8 +632,8 @@ function ScenariosTab({
                     {desc.icon}
                   </div>
                   <div>
-                    <h3 className="font-bold text-vpp-navy">{s.name}</h3>
-                    <p className="text-[11px] text-vpp-navy-muted mt-0.5 max-w-[200px] leading-relaxed">{s.description}</p>
+                    <h3 className="font-bold text-vpp-cream">{s.name}</h3>
+                    <p className="text-[11px] text-white/60 mt-0.5 max-w-[200px] leading-relaxed">{s.description}</p>
                   </div>
                 </div>
                 {isActive && (
@@ -642,7 +642,7 @@ function ScenariosTab({
                   </span>
                 )}
               </div>
-              <div className="grid grid-cols-3 gap-2 text-[11px] text-vpp-navy-muted mb-3">
+              <div className="grid grid-cols-3 gap-2 text-[11px] text-white/60 mb-3">
                 <div>
                   <span className="block font-bold">Cloud Cover</span>
                   <span className="font-mono">{(s.cloud_cover_base * 100).toFixed(0)}%</span>
@@ -661,7 +661,7 @@ function ScenariosTab({
                 disabled={isSaving || isActive}
                 className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 ${
                   isActive
-                    ? 'bg-white/10 text-vpp-navy-muted cursor-default'
+                    ? 'bg-white/10 text-white/60 cursor-default'
                     : 'bg-vpp-emerald text-white hover:bg-vpp-emerald-light shadow-emerald-glow-sm'
                 }`}
               >
@@ -687,11 +687,11 @@ function ScenariosTab({
 function ExportTab() {
   return (
     <div>
-      <h2 className="text-lg font-bold text-vpp-navy mb-2 flex items-center gap-2">
+      <h2 className="text-lg font-bold text-vpp-cream mb-2 flex items-center gap-2">
         <Download size={18} className="text-vpp-emerald" />
         Statutory Export
       </h2>
-      <p className="text-sm text-vpp-navy-muted mb-6">
+      <p className="text-sm text-white/60 mb-6">
         Generate and download cost savings and carbon reduction reports in CSV or PDF format
         for statutory reporting requirements.
       </p>
@@ -699,14 +699,14 @@ function ExportTab() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <button
           onClick={downloadCSV}
-          className="glass-card rounded-2xl p-6 flex items-center gap-4 hover:border-vpp-emerald/40 transition-all duration-200 group text-left"
+          className="vpp-card rounded-2xl p-6 flex items-center gap-4 hover:border-vpp-emerald/40 transition-all duration-200 group text-left"
         >
           <div className="w-14 h-14 rounded-xl bg-vpp-emerald/15 flex items-center justify-center group-hover:bg-vpp-emerald/25 transition-colors">
             <FileSpreadsheet size={28} className="text-vpp-emerald" />
           </div>
           <div>
-            <h3 className="font-bold text-vpp-navy">Export as CSV</h3>
-            <p className="text-sm text-vpp-navy-muted mt-1">
+            <h3 className="font-bold text-vpp-cream">Export as CSV</h3>
+            <p className="text-sm text-white/60 mt-1">
               Building snapshots + decision logs in spreadsheet format
             </p>
           </div>
@@ -714,23 +714,23 @@ function ExportTab() {
 
         <button
           onClick={downloadPDF}
-          className="glass-card rounded-2xl p-6 flex items-center gap-4 hover:border-vpp-blue/40 transition-all duration-200 group text-left"
+          className="vpp-card rounded-2xl p-6 flex items-center gap-4 hover:border-vpp-blue/40 transition-all duration-200 group text-left"
         >
           <div className="w-14 h-14 rounded-xl bg-vpp-blue/15 flex items-center justify-center group-hover:bg-vpp-blue/25 transition-colors">
             <FileText size={28} className="text-vpp-blue" />
           </div>
           <div>
-            <h3 className="font-bold text-vpp-navy">Export as PDF</h3>
-            <p className="text-sm text-vpp-navy-muted mt-1">
+            <h3 className="font-bold text-vpp-cream">Export as PDF</h3>
+            <p className="text-sm text-white/60 mt-1">
               Formatted statutory report with executive summary
             </p>
           </div>
         </button>
       </div>
 
-      <div className="mt-8 glass-card rounded-xl p-4">
-        <h3 className="text-sm font-bold text-vpp-navy mb-2">Report Contents</h3>
-        <ul className="text-xs text-vpp-navy-muted space-y-1.5">
+      <div className="mt-8 vpp-card rounded-xl p-4">
+        <h3 className="text-sm font-bold text-vpp-cream mb-2">Report Contents</h3>
+        <ul className="text-xs text-white/60 space-y-1.5">
           <li className="flex items-start gap-2">
             <span className="text-vpp-emerald mt-0.5">•</span>
             <span>Building snapshot: solar gen, wind gen, consumption, grid import/export, battery SoC</span>

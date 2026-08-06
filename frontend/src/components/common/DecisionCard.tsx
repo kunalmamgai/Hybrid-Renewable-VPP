@@ -44,7 +44,7 @@ export const DecisionCard = memo(function DecisionCard({ decision }: { decision:
   return (
     <div
       className={cn(
-        "glass-card rounded-2xl p-4 border-l-4 transition-all duration-200 hover:shadow-glass-lg",
+        "vpp-card p-4 border-l-4 transition-all duration-200 hover:shadow-glass-lg",
         borderClass,
       )}
     >
@@ -52,10 +52,10 @@ export const DecisionCard = memo(function DecisionCard({ decision }: { decision:
         <div className="flex items-center gap-3">
           {getIcon()}
           <div>
-            <span className="text-[10px] font-bold text-vpp-navy-muted uppercase tracking-wider">
+            <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">
               {getTypeLabel()}
             </span>
-            <div className="text-xs text-vpp-navy-muted mt-0.5">
+            <div className="text-xs text-white/45 mt-0.5">
               {decision.timestamp && new Date(decision.timestamp).toLocaleTimeString('en-IN', {
                 hour: '2-digit', minute: '2-digit', hour12: true
               })}
@@ -63,18 +63,18 @@ export const DecisionCard = memo(function DecisionCard({ decision }: { decision:
           </div>
         </div>
         <div className="text-right">
-          <div className="text-lg font-bold text-vpp-navy">
+          <div className="text-lg font-bold text-vpp-cream font-display">
             {decision.confidence_pct.toFixed(0)}%
           </div>
-          <span className="text-[10px] text-vpp-navy-muted uppercase tracking-wider">CONFIDENCE</span>
+          <span className="text-[10px] text-white/45 uppercase tracking-wider">CONFIDENCE</span>
         </div>
       </div>
 
       <div className="mt-3 space-y-2">
-        <p className="text-sm text-vpp-navy font-semibold leading-relaxed">{decision.action}</p>
+        <p className="text-sm text-vpp-cream font-semibold leading-relaxed">{decision.action}</p>
 
         {decision.reason && (
-          <p className="text-xs text-vpp-navy-muted leading-relaxed">{decision.reason}</p>
+          <p className="text-xs text-white/60 leading-relaxed">{decision.reason}</p>
         )}
 
         {decision.building_id && (
@@ -82,40 +82,40 @@ export const DecisionCard = memo(function DecisionCard({ decision }: { decision:
             "inline-block text-[10px] font-semibold px-2.5 py-0.5 rounded-full tracking-wide",
             decision.context?.criticality === 'critical'
               ? "bg-vpp-blue/15 text-vpp-blue"
-              : "bg-vpp-navy-muted/10 text-vpp-navy-muted",
+              : "bg-white/10 text-white/60",
           )}>
             {decision.building_id.replace('_', ' ').toUpperCase()}
           </span>
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-white/20">
+      <div className="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-white/10">
         <div className="text-center">
           <div className="flex items-center justify-center gap-1 text-vpp-emerald">
             <IndianRupee size={14} />
-            <span className="text-sm font-bold">{decision.expected_savings_inr.toFixed(1)}</span>
+            <span className="text-sm font-bold font-display">{decision.expected_savings_inr.toFixed(1)}</span>
           </div>
-          <span className="text-[10px] text-vpp-navy-muted">Savings (INR)</span>
+          <span className="text-[10px] text-white/50">Savings (INR)</span>
         </div>
         <div className="text-center">
           <div className="flex items-center justify-center gap-1 text-vpp-teal">
             <Leaf size={14} />
-            <span className="text-sm font-bold">{decision.expected_carbon_reduction_kg.toFixed(2)}</span>
+            <span className="text-sm font-bold font-display">{decision.expected_carbon_reduction_kg.toFixed(2)}</span>
           </div>
-          <span className="text-[10px] text-vpp-navy-muted">Carbon (kg)</span>
+          <span className="text-[10px] text-white/50">Carbon (kg)</span>
         </div>
         <div className="text-center">
-          <div className="text-sm font-bold text-vpp-navy">
+          <div className="text-sm font-bold text-vpp-cream font-display">
             {decision.battery_soc_after_pct.toFixed(0)}%
           </div>
-          <span className="text-[10px] text-vpp-navy-muted">SoC After</span>
+          <span className="text-[10px] text-white/50">SoC After</span>
         </div>
       </div>
 
       {decision.alternative_considered && (
-        <div className="mt-3 pt-2 border-t border-white/20">
-          <span className="text-[10px] text-vpp-navy-muted font-medium">Alternative:</span>
-          <p className="text-xs text-vpp-navy-muted mt-1 leading-relaxed">{decision.alternative_considered}</p>
+        <div className="mt-3 pt-2 border-t border-white/10">
+          <span className="text-[10px] text-white/50 font-medium">Alternative:</span>
+          <p className="text-xs text-white/60 mt-1 leading-relaxed">{decision.alternative_considered}</p>
         </div>
       )}
     </div>

@@ -14,6 +14,7 @@ class VppWebSocketClient {
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000; // ms
+  private reconnectTimer: number | null = null;
 
   constructor(url: string) {
     this.url = url;
@@ -42,13 +43,23 @@ class VppWebSocketClient {
     this.ws.onclose = () => {
       if (this.reconnectAttempts < this.maxReconnectAttempts) {
         this.reconnectAttempts++;
-        setTimeout(() => this.connect(), this.reconnectDelay * this.reconnectAttempts);
+        const delay = this.reconnectDelay * this.reconnectAttempts;
+        this.reconnectTimer = window.setTimeout(() => {
+          this.reconnectTimer = null;
+          this.connect();
+        }, delay);
       }
     };
   }
 
   disconnect(): void {
+    if (this.reconnectTimer !== null) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
     if (this.ws) {
+      // Prevent an intentional close from scheduling a reconnect
+      this.ws.onclose = null;
       this.ws.close();
       this.ws = null;
     }
