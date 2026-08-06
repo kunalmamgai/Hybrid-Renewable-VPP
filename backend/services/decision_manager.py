@@ -16,26 +16,23 @@ Manager orchestrates them without tight coupling — modules can be upgraded
 (e.g., rule-based → Pyomo LP) without touching the orchestration logic.
 """
 from __future__ import annotations
-import json
+
 import logging
-import math
 import uuid
-from datetime import datetime, timezone, timedelta
-from typing import Optional, Any
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 
 from backend.adapters.base import EnergyAdapter
-from backend.adapters.simulated import SimulatedAdapter
-from backend.simulator.battery_model import BatteryModel
-from backend.services.forecast_engine import ForecastEngine, FullForecast
-from backend.services.reliability_guard import ReliabilityGuard, ReliabilityConstraints
-from backend.services.load_advisor import LoadShiftAdvisor, LoadShiftAdvice
-from backend.services.dispatch_optimizer import DispatchOptimizer, DispatchCandidate
-from backend.services.battery_scheduler import BatteryChargeScheduler, BatteryCandidate
-from backend.services.vnm_optimizer import VnmOptimizer, VnmCandidate
-from backend.services.cost_optimizer import CostOptimizer
+from backend.config import settings
+from backend.services.battery_scheduler import BatteryCandidate, BatteryChargeScheduler
 from backend.services.carbon_optimizer import CarbonOptimizer
-from backend.models.decision_log import DecisionLog
+from backend.services.cost_optimizer import CostOptimizer
+from backend.services.dispatch_optimizer import DispatchCandidate, DispatchOptimizer
+from backend.services.forecast_engine import ForecastEngine, FullForecast
+from backend.services.load_advisor import LoadShiftAdvisor
+from backend.services.reliability_guard import ReliabilityConstraints, ReliabilityGuard
+from backend.services.vnm_optimizer import VnmOptimizer
+from backend.simulator.battery_model import BatteryModel
 from backend.ws.websocket_manager import ConnectionManager
 
 logger = logging.getLogger(__name__)
@@ -53,7 +50,7 @@ class DecisionResult:
     alternative_considered: str
     expected_savings_inr: float
     expected_carbon_reduction_kg: float
-    building_id: Optional[str]
+    building_id: str | None
     battery_soc_after_pct: float
     context: dict = field(default_factory=dict)
 
@@ -81,7 +78,7 @@ class ScoredStrategy:
     dispatch: DispatchCandidate
     battery: BatteryCandidate
     vnm_allocation: dict
-    load_shift: Optional[dict]
+    load_shift: dict | None
     cost_inr: float
     carbon_kg: float
     normalized_cost: float
@@ -121,18 +118,13 @@ class DecisionManager:
         self.load_advisor = LoadShiftAdvisor()
         self.dispatch_optimizer = DispatchOptimizer()
         self.battery_scheduler = BatteryChargeScheduler()
-        self.vnm_optimizer = VnmOptimizer(
-            sell_rate_inr=5.0,  # Will be updated from config
-        )
-        self.cost_optimizer = CostOptimizer(
-            tariff_buy=9.0,
-            tariff_sell=5.0,
-        )
+        self.vnm_optimizer = VnmOptimizer()
+        self.cost_optimizer = CostOptimizer()
         self.carbon_optimizer = CarbonOptimizer()
 
         self.decision_count = 0
 
-    async def run_cycle(self, twin_snapshot: dict) -> Optional[dict]:
+    async def run_cycle(self, twin_snapshot: dict) -> dict | None:
         """Execute the full 5-minute decision cycle.
 
         Returns a summary of the best decision for each building, or None
@@ -208,7 +200,7 @@ class DecisionManager:
             twin_snapshot, forecast, constraints, bid
         )
         load_advice = await self.load_advisor.advise(
-            forecast, bid, tariff=bdata.get("tariff_inr_per_unit", 9.0)
+            forecast, bid, tariff=bdata.get("tariff_inr_per_unit", settings.default_tariff_buy_inr)
         )
 
         strategies: list[ScoredStrategy] = []
@@ -364,8 +356,8 @@ class DecisionManager:
                     confidence_pct=85.0,
                     reason=best.load_shift.get("reason", "Optimal window for flexible load identified."),
                     alternative_considered="Keep current schedule",
-                    expected_savings_inr=round(best.load_shift.get("expected_surplus_kwh", 0) * 5.0, 2),
-                    expected_carbon_reduction_kg=round(best.load_shift.get("expected_surplus_kwh", 0) * 0.74, 3),
+                    expected_savings_inr=round(best.load_shift.get("expected_surplus_kwh", 0) * settings.default_tariff_sell_inr, 2),
+                    expected_carbon_reduction_kg=round(best.load_shift.get("expected_surplus_kwh", 0) * settings.grid_emission_factor_kg_per_kwh, 3),
                     building_id=bid,
                     battery_soc_after_pct=best.battery.target_soc_pct,
                     context=best.load_shift,
@@ -389,7 +381,7 @@ class DecisionManager:
                         reason=best_vnm.reason,
                         alternative_considered="Standard net metering",
                         expected_savings_inr=alloc["inr"],
-                        expected_carbon_reduction_kg=round(alloc["kwh"] * 0.74, 3),
+                        expected_carbon_reduction_kg=round(alloc["kwh"] * settings.grid_emission_factor_kg_per_kwh, 3),
                         building_id=bid,
                         battery_soc_after_pct=0,  # Not applicable
                         context=alloc,
@@ -426,7 +418,7 @@ class DecisionManager:
         all_strategies: list[ScoredStrategy],
         best: ScoredStrategy,
         building_id: str,
-    ) -> Optional[ScoredStrategy]:
+    ) -> ScoredStrategy | None:
         """Find the second-best strategy for the same building."""
         building_strategies = [s for s in all_strategies if s.building_id == building_id and s is not best]
         if not building_strategies:

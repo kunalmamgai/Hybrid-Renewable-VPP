@@ -4,16 +4,9 @@
  */
 import axios from 'axios';
 import type {
-  BuildingTwin,
-  TurbineTwin,
-  BatteryTwin,
-  CampusState,
   Decision,
   DecisionStats,
   ExportStats,
-  HealthStatus,
-  LiveSnapshot,
-  SchedulerHealth,
   AlertThreshold,
   BuildingTierConfig,
   VnmSharingRule,
@@ -27,54 +20,6 @@ const api = axios.create({
 });
 
 // ============================================================
-// Health & Status
-// ============================================================
-
-export const getHealth = async (): Promise<HealthStatus> => {
-  const resp = await api.get<HealthStatus>('/health');
-  return resp.data;
-};
-
-export const getSchedulerHealth = async (): Promise<SchedulerHealth> => {
-  const resp = await api.get<SchedulerHealth>('/health/scheduler');
-  return resp.data;
-};
-
-// ============================================================
-// Digital Twin
-// ============================================================
-
-export const getBuildings = async (): Promise<BuildingTwin[]> => {
-  const resp = await api.get<BuildingTwin[]>('/api/v1/digital-twin/buildings');
-  return resp.data;
-};
-
-export const getBuilding = async (id: string): Promise<BuildingTwin> => {
-  const resp = await api.get<BuildingTwin>(`/api/v1/digital-twin/buildings/${id}`);
-  return resp.data;
-};
-
-export const getTurbines = async (): Promise<TurbineTwin[]> => {
-  const resp = await api.get<TurbineTwin[]>('/api/v1/digital-twin/turbines');
-  return resp.data;
-};
-
-export const getBatteries = async (): Promise<BatteryTwin[]> => {
-  const resp = await api.get<BatteryTwin[]>('/api/v1/digital-twin/batteries');
-  return resp.data;
-};
-
-export const getCampusState = async (): Promise<CampusState> => {
-  const resp = await api.get<CampusState>('/api/v1/digital-twin/campus');
-  return resp.data;
-};
-
-export const getLiveSnapshot = async (): Promise<LiveSnapshot> => {
-  const resp = await api.get<LiveSnapshot>('/api/v1/digital-twin/live');
-  return resp.data;
-};
-
-// ============================================================
 // Decisions
 // ============================================================
 
@@ -84,11 +29,6 @@ export const getDecisions = async (
 ): Promise<Decision[]> => {
   const params = buildingId ? { building_id: buildingId, limit } : { limit };
   const resp = await api.get<Decision[]>('/api/v1/decisions', { params });
-  return resp.data;
-};
-
-export const getLatestDecision = async (): Promise<Decision | null> => {
-  const resp = await api.get<Decision | null>('/api/v1/decisions/latest');
   return resp.data;
 };
 

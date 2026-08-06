@@ -1,7 +1,8 @@
 """API routes for CSV/PDF statutory export of cost and carbon savings."""
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException, Response
-from sqlalchemy import select, desc
+
+from fastapi import APIRouter, Depends, Response
+from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_session
@@ -13,8 +14,8 @@ router = APIRouter(prefix="/api/v1", tags=["export"])
 
 def generate_csv(building_data: list, decision_data: list) -> str:
     """Generate CSV content from building snapshots and decision logs."""
-    import io
     import csv
+    import io
 
     output = io.StringIO()
     writer = csv.writer(output)
@@ -58,13 +59,20 @@ def generate_csv(building_data: list, decision_data: list) -> str:
 
 def generate_pdf(building_data: list, decision_data: list, stats: dict) -> bytes:
     """Generate a PDF statutory report using reportlab."""
-    from reportlab.lib.pagesizes import letter
-    from reportlab.lib.units import inch
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    import io
+
     from reportlab.lib import colors
     from reportlab.lib.colors import HexColor
-    import io
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+    from reportlab.lib.units import inch
+    from reportlab.platypus import (
+        Paragraph,
+        SimpleDocTemplate,
+        Spacer,
+        Table,
+        TableStyle,
+    )
 
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter,
@@ -208,28 +216,32 @@ async def export_pdf(session: AsyncSession = Depends(get_session)):
 
 @router.get("/export/stats")
 async def export_stats(session: AsyncSession = Depends(get_session)):
-    """Return exportable statistics summary."""
-    buildings_result = await session.execute(select(BuildingTwin))
-    decisions_result = await session.execute(select(DecisionLog))
-    buildings = buildings_result.scalars().all()
-    decisions = decisions_result.scalars().all()
+    """Return exportable statistics summary (SQL-aggregated)."""
+    building_sums = (await session.execute(select(
+        func.coalesce(func.sum(BuildingTwin.grid_import_kwh), 0.0),
+        func.coalesce(func.sum(BuildingTwin.grid_export_kwh), 0.0),
+        func.coalesce(func.sum(BuildingTwin.solar_generation_kwh), 0.0),
+        func.coalesce(func.sum(BuildingTwin.wind_generation_kwh), 0.0),
+    ))).one()
+    decision_sums = (await session.execute(select(
+        func.count(DecisionLog.id),
+        func.coalesce(func.sum(DecisionLog.expected_savings_inr), 0.0),
+        func.coalesce(func.sum(DecisionLog.expected_carbon_reduction_kg), 0.0),
+    ))).one()
 
-    total_grid_import = sum(b.grid_import_kwh or 0 for b in buildings)
-    total_grid_export = sum(b.grid_export_kwh or 0 for b in buildings)
-    total_solar = sum(b.solar_generation_kwh or 0 for b in buildings)
-    total_wind = sum(b.wind_generation_kwh or 0 for b in buildings)
-    total_savings = sum(d.expected_savings_inr or 0 for d in decisions)
-    total_carbon = sum(d.expected_carbon_reduction_kg or 0 for d in decisions)
+    total_solar = float(building_sums[2])
+    total_wind = float(building_sums[3])
+    total_renewable = total_solar + total_wind
 
     return {
         "period": "lifetime (all logged data)",
         "total_solar_generation_kwh": round(total_solar, 2),
         "total_wind_generation_kwh": round(total_wind, 2),
-        "total_grid_import_kwh": round(total_grid_import, 2),
-        "total_grid_export_kwh": round(total_grid_export, 2),
-        "total_cost_savings_inr": round(total_savings, 2),
-        "total_carbon_reduction_kg": round(total_carbon, 2),
+        "total_grid_import_kwh": round(float(building_sums[0]), 2),
+        "total_grid_export_kwh": round(float(building_sums[1]), 2),
+        "total_cost_savings_inr": round(float(decision_sums[1]), 2),
+        "total_carbon_reduction_kg": round(float(decision_sums[2]), 2),
         "renewable_self_consumption_pct": round(
-            (total_solar + total_wind - total_grid_export) / max(0.01, total_solar + total_wind) * 100, 1
-        ) if (total_solar + total_wind) > 0 else 0,
+            (total_renewable - float(building_sums[1])) / total_renewable * 100, 1
+        ) if total_renewable > 0 else 0,
     }

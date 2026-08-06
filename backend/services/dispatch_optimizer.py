@@ -6,10 +6,9 @@ For each candidate strategy, produces a dispatch plan describing how energy
 flows through the system. The Cost and Carbon engines then score each plan.
 """
 from __future__ import annotations
+
 import logging
-import math
 from dataclasses import dataclass, field
-from typing import Optional
 
 from backend.services.forecast_engine import FullForecast
 from backend.services.reliability_guard import ReliabilityConstraints

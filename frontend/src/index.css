@@ -39,22 +39,6 @@ body {
   color: #fff6e6;
 }
 
-/* ─── Standardized VPP Glass System ─── */
-.vpp-glass {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 1.25rem;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
-  transition: all 0.3s ease;
-}
-
-.vpp-glass:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(217, 119, 6, 0.25); /* vpp-accent-gold */
-}
-
 /* ─── VPP Sheet — seamless connected panel (no floating box) ─── */
 .vpp-sheet {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015));
@@ -78,23 +62,6 @@ body {
 
 .flow-dot {
   animation: flowPulse 2s ease-in-out infinite;
-}
-
-.vpp-glass-warm {
-  background: rgba(217, 119, 6, 0.04);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(217, 119, 6, 0.15);
-  border-radius: 1.25rem;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
-}
-
-.vpp-glass-dark {
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 1.25rem;
 }
 
 /* ─── Legacy glass card utilities (dashboard surfaces) ─── */

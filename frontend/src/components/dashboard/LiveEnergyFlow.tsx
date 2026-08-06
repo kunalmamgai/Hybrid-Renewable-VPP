@@ -4,7 +4,7 @@
  * Uses React Flow for the node-based visualization.
  * Glass-morphism style matching the landing page aesthetic.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import ReactFlow, {
   Controls,
   Background,
@@ -122,7 +122,7 @@ const generateBuildingNodes = (buildings: BuildingTwin[]): Node[] =>
     position: { x: 500 + i * 200, y: 100 + (i % 2) * 200 },
     data: {
       label: b.name || b.building_id.replace('_', ' '),
-      value: 0,
+      value: b.consumption_kwh * 12,
       tier: b.criticality_tier,
       soc: b.battery_soc_pct,
     },
@@ -139,98 +139,48 @@ const generateBuildingEdges = (buildings: BuildingTwin[]): Edge[] =>
 export function LiveEnergyFlow() {
   const { buildings } = useVppData();
 
-  const [nodes, setNodes] = useState<Node[]>(STATIC_NODES);
-  const [edges, setEdges] = useState<Edge[]>(STATIC_EDGES);
+  // Compute the entire graph in a single pass so a live refresh results in
+  // one state reconciliation instead of three sequential effects.
+  const { nodes, edges } = useMemo(() => {
+    const totalSolar = buildings.reduce((sum, b) => sum + b.solar_generation_kwh * 12, 0);
+    const totalWind = buildings.reduce((sum, b) => sum + b.wind_generation_kwh * 12, 0);
+    const avgSoC = buildings.reduce((sum, b) => sum + b.battery_soc_pct, 0) / (buildings.length || 1);
+    const gridPower =
+      buildings.reduce((sum, b) => sum + b.grid_import_kwh * 12, 0) -
+      buildings.reduce((sum, b) => sum + b.grid_export_kwh * 12, 0);
 
-  // Append building nodes/edges once live data arrives
-  useEffect(() => {
-    if (buildings.length === 0) return;
-    setNodes((nds) => {
-      const existing = new Set(nds.map((n) => n.id));
-      return [...nds, ...generateBuildingNodes(buildings).filter((n) => !existing.has(n.id))];
+    const nodes: Node[] = [
+      { ...STATIC_NODES[0], data: { ...STATIC_NODES[0].data, value: totalSolar } },
+      { ...STATIC_NODES[1], data: { ...STATIC_NODES[1].data, value: totalWind } },
+      { ...STATIC_NODES[2], data: { soc: avgSoC, power: gridPower } },
+      ...generateBuildingNodes(buildings),
+    ];
+
+    const solarEdge: Edge = {
+      ...STATIC_EDGES[0],
+      style: { ...STATIC_EDGES[0].style, strokeWidth: Math.max(2, Math.min(8, totalSolar / 10)) },
+    };
+    const windEdge: Edge = {
+      ...STATIC_EDGES[1],
+      style: { ...STATIC_EDGES[1].style, strokeWidth: Math.max(2, Math.min(8, totalWind / 10)) },
+    };
+    const buildingEdges = generateBuildingEdges(buildings).map((edge) => {
+      const { source, target } = edge;
+      const building = buildings.find((b) => b.building_id === source) ??
+        buildings.find((b) => b.building_id === target);
+      if (!building) return edge;
+      if (source === 'battery') {
+        const soc = building.battery_soc_pct;
+        return { ...edge, style: { ...edge.style, strokeWidth: Math.max(1, (soc / 100) * 4) } };
+      }
+      if (target === 'grid') {
+        const exportPower = building.grid_export_kwh * 12;
+        return { ...edge, style: { ...edge.style, strokeWidth: Math.max(1, Math.min(6, exportPower / 5)) } };
+      }
+      return edge;
     });
-    setEdges((eds) => {
-      const existing = new Set(eds.map((e) => e.id));
-      return [...eds, ...generateBuildingEdges(buildings).filter((e) => !existing.has(e.id))];
-    });
-  }, [buildings]);
 
-  // Update node data with live values
-  useEffect(() => {
-    setNodes((nds) =>
-      nds.map((node) => {
-        if (node.id === 'solar') {
-          const totalSolar = buildings.reduce((sum, b) => sum + b.solar_generation_kwh * 12, 0);
-          return { ...node, data: { ...node.data, value: totalSolar } };
-        }
-        if (node.id === 'wind') {
-          const totalWind = buildings.reduce((sum, b) => sum + b.wind_generation_kwh * 12, 0);
-          return { ...node, data: { ...node.data, value: totalWind } };
-        }
-        if (node.id === 'battery') {
-          const avgSoC = buildings.reduce((sum, b) => sum + b.battery_soc_pct, 0) / (buildings.length || 1);
-          const totalPower = buildings.reduce((sum, b) => sum + b.grid_import_kwh * 12, 0) -
-                            buildings.reduce((sum, b) => sum + b.grid_export_kwh * 12, 0);
-          return { ...node, data: { soc: avgSoC, power: totalPower } };
-        }
-        // Building node
-        const building = buildings.find((b) => b.building_id === node.id);
-        if (building) {
-          const demand = building.consumption_kwh * 12;
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              label: building.name || building.building_id.replace('_', ' '),
-              value: demand,
-              tier: building.criticality_tier,
-              soc: building.battery_soc_pct,
-            },
-          };
-        }
-        return node;
-      }),
-    );
-  }, [buildings]);
-
-  // Update edge styles dynamically based on energy flow
-  useEffect(() => {
-    setEdges((eds) =>
-      eds.map((edge) => {
-        const sourceId = edge.source;
-        const targetId = edge.target;
-
-        // Solar/Wind → Battery: thickness based on total generation
-        if (sourceId === 'solar' && targetId === 'battery') {
-          const totalSolar = buildings.reduce((sum, b) => sum + b.solar_generation_kwh * 12, 0);
-          return { ...edge, style: { ...edge.style, strokeWidth: Math.max(2, Math.min(8, totalSolar / 10)) } };
-        }
-        if (sourceId === 'wind' && targetId === 'battery') {
-          const totalWind = buildings.reduce((sum, b) => sum + b.wind_generation_kwh * 12, 0);
-          return { ...edge, style: { ...edge.style, strokeWidth: Math.max(2, Math.min(8, totalWind / 10)) } };
-        }
-
-        // Battery → Building: thickness based on battery SoC
-        if (sourceId === 'battery' && buildings.some((b) => b.building_id === targetId)) {
-          const building = buildings.find((b) => b.building_id === targetId);
-          if (building) {
-            const soc = building.battery_soc_pct;
-            return { ...edge, style: { ...edge.style, strokeWidth: Math.max(1, (soc / 100) * 4) } };
-          }
-        }
-
-        // Building → Grid: thickness based on grid export
-        if (targetId === 'grid' && buildings.some((b) => b.building_id === sourceId)) {
-          const building = buildings.find((b) => b.building_id === sourceId);
-          if (building) {
-            const exportPower = building.grid_export_kwh * 12;
-            return { ...edge, style: { ...edge.style, strokeWidth: Math.max(1, Math.min(6, exportPower / 5)) } };
-          }
-        }
-
-        return edge;
-      }),
-    );
+    return { nodes, edges: [solarEdge, windEdge, ...buildingEdges] };
   }, [buildings]);
 
   return (

@@ -8,15 +8,16 @@ Uses heuristic/statistical models:
 This is the MVP; Phase 3+ upgrade: XGBoost for solar, LSTM for wind/demand.
 """
 from __future__ import annotations
-import math
-import logging
-from datetime import datetime, timezone, timedelta
-from dataclasses import dataclass, field
-from typing import Optional
 
+import logging
+import math
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
+
+from backend.config import settings
+from backend.simulator.demand_curve import DemandCurve
 from backend.simulator.solar_curve import SolarCurve
 from backend.simulator.wind_curve import WindCurve
-from backend.simulator.demand_curve import DemandCurve
 
 logger = logging.getLogger(__name__)
 
@@ -55,11 +56,11 @@ class ForecastEngine:
         self.solar_curve = SolarCurve(latitude, longitude)
         self.wind_curve = WindCurve()
         self.demand_curve = DemandCurve()
-        self.grid_emission_factor = 0.74  # kg CO2 / kWh — Rajasthan average
+        self.grid_emission_factor = settings.grid_emission_factor_kg_per_kwh
         self.forecast_horizon_hours = 24
         self.forecast_interval_minutes = 5
 
-    async def forecast(self, twin_snapshot: dict, start_time: Optional[datetime] = None) -> FullForecast:
+    async def forecast(self, twin_snapshot: dict, start_time: datetime | None = None) -> FullForecast:
         """Produce 24h forecast from current twin state.
 
         Args:
@@ -82,7 +83,6 @@ class ForecastEngine:
                          and not k.startswith("battery_") and k != "timestamp"]
         buildings = {bid: twin_snapshot[bid] for bid in building_keys}
         turbines = {k: v for k, v in twin_snapshot.items() if k.startswith("turbine_") and isinstance(v, dict)}
-        batteries = {k: v for k, v in twin_snapshot.items() if k.startswith("battery_") and isinstance(v, dict)}
 
         # Forecast each building
         for bid, building_data in buildings.items():
@@ -91,8 +91,6 @@ class ForecastEngine:
 
             # Solar forecast
             solar_forecast = Forecast()
-            # Use current cloud cover as base, persist forward with slight regression to mean
-            current_irr = building_data.get("solar_generation_kwh", 0) * 12  # Convert to kW
             current_capacity = self._get_solar_capacity(bid, building_data)
 
             for i in range(total_steps):

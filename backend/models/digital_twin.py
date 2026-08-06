@@ -1,7 +1,7 @@
 """Digital Twin SQLAlchemy models — the authoritative state of the campus."""
 from __future__ import annotations
 
-from sqlalchemy import Column, String, Float, Integer, DateTime, ForeignKey, func
+from sqlalchemy import Column, DateTime, Float, ForeignKey, String, func
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
@@ -34,7 +34,6 @@ class BuildingTwin(Base):
     # Forecast (24h)
     predicted_solar_tomorrow_kwh = Column(Float, default=0.0)
     predicted_wind_tomorrow_kwh = Column(Float, default=0.0)
-    predicted_demand_tomorrow_kwh = Column(Float, default=0.0)
 
     last_updated = Column(DateTime, default=func.now(), onupdate=func.now())
 
@@ -57,7 +56,6 @@ class BuildingTwin(Base):
             "tariff_inr_per_unit": self.tariff_inr_per_unit,
             "predicted_solar_tomorrow_kwh": round(self.predicted_solar_tomorrow_kwh, 2),
             "predicted_wind_tomorrow_kwh": round(self.predicted_wind_tomorrow_kwh, 2),
-            "predicted_demand_tomorrow_kwh": round(self.predicted_demand_tomorrow_kwh, 2),
             "last_updated": self.last_updated.isoformat() if self.last_updated else None,
         }
 

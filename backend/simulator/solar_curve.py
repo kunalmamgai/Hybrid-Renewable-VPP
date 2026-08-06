@@ -11,9 +11,9 @@ Formula:
 Where G_sc = 1000 W/m² (solar constant at sea level)
 """
 from __future__ import annotations
+
 import math
 from datetime import datetime
-
 
 DEGREES_TO_RADIANS = math.pi / 180.0
 
@@ -30,18 +30,6 @@ class SolarCurve:
         return 23.45 * DEGREES_TO_RADIANS * math.sin(
             math.radians(360.0 * (284 + day_of_year) / 365.0)
         )
-
-    def solar_time(self, dt: datetime) -> float:
-        """Returns local solar time as a fraction of day (0-24)."""
-        # Equation of time correction (simplified)
-        day_of_year = dt.timetuple().tm_yday
-        b = math.radians(360.0 * (day_of_year - 81) / 365.0)
-        eq_time = 9.87 * math.sin(2 * b) - 7.53 * math.cos(b) - 1.5 * math.sin(b)
-        tc = 4.0 * (dt.longitude if hasattr(dt, 'longitude') else self.longitude) + eq_time
-        lstm = 15.0 * round(self.longitude / 15.0)
-        lst = dt.hour + dt.minute / 60.0 + dt.second / 3600.0
-        lst -= tc / 60.0
-        return lst
 
     def zenith_angle(self, dt: datetime) -> float:
         """Solar zenith angle in radians."""
@@ -82,8 +70,3 @@ class SolarCurve:
         # Add some natural variability
         variability = 0.05 * math.sin(dt.hour * 0.5)
         return max(0, g_actual * (1 + variability))
-
-    def capacity_factor(self, dt: datetime, cloud_cover: float = 0.0) -> float:
-        """Return PV capacity factor (0.0 to 1.0) for a given time."""
-        irr = self.irradiance(dt, cloud_cover)
-        return irr / 1000.0

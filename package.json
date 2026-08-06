@@ -8,7 +8,7 @@
     "dev:sim": "python -m backend.simulator.run_simulation --duration 24h --interval 5",
     "dev:scheduler": "python -m backend.services.scheduler --mode continuous",
     "test": "pytest backend/tests/ -v",
-    "test:24h": "python -m backend.tests.test_24h_simulation",
+    "test:24h": "python -m pytest backend/tests/test_24h_simulation.py -v",
     "lint": "ruff check backend/",
     "format": "ruff format backend/"
   },

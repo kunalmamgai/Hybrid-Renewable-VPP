@@ -1,14 +1,14 @@
 """Database initialization and session management (async SQLAlchemy)."""
 import logging
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from backend.config import settings
-from backend.models.digital_twin import Base as TwinBase
-from backend.models.decision_log import Base as LogBase
 from backend.models.config import Base as ConfigBase
+from backend.models.decision_log import Base as LogBase
+from backend.models.digital_twin import Base as TwinBase
 
 logger = logging.getLogger(__name__)
 

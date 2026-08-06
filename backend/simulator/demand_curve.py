@@ -10,6 +10,7 @@ The curve uses a cosine-modulated sinusoidal model:
   P(t) = P_peak × (0.15 + 0.85 × (1 + cos(π × (t - t_peak) / 12)) / 2) × occupancy
 """
 from __future__ import annotations
+
 import math
 from datetime import datetime
 
@@ -64,19 +65,3 @@ class DemandCurve:
 
         # Apply occupancy and weekend factor
         return peak_kw * demand_factor * occupancy
-
-    def is_weekend(self, dt: datetime) -> bool:
-        return dt.weekday() >= 5
-
-    def occupancy_for_hour(self, hour: int, building_type: str = "academic") -> float:
-        """Return occupancy fraction for a given hour and building type."""
-        if building_type == "admin":
-            return 1.0 if 9 <= hour < 18 else 0.1
-        elif building_type == "lab":
-            return 1.0 if 8 <= hour < 20 else 0.3
-        elif building_type == "hostel":
-            return 1.0 if (7 <= hour < 10) or (17 <= hour < 23) else 0.5
-        elif building_type == "sports":
-            return 0.8 if 6 <= hour < 10 else 0.4 if 15 <= hour < 19 else 0.1
-        else:  # academic
-            return 1.0 if 8 <= hour < 18 else 0.3

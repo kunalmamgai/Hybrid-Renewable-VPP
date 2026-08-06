@@ -5,9 +5,10 @@ must implement this interface. This is what makes the system truly vendor-neutra
 the core code never talks to hardware directly — it goes through this contract.
 """
 from __future__ import annotations
+
+import logging
 from abc import ABC, abstractmethod
 from typing import Any
-import logging
 
 logger = logging.getLogger(__name__)
 

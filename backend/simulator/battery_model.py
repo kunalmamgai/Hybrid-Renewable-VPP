@@ -11,9 +11,6 @@ Battery health degrades slowly over cycles.
 State transitions: charging → holding → discharging → emergency_shed
 """
 from __future__ import annotations
-import math
-from dataclasses import dataclass, field
-from typing import Optional
 
 
 class BatteryModel:
@@ -63,7 +60,6 @@ class BatteryModel:
         self.soc_pct = min(100.0, self.soc_pct + soc_delta)
 
         # Losses as heat
-        losses = power_kw * self.LOSS_FACTOR * (interval_seconds / 3600.0)
         self._apply_temperature(power_kw, interval_seconds)
 
         # Health degradation
@@ -98,7 +94,6 @@ class BatteryModel:
         soc_delta = (energy_kwh / self.capacity_kwh) * 100.0
         self.soc_pct = max(0.0, self.soc_pct - soc_delta)
 
-        losses = power_kw * self.LOSS_FACTOR * (interval_seconds / 3600.0)
         self._apply_temperature(-power_kw, interval_seconds)
         self._degrade_health(energy_kwh)
 
@@ -120,12 +115,6 @@ class BatteryModel:
         available_capacity = (100.0 - self.soc_pct) / 100.0 * self.capacity_kwh
         max_charge_energy = min(available_capacity * 0.5, available_capacity)
         return max_charge_energy / (300.0 / 3600.0)
-
-    def step_idle(self, interval_seconds: float = 300.0) -> None:
-        """Advance time without charging or discharging (passive cooling)."""
-        self._apply_temperature(0, interval_seconds)
-        self.power_kw = 0.0
-        self._update_electrical_params(0)
 
     def _apply_temperature(self, power_kw: float, interval_seconds: float) -> None:
         heat_from_loss = abs(power_kw) * self.LOSS_FACTOR
@@ -150,16 +139,3 @@ class BatteryModel:
         health_factor = self.health_pct / 100.0
         self.voltage_v = voltage_nominal * soc_factor * health_factor
         self.current_a = power_kw / max(0.01, self.voltage_v) * 1000.0 if power_kw != 0 else 0.0
-
-    def to_dict(self) -> dict:
-        return {
-            "soc_pct": round(self.soc_pct, 1),
-            "health_pct": round(self.health_pct, 1),
-            "capacity_kwh": self.capacity_kwh,
-            "power_kw": round(self.power_kw, 2),
-            "temperature_c": round(self.temperature_c, 1),
-            "voltage_v": round(self.voltage_v, 2),
-            "current_a": round(self.current_a, 2),
-            "total_charged_kwh": round(self._total_charged_kwh, 2),
-            "total_discharged_kwh": round(self._total_discharged_kwh, 2),
-        }

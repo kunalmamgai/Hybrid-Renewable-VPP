@@ -1,9 +1,8 @@
 """API routes for health checks and status."""
-from fastapi import APIRouter, HTTPException
 from datetime import datetime
-import logging
 
-logger = logging.getLogger(__name__)
+from fastapi import APIRouter, HTTPException
+
 router = APIRouter(tags=["health"])
 
 
@@ -15,20 +14,6 @@ async def health():
         "timestamp": datetime.utcnow().isoformat() + "Z",
         "service": "hybrid-renewable-vpp",
         "version": "1.0.0",
-    }
-
-
-@router.get("/health/adapter")
-async def adapter_health():
-    """Check adapter layer connectivity."""
-    return {
-        "adapters": {
-            "simulated": {"status": "online", "adapter_type": "simulated"},
-            "modbus": {"status": "offline", "adapter_type": "modbus"},
-            "mqtt": {"status": "offline", "adapter_type": "mqtt"},
-            "rest": {"status": "offline", "adapter_type": "rest"},
-        },
-        "timestamp": datetime.utcnow().isoformat() + "Z",
     }
 
 

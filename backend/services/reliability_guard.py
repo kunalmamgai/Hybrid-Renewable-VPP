@@ -9,11 +9,11 @@ The Reliability Guard is a CONSTRAINT, not an optimizer. It filters candidates,
 not scores them.
 """
 from __future__ import annotations
-import logging
-import math
-from dataclasses import dataclass, field
-from typing import Optional
 
+import logging
+from dataclasses import dataclass, field
+
+from backend.config import settings
 from backend.services.forecast_engine import FullForecast
 
 logger = logging.getLogger(__name__)
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ReliabilityConstraints:
     """Hard constraints that all optimization candidates must satisfy."""
-    reserve_floor_pct: float = 20.0          # Minimum battery SoC to never go below
+    reserve_floor_pct: float = settings.battery_min_soc_pct  # Min battery SoC to never go below
     critical_load_kw: float = 0.0             # Total critical load across campus (kW)
     non_critical_load_kw: float = 0.0         # Total non-critical load (kW)
     shedding_priority: list[dict] = field(default_factory=list)  # [{building_id, tier, priority}]
@@ -53,9 +53,9 @@ class ReliabilityGuard:
     RESERVE_DURATION_HOURS = 2.0  # Battery must support critical load for 2 hours
 
     def __init__(self):
-        self.last_constraints: Optional[ReliabilityConstraints] = None
+        self.last_constraints: ReliabilityConstraints | None = None
 
-    async def compute_constraints(self, twin_snapshot: dict, forecast: Optional[FullForecast] = None) -> ReliabilityConstraints:
+    async def compute_constraints(self, twin_snapshot: dict, forecast: FullForecast | None = None) -> ReliabilityConstraints:
         """Compute reliability constraints based on current state and forecast.
 
         Args:
@@ -135,7 +135,7 @@ class ReliabilityGuard:
         emergency = False
         if forecast and forecast.demand:
             # Look at next 6 hours (72 intervals at 5 min = 12 per hour)
-            first_demand = list(forecast.demand.values())[0]
+            first_demand = next(iter(forecast.demand.values()))
             horizon = min(72, len(first_demand.values) if first_demand.values else 0)
             for bid, demand_fc in forecast.demand.items():
                 solar_fc = forecast.solar.get(bid)

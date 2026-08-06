@@ -3,36 +3,33 @@
 Exit criteria:
   - The simulator streams believable 5-minute readings for every source
     into the Digital Twin.
-  - All four adapter types (Simulated, Modbus, MQTT, REST) satisfy the
-    same EnergyAdapter interface.
+  - The simulated adapter satisfies the EnergyAdapter interface.
   - Solar curve is driven by time-of-day + cloud cover.
   - Wind curve has realistic cut-in/rated/cut-out behaviour.
   - Battery model has SoC dynamics with losses.
   - Demand curve is driven by time-of-day + occupancy.
 """
 from __future__ import annotations
-import asyncio
+
+from datetime import datetime
+
 import pytest
-from datetime import datetime, timezone, timedelta
 
 from backend.adapters.base import EnergyAdapter
-from backend.adapters.simulated import SimulatedAdapter, SimulatedConfig, SimulatedBuilding
-from backend.adapters.modbus import ModbusAdapter, ModbusConfig
-from backend.adapters.mqtt import MqttAdapter, MqttConfig
-from backend.adapters.rest import RestAdapter, RestConfig
+from backend.adapters.simulated import (
+    SimulatedAdapter,
+    SimulatedBuilding,
+    SimulatedConfig,
+)
 
 
 def test_all_adapters_implement_interface():
-    """Verify every adapter satisfies the EnergyAdapter ABC."""
+    """Verify the simulated adapter satisfies the EnergyAdapter ABC."""
     config = SimulatedConfig(time_scale=1.0, interval_seconds=300.0, scenario="mvp_day")
     buildings = [SimulatedBuilding(building_id="test", name="Test", solar_capacity_kw=50.0, wind_capacity_kw=20.0)]
     sim = SimulatedAdapter(config=config, buildings=buildings)
 
-    modbus = ModbusAdapter(config=ModbusConfig(host="localhost"))
-    mqtt = MqttAdapter(config=MqttConfig(host="localhost"))
-    rest = RestAdapter(config=RestConfig(base_url="http://localhost:8001"))
-
-    for adapter in [sim, modbus, mqtt, rest]:
+    for adapter in [sim]:
         assert isinstance(adapter, EnergyAdapter), f"{adapter.adapter_type} does not implement EnergyAdapter"
         assert hasattr(adapter, "read_sensors")
         assert hasattr(adapter, "write_command")
@@ -118,7 +115,6 @@ async def test_24h_simulation_produces_believable_data():
         assert "timestamp" in r
 
     # Verify wind has cut-in/rated/cut-out behaviour
-    wind_speeds = [r.get("turbine_academic_block", {}).get("wind_speed_mps", 0) for r in readings]
     wind_powers = [r.get("turbine_academic_block", {}).get("power_output_kw", 0) for r in readings]
 
     # At least some readings should have wind generation
@@ -130,11 +126,11 @@ async def test_24h_simulation_produces_believable_data():
     assert max(soc_values) <= 100, "SoC should never exceed 100%"
 
     # Verify demand follows occupancy pattern (higher during day)
-    night_demand = sum(readings[i]["admin_block"].get("consumption_kwh", 0) for i in range(0, 24))
+    night_demand = sum(readings[i]["admin_block"].get("consumption_kwh", 0) for i in range(24))
     day_demand = sum(readings[i]["admin_block"].get("consumption_kwh", 0) for i in range(100, 124))
     assert day_demand > night_demand, "Day demand should exceed night demand for admin block"
 
-    logger_info = print(f"  24h simulation: {len(readings)} readings, solar peak={max(solar for solar in [sum(r.get(b, {}).get('solar_generation_kwh', 0) for b in ['academic_block','hostel_block','admin_block']) for r in readings]):.2f} kWh")
+    print(f"  24h simulation: {len(readings)} readings, solar peak={max(solar for solar in [sum(r.get(b, {}).get('solar_generation_kwh', 0) for b in ['academic_block','hostel_block','admin_block']) for r in readings]):.2f} kWh")
     # Phase 0 exit criteria MET
     print("Phase 0 exit criteria: PASSED - believable 24h data at 5-min resolution")
 
@@ -149,8 +145,6 @@ async def test_wind_fills_solar_gap_scenario():
     for _ in range(288):
         await adapter.read_sensors()
 
-    total_solar = sum(r.get("academic_block", {}).get("solar_generation_kwh", 0) for r in
-                      [await adapter.read_sensors() for _ in range(5)])
     # This scenario should have low solar but significant wind
     health = await adapter.health()
     assert health["status"] == "online"

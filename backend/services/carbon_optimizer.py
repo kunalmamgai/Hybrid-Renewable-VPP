@@ -10,23 +10,23 @@ Diesel generator has ~0.75 kg CO₂/kWh (diesel combustion).
 The engine normalizes carbon across candidates for comparison.
 """
 from __future__ import annotations
+
 import logging
 from typing import Any
 
-from backend.services.forecast_engine import FullForecast
+from backend.config import settings
 
 logger = logging.getLogger(__name__)
 
 
 class CarbonOptimizer:
-    """Scores candidates by carbon impact (kg CO₂).
+    """Scores candidates by carbon impact (kg CO₂)."""
 
-    Grid emission factor: 0.74 kg CO₂/kWh (Rajasthan average, 2025)
-    Diesel emission factor: 0.75 kg CO₂/kWh (diesel combustion)
-    Solar/wind emission: 0 kg CO₂ (zero marginal)
-    """
-
-    def __init__(self, grid_emission_factor: float = 0.74, diesel_emission_factor: float = 0.75):
+    def __init__(
+        self,
+        grid_emission_factor: float = settings.grid_emission_factor_kg_per_kwh,
+        diesel_emission_factor: float = 0.75,
+    ):
         self.grid_emission_factor = grid_emission_factor
         self.diesel_emission_factor = diesel_emission_factor
 
@@ -51,27 +51,6 @@ class CarbonOptimizer:
             "carbon_from_import_kg": round(carbon_from_import, 4),
             "carbon_offset_by_export_kg": round(carbon_offset_by_export, 4),
             "emission_factor_kg_per_kwh": self.grid_emission_factor,
-        }
-
-    async def score_battery_candidate(self, candidate: Any, building_id: str, twin_snapshot: dict) -> dict:
-        """Score a battery candidate's carbon impact."""
-        discharge_kw = candidate.discharge_rate_kw
-        charge_kw = candidate.charge_rate_kw
-
-        discharge_kwh = discharge_kw * (5 / 60.0)
-        charge_kwh = charge_kw * (5 / 60.0)
-
-        # Discharging displaces grid import → carbon saved
-        carbon_saved = discharge_kwh * self.grid_emission_factor
-        # Charging from surplus → no carbon added (surplus would otherwise be exported)
-        carbon_added = 0.0  # Assume charging from renewable surplus
-
-        net_carbon = carbon_added - carbon_saved
-
-        return {
-            "carbon_kg": round(net_carbon, 4),
-            "carbon_saved_kg": round(carbon_saved, 4),
-            "carbon_added_kg": round(carbon_added, 4),
         }
 
     def normalize_carbons(self, carbons: list[float]) -> list[float]:

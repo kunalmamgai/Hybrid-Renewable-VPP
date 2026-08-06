@@ -5,6 +5,7 @@
  * dark forest overlay + gold hairline so all media stays on-theme.
  */
 import { useRef } from 'react';
+import { useInView } from 'framer-motion';
 import { Play, Sun, Wind, Battery, Activity } from 'lucide-react';
 import { RevealSection, BackgroundGlow } from './LandingSections';
 
@@ -37,6 +38,9 @@ const mediaCards = [
 
 export function MediaShowcase() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  // Defer downloading the mp4 until it is close to being scrolled into view.
+  const inView = useInView(sectionRef, { once: true, margin: '300px 0px' });
 
   const handlePlay = () => {
     videoRef.current?.play();
@@ -47,7 +51,7 @@ export function MediaShowcase() {
       <BackgroundGlow color="orange" size="550px" top="10%" left="60%" opacity={0.08} blur="150px" />
       <BackgroundGlow color="emerald" size="500px" top="50%" left="-10%" opacity={0.06} blur="160px" />
 
-      <div className="relative max-w-6xl mx-auto">
+      <div className="relative max-w-6xl mx-auto" ref={sectionRef}>
         <RevealSection className="text-center mb-16">
           <span className="text-[10px] font-bold text-vpp-accent-gold uppercase tracking-[0.25em]">
             The Problem We Solve
@@ -66,17 +70,26 @@ export function MediaShowcase() {
           {/* ─── Video card ─── */}
           <RevealSection className="lg:col-span-3">
             <div className="glass-video-frame relative overflow-hidden rounded-2xl aspect-video group">
-              <video
-                ref={videoRef}
-                className="w-full h-full object-cover brightness-[1.04] saturate-[1.12]"
-                src="/assets/field-video.mp4"
-                poster="/assets/solar-sunset.webp"
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-              />
+              {inView ? (
+                <video
+                  ref={videoRef}
+                  className="w-full h-full object-cover brightness-[1.04] saturate-[1.12]"
+                  src="/assets/field-video.mp4"
+                  poster="/assets/solar-sunset.webp"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                />
+              ) : (
+                <img
+                  src="/assets/solar-sunset.webp"
+                  alt="Field footage preview"
+                  loading="lazy"
+                  className="w-full h-full object-cover brightness-[1.04] saturate-[1.12]"
+                />
+              )}
 
               {/* Forest tint overlay — keeps footage on-theme */}
               <div className="absolute inset-0 bg-gradient-to-t from-[#0b1410]/60 via-transparent to-[#0b1410]/10 pointer-events-none" />

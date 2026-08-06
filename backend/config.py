@@ -1,6 +1,6 @@
 """Application configuration loaded from environment variables."""
-import os
 from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -40,5 +40,8 @@ class Settings(BaseSettings):
 
     # Dispatch intervals
     decision_cycle_seconds: int = 10  # Demo speed: 10s cycle (production: 300s = 5min)
+
+    # Data retention
+    decision_retention_days: int = 30
 
 settings = Settings()

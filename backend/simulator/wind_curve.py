@@ -12,7 +12,6 @@ Default parameters tuned to Rajasthan's typical wind regime:
 The cubic segment comes from the fact that wind power is proportional to v³.
 """
 from __future__ import annotations
-import math
 
 
 class WindCurve:
@@ -53,17 +52,3 @@ class WindCurve:
         if denominator == 0:
             return 0.0
         return max(0.0, min(1.0, numerator / denominator))
-
-    def power_kw(self, wind_speed: float) -> float:
-        """Return absolute power output in kW."""
-        return self.rated_power_kw * self.power_output(wind_speed)
-
-    def status(self, wind_speed: float) -> str:
-        """Return operational status string."""
-        if wind_speed < self.cut_in:
-            return "idle"
-        if wind_speed >= self.cut_out:
-            return "braked"  # Safety shutdown at high wind
-        if wind_speed < self.rated:
-            return "generating_increase"
-        return "generating_rated"

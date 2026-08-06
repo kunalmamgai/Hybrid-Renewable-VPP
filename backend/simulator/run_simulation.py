@@ -6,20 +6,16 @@ readings for solar, wind, battery, and demand before any decision loop is built.
 Run:  python -m backend.simulator.run_simulation --duration 24h --interval 5min
 """
 from __future__ import annotations
+
 import argparse
 import asyncio
-import json
 import logging
-import math
-import sys
-from datetime import datetime, timezone, timedelta
-from typing import List
 
-from backend.adapters.simulated import SimulatedAdapter, SimulatedConfig, SimulatedBuilding
-from backend.simulator.solar_curve import SolarCurve
-from backend.simulator.wind_curve import WindCurve
-from backend.simulator.battery_model import BatteryModel
-from backend.simulator.demand_curve import DemandCurve
+from backend.adapters.simulated import (
+    SimulatedAdapter,
+    SimulatedBuilding,
+    SimulatedConfig,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -28,7 +24,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def default_buildings() -> List[SimulatedBuilding]:
+def default_buildings() -> list[SimulatedBuilding]:
     """Standard campus configuration: 4 representative buildings."""
     return [
         SimulatedBuilding(
@@ -87,7 +83,6 @@ async def run_simulation(duration_hours: int = 24, interval_minutes: int = 5, sc
     )
 
     adapter = SimulatedAdapter(config=config, buildings=default_buildings())
-    interval_seconds = interval_minutes * 60
 
     readings: list[dict] = []
     stats = {
@@ -96,12 +91,8 @@ async def run_simulation(duration_hours: int = 24, interval_minutes: int = 5, sc
         "total_consumption_kwh": 0.0,
         "total_grid_import_kwh": 0.0,
         "total_grid_export_kwh": 0.0,
-        "total_battery_charge_kwh": 0.0,
-        "total_battery_discharge_kwh": 0.0,
         "min_soc_pct": 100.0,
         "max_soc_pct": 0.0,
-        "critical_buildings_shed": 0,
-        "decisions_logged": 0,
     }
 
     total_intervals = int((duration_hours * 60) / interval_minutes)
@@ -147,7 +138,7 @@ async def run_simulation(duration_hours: int = 24, interval_minutes: int = 5, sc
     logger.info(f"    Min SoC:        {stats['min_soc_pct']:.1f}%")
     logger.info(f"    Max SoC:        {stats['max_soc_pct']:.1f}%")
     logger.info("")
-    logger.info("  COST (at ₹%.2f buy / ₹%.2f sell)" % (9.0, 5.0))
+    logger.info("  COST (at ₹9.00 buy / ₹5.00 sell)")
     cost = stats["total_grid_import_kwh"] * 9.0 - stats["total_grid_export_kwh"] * 5.0
     carbon = stats["total_grid_import_kwh"] * 0.74
     logger.info(f"    Grid cost:      ₹{cost:.2f}")

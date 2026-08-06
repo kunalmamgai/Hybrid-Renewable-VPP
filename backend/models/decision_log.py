@@ -1,11 +1,11 @@
 """Decision Log SQLAlchemy model — immutable audit trail of every automated decision."""
 from __future__ import annotations
-import json
 
-from sqlalchemy import Column, String, Float, DateTime, Text, func
-from sqlalchemy.dialects.sqlite import BLOB
-from sqlalchemy.orm import declarative_base
+import json
 import uuid
+
+from sqlalchemy import Column, DateTime, Float, String, Text, func
+from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
@@ -31,7 +31,6 @@ class DecisionLog(Base):
 
     # Full context snapshot as JSON string
     context_json = Column(Text, default="{}")
-    candidate_scores_json = Column(Text, default="{}")
 
     def to_dict(self) -> dict:
         return {

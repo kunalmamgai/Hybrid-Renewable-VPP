@@ -28,40 +28,6 @@ export interface BuildingTwin {
   last_updated?: string;
 }
 
-export interface TurbineTwin {
-  turbine_id: string;
-  building_id: string;
-  wind_speed_mps: number;
-  wind_direction_deg: number;
-  power_output_kw: number;
-  cut_in_speed_mps: number;
-  rated_speed_mps: number;
-  cut_out_speed_mps: number;
-  rated_power_kw: number;
-  status: string;
-}
-
-export interface BatteryTwin {
-  battery_id: string;
-  building_id: string;
-  soc_pct: number;
-  health_pct: number;
-  capacity_kwh: number;
-  charge_rate_max_kw: number;
-  discharge_rate_max_kw: number;
-  temperature_c: number;
-  voltage_v: number;
-  current_a: number;
-  power_kw: number;
-}
-
-export interface CampusState {
-  buildings: BuildingTwin[];
-  turbines: TurbineTwin[];
-  batteries: BatteryTwin[];
-  last_updated?: string;
-}
-
 // ============================================================================
 // Decision Types
 // ============================================================================
@@ -161,29 +127,6 @@ export interface SheddingPriorityEntry {
 }
 
 // ============================================================================
-// Live Snapshot (raw adapter data)
-// ============================================================================
-
-export interface LiveReading {
-  building_id: string;
-  criticality_tier: CriticalityTier;
-  solar_generation_kwh: number;
-  wind_generation_kwh: number;
-  consumption_kwh: number;
-  battery_soc_pct: number;
-  battery_health_pct: number;
-  grid_import_kwh: number;
-  grid_export_kwh: number;
-  net_meter_units: number;
-  tariff_inr_per_unit: number;
-}
-
-export interface LiveSnapshot {
-  data: Record<string, unknown>;
-  adapter_type: string;
-}
-
-// ============================================================================
 // Export Stats Types
 // ============================================================================
 
@@ -196,19 +139,6 @@ export interface ExportStats {
   total_cost_savings_inr: number;
   total_carbon_reduction_kg: number;
   renewable_self_consumption_pct: number;
-}
-
-export interface HealthStatus {
-  status: string;
-  timestamp: string;
-  service: string;
-  version: string;
-}
-
-export interface SchedulerHealth {
-  running: boolean;
-  last_cycle?: string;
-  cycles_completed: number;
 }
 
 // ============================================================================

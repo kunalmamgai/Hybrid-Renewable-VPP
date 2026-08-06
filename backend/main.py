@@ -2,21 +2,25 @@
 import logging
 import sys
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import select
 
-from backend.api.routes_digital_twin import router as digital_twin_router
+from backend.adapters.simulated import (
+    SimulatedAdapter,
+    SimulatedBuilding,
+    SimulatedConfig,
+)
 from backend.api.routes_decisions import router as decisions_router
 from backend.api.routes_export import router as export_router
-from backend.api.routes_settings import router as settings_router
 from backend.api.routes_health import router as health_router
-from backend.ws.websocket_manager import ConnectionManager
-from backend.db.database import init_db, AsyncSessionLocal
-from sqlalchemy import select
-from backend.services.scheduler import SchedulerService
-from backend.services.decision_manager import DecisionManager
-from backend.adapters.simulated import SimulatedAdapter, SimulatedConfig, SimulatedBuilding
+from backend.api.routes_settings import router as settings_router
 from backend.config import settings
+from backend.db.database import AsyncSessionLocal, init_db
+from backend.services.decision_manager import DecisionManager
+from backend.services.scheduler import SchedulerService
+from backend.ws.websocket_manager import ConnectionManager
 
 logging.basicConfig(
     level=logging.INFO,
@@ -186,13 +190,13 @@ app.add_middleware(
 )
 
 app.include_router(health_router)
-app.include_router(digital_twin_router)
 app.include_router(decisions_router)
 app.include_router(export_router)
 app.include_router(settings_router)
 
 # WebSocket endpoint
 from fastapi import WebSocket
+
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -214,8 +218,8 @@ async def root():
         "adapter": "simulated",
         "features": [
             "hybrid solar + wind + battery + grid orchestration",
-            "vendor-neutral adapter layer (Modbus/MQTT/REST/Simulated)",
-            "5-minute decision cycle",
+            "simulated adapter layer for demo playback",
+            "10-second decision cycle",
             "critical-load reliability guard",
             "demand-side load-shift advisor",
             "VNM/GNM optimizer (RERC 2025)",

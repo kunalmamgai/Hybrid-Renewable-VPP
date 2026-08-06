@@ -5,19 +5,17 @@ It reads raw sensor data from the adapter, transforms it into the Digital Twin
 schema, and persists it to SQLite. All other services query this store.
 
 Design patterns:
-  • CQRS: write model (update_twin) is separate from read model (get_building)
-  • Unit of Work: each 5-min cycle is a single atomic twin update
+  • Unit of Work: each cycle is a single atomic twin update
 """
 from __future__ import annotations
+
 import logging
-from datetime import datetime, timezone, timedelta
-from typing import Any, Optional
-from sqlalchemy import select, insert, update
+from datetime import datetime, timedelta, timezone
+from typing import Any
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.models.digital_twin import BuildingTwin, WindTurbineTwin, BatteryTwin
-from backend.adapters.base import EnergyAdapter
-from backend.adapters.simulated import SimulatedAdapter, SimulatedBuilding
+from backend.models.digital_twin import BatteryTwin, BuildingTwin, WindTurbineTwin
 
 logger = logging.getLogger(__name__)
 
@@ -25,26 +23,19 @@ logger = logging.getLogger(__name__)
 class DigitalTwinStore:
     """Manages the Digital Twin lifecycle: ingest → transform → persist → serve."""
 
-    def __init__(self, adapter: EnergyAdapter):
+    def __init__(self, adapter):
         self.adapter = adapter
         self._buildings: dict[str, dict] = {}
         self._turbines: dict[str, dict] = {}
         self._batteries: dict[str, dict] = {}
-        self._last_update: Optional[datetime] = None
-
-    async def update_twin(self, session: AsyncSession) -> dict[str, Any]:
-        """Read sensors via adapter, update in-memory twin, persist to DB.
-
-        Returns the complete twin snapshot for downstream modules.
-        """
-        return await self.update_twin_with_data(session, await self.adapter.read_sensors())
+        self._last_update: datetime | None = None
 
     async def update_twin_with_data(self, session: AsyncSession, raw: dict[str, Any]) -> dict[str, Any]:
         """Update the twin from pre-read sensor data, persist to DB.
 
         This avoids double-reading sensors when the scheduler already has the data.
         """
-        timestamp = raw.pop("timestamp", datetime.now(timezone(timedelta(hours=5, minutes=30))).isoformat())
+        timestamp = raw.get("timestamp", datetime.now(timezone(timedelta(hours=5, minutes=30))).isoformat())
 
         # Update in-memory structures and persist
         for key, value in raw.items():
@@ -53,11 +44,9 @@ class DigitalTwinStore:
                 await self._update_building(session, key, value)
                 self._buildings[key] = value
             elif key.startswith("turbine_"):
-                bid = key.replace("turbine_", "")
                 await self._upsert_turbine(session, value)
                 self._turbines[key] = value
             elif key.startswith("battery_"):
-                bid = key.replace("battery_", "")
                 await self._upsert_battery(session, value)
                 self._batteries[key] = value
 
@@ -139,19 +128,3 @@ class DigitalTwinStore:
                 power_kw=data.get("power_kw", 0.0),
             )
             session.add(battery)
-
-    async def get_twin_snapshot(self, session: AsyncSession) -> dict[str, Any]:
-        """Return the full twin snapshot from the database."""
-        buildings = (await session.execute(select(BuildingTwin))).scalars().all()
-        turbines = (await session.execute(select(WindTurbineTwin))).scalars().all()
-        batteries = (await session.execute(select(BatteryTwin))).scalars().all()
-        return {
-            "buildings": [b.to_dict() for b in buildings],
-            "turbines": [t.to_dict() for t in turbines],
-            "batteries": [b.to_dict() for b in batteries],
-            "last_updated": self._last_update.isoformat() if self._last_update else None,
-        }
-
-    def get_building(self, building_id: str) -> Optional[dict]:
-        """Get a building twin from the in-memory cache."""
-        return self._buildings.get(building_id)

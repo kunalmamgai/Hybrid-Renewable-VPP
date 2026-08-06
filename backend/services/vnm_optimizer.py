@@ -12,9 +12,11 @@ This is a secondary differentiator (not the core ask) but grounded in real
 Rajasthan regulation.
 """
 from __future__ import annotations
+
 import logging
 from dataclasses import dataclass, field
-from typing import Dict, Optional
+
+from backend.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -40,15 +42,12 @@ class VnmOptimizer:
       - All allocations are time-stamped for settlement
     """
 
-    RERC_REFERENCE = "RERC Third Amendment Regulations, 2025, Section 4(1)(b)"
-
-    def __init__(self, sell_rate_inr: float = 5.0):
+    def __init__(self, sell_rate_inr: float = settings.default_tariff_sell_inr):
         self.sell_rate_inr = sell_rate_inr
 
     async def generate_candidates(
         self,
         twin_snapshot: dict,
-        forecast: Optional[object] = None,
     ) -> list[VnmCandidate]:
         """Generate VNM/GNM credit allocation candidates."""
         buildings_data = {k: v for k, v in twin_snapshot.items()
@@ -125,7 +124,7 @@ class VnmOptimizer:
             allocations=alloc_critical,
             total_export_kwh=round(total_export, 2),
             total_value_inr=round(total_value_crit, 2),
-            reason=f"Critical buildings (labs, hostels) receive 70% of VNM credits per RERC priority rules.",
+            reason="Critical buildings (labs, hostels) receive 70% of VNM credits per RERC priority rules.",
             confidence_pct=80,
         ))
 

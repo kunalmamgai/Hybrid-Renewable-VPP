@@ -11,20 +11,23 @@ The Decision Manager orchestrates the AI optimization engine every 5 minutes:
 8. Broadcast twin update and decision via WebSocket
 """
 from __future__ import annotations
+
+import argparse
 import asyncio
 import json
 import logging
 import time
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import datetime, timedelta, timezone
 
-from backend.adapters.simulated import SimulatedAdapter
-from backend.services.digital_twin_store import DigitalTwinStore
-from backend.services.decision_manager import DecisionManager
-from backend.models.decision_log import DecisionLog
-from backend.ws.websocket_manager import ConnectionManager
-from backend.db.database import AsyncSessionLocal
+from sqlalchemy import delete
+
+from backend.adapters.simulated import SimulatedAdapter, SimulatedConfig
 from backend.config import settings
+from backend.db.database import AsyncSessionLocal as SessionFactory
+from backend.models.decision_log import DecisionLog
+from backend.services.decision_manager import DecisionManager
+from backend.services.digital_twin_store import DigitalTwinStore
+from backend.ws.websocket_manager import ConnectionManager
 
 logger = logging.getLogger(__name__)
 
@@ -41,14 +44,15 @@ class SchedulerService:
         self.manager = manager
         self.db_session_factory = db_session_factory
         self.is_running = False
-        self._task: Optional[asyncio.Task] = None
-        self.last_cycle: Optional[datetime] = None
+        self._task: asyncio.Task | None = None
+        self.last_cycle: datetime | None = None
         self.cycle_count = 0
         self.interval_seconds = settings.decision_cycle_seconds
+        self._last_prune = time.time()
 
         # Services
         self.twin_store = DigitalTwinStore(adapter)
-        self._decision_manager: Optional[DecisionManager] = None
+        self._decision_manager: DecisionManager | None = None
 
     def set_decision_manager(self, decision_manager: DecisionManager) -> None:
         """Inject the AI Decision Manager."""
@@ -103,6 +107,20 @@ class SchedulerService:
         except Exception as e:
             logger.warning(f"Decision log persist failed: {e}")
 
+    async def prune_old_decisions(self, days: int | None = None) -> int:
+        """Delete decision logs older than the retention window to bound DB growth."""
+        if not self.db_session_factory:
+            return 0
+        retention_days = days or settings.decision_retention_days
+        cutoff = datetime.now(timezone.utc) - timedelta(days=retention_days)
+        async with self.db_session_factory() as session:
+            result = await session.execute(delete(DecisionLog).where(DecisionLog.timestamp < cutoff))
+            await session.commit()
+        removed = result.rowcount
+        if removed:
+            logger.info("Pruned %d decision logs older than %d days.", removed, retention_days)
+        return removed
+
     @staticmethod
     def _build_buildings_payload(twin_snapshot: dict) -> dict:
         """Filter the twin snapshot down to building entries for WS broadcast."""
@@ -129,6 +147,14 @@ class SchedulerService:
         while self.is_running:
             cycle_start = time.time()
             self.cycle_count += 1
+
+            # Prune stale decision logs at most once per 24h of wall time
+            if time.time() - self._last_prune >= 86400:
+                try:
+                    await self.prune_old_decisions()
+                except Exception:
+                    logger.exception("Decision log pruning failed (non-blocking)")
+                self._last_prune = time.time()
 
             try:
                 # Step 1: Read sensors once
@@ -171,11 +197,11 @@ class SchedulerService:
 
                 self.last_cycle = datetime.now(timezone.utc)
 
-            except Exception as e:
-                logger.error(f"Scheduler cycle {self.cycle_count} failed: {e}", exc_info=True)
+            except Exception:
+                logger.exception(f"Scheduler cycle {self.cycle_count} failed")
                 await self.manager.send_to_all({
                     "type": "error",
-                    "message": str(e),
+                    "message": "Scheduler cycle failed",
                     "cycle_number": self.cycle_count,
                 })
 
@@ -223,3 +249,49 @@ class SchedulerService:
             "twin_snapshot": twin_snapshot,
             "decision": decision,
         }
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run the VPP decision scheduler.")
+    parser.add_argument(
+        "--mode",
+        choices=["continuous", "one-shot"],
+        default="continuous",
+        help="continuous: run forever (default), one-shot: run a single cycle",
+    )
+    return parser.parse_args()
+
+
+async def _standalone_main(mode: str) -> None:
+    from backend.main import _create_default_buildings
+
+    adapter = SimulatedAdapter(
+        SimulatedConfig(
+            time_scale=settings.simulator_time_scale,
+            scenario=settings.simulator_default_scenario,
+        ),
+        _create_default_buildings(),
+    )
+    manager = ConnectionManager()
+    scheduler = SchedulerService(adapter, manager, db_session_factory=SessionFactory)
+    decision_manager = DecisionManager(adapter, manager)
+    scheduler.set_decision_manager(decision_manager)
+
+    await scheduler.start()
+    if mode == "one-shot":
+        await scheduler.force_cycle()
+        await scheduler.stop()
+        return
+
+    try:
+        await asyncio.Event().wait()
+    except (KeyboardInterrupt, asyncio.CancelledError):
+        pass
+    finally:
+        await scheduler.shutdown()
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+    args = parse_args()
+    asyncio.run(_standalone_main(args.mode))

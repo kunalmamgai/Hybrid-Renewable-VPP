@@ -10,11 +10,11 @@ Input: SoC, health, temperature, solar+wind forecast, demand forecast, tariff, r
 Output: charge / discharge / hold / charge-slow / charge-rapid / reserve
 """
 from __future__ import annotations
-import logging
-import math
-from dataclasses import dataclass, field
-from typing import Optional
 
+import logging
+from dataclasses import dataclass, field
+
+from backend.config import settings
 from backend.services.forecast_engine import FullForecast
 from backend.services.reliability_guard import ReliabilityConstraints
 
@@ -38,9 +38,7 @@ class BatteryCandidate:
 class BatteryChargeScheduler:
     """Schedules battery charge/discharge decisions based on forecasts and constraints."""
 
-    CHARGE_RAPID_THRESHOLD = 0.3  # If surplus > 30% of capacity, rapid charge
-    SOC_MAX = 95.0
-    SOC_MIN = 15.0
+    SOC_MAX: float = settings.battery_max_soc_pct
 
     def __init__(self):
         self.actions = ["charge_rapid", "charge_slow", "discharge", "hold", "reserve"]
@@ -60,7 +58,6 @@ class BatteryChargeScheduler:
             return []
 
         soc = battery.get("soc_pct", 50)
-        health = battery.get("health_pct", 100)
         capacity = battery.get("capacity_kwh", 200)
         charge_max = battery.get("charge_rate_max_kw", 50)
         discharge_max = battery.get("discharge_rate_max_kw", 50)

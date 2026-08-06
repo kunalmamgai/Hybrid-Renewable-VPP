@@ -13,19 +13,18 @@ The simulator models:
   • Grid import/export based on net balance
 """
 from __future__ import annotations
-import asyncio
-import json
+
 import logging
 import math
-from datetime import datetime, timezone, timedelta
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from typing import Any
-from dataclasses import dataclass, field
 
 from backend.adapters.base import EnergyAdapter
-from backend.simulator.solar_curve import SolarCurve
-from backend.simulator.wind_curve import WindCurve
 from backend.simulator.battery_model import BatteryModel
 from backend.simulator.demand_curve import DemandCurve
+from backend.simulator.solar_curve import SolarCurve
+from backend.simulator.wind_curve import WindCurve
 
 logger = logging.getLogger(__name__)
 
@@ -72,8 +71,6 @@ class SimulatedAdapter(EnergyAdapter):
         # Simulation state
         self._sim_time: datetime | None = None
         self._sim_start: datetime | None = None
-        self._running: bool = False
-        self._last_readings: dict[str, Any] = {}
         self._read_count: int = 0
 
     @property
@@ -309,7 +306,6 @@ class SimulatedAdapter(EnergyAdapter):
                 "status": "generating" if wind_kw > 0 else "idle",
             }
 
-        self._last_readings = readings
         return readings
 
     async def write_command(self, command: dict[str, Any]) -> bool:
@@ -342,9 +338,7 @@ class SimulatedAdapter(EnergyAdapter):
 
     async def start_stream(self, interval_seconds: float = 300.0) -> None:
         """Start streaming readings at the given interval (non-blocking)."""
-        self._running = True
         logger.info(f"SimulatedAdapter streaming started (interval={interval_seconds}s, scale={self.config.time_scale})")
 
     async def stop_stream(self) -> None:
-        self._running = False
         logger.info("SimulatedAdapter stopped.")

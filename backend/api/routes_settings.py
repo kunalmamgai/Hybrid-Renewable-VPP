@@ -1,7 +1,7 @@
 """API routes for facilities settings — alert thresholds, building tiers, VNM sharing rules."""
 from __future__ import annotations
+
 import logging
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -23,19 +23,9 @@ class AlertThresholdUpdate(BaseModel):
     active: bool = True
 
 
-class AlertThresholdCreate(BaseModel):
-    id: str
-    name: str
-    description: Optional[str] = None
-    threshold_value: float
-    unit: str = ""
-    active: bool = True
-    severity: str = "warning"
-
-
 class BuildingTierUpdate(BaseModel):
     tier: str
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class VnmSharingRuleUpdate(BaseModel):
@@ -148,7 +138,6 @@ async def update_vnm_sharing_rule(
     if existing:
         existing.sharing_ratio = payload.sharing_ratio
     else:
-        import uuid
         existing = VnmSharingRule(
             id=f"vnm_{building_id}",
             building_id=building_id,

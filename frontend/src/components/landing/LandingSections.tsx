@@ -85,16 +85,9 @@ export function BackgroundGlow({ color = 'emerald', size = '300px', top = '0%', 
   const colorMap = {
     emerald: 'bg-vpp-emerald',
     teal: 'bg-vpp-accent-teal',
-    blue: 'bg-vpp-blue',
-    amber: 'bg-vpp-accent-gold',
     orange: 'bg-vpp-accent-orange',
-    peach: 'bg-hero-sunset-peach',
     sky: 'bg-hero-sunlight',
     sunlight: 'bg-hero-sunlight',
-    sand: 'bg-desert-transition-sand',
-    dune: 'bg-desert-transition-dune',
-    clay: 'bg-desert-transition-sand',
-    dusk: 'bg-vpp-deep-night',
   };
   
   return (

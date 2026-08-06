@@ -1,7 +1,7 @@
 """Configuration models — alert thresholds, building tiers, VNM sharing rules."""
 from __future__ import annotations
 
-from sqlalchemy import Column, String, Float, Boolean
+from sqlalchemy import Boolean, Column, Float, String
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
