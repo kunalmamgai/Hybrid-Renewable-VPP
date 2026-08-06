@@ -1,6 +1,6 @@
 """Services package — orchestration and AI optimization modules."""
 from backend.services.digital_twin_store import DigitalTwinStore
-from backend.services.scheduler import SchedulerService, StubDecisionManager
+from backend.services.scheduler import SchedulerService
 from backend.services.decision_manager import DecisionManager, DecisionResult, ScoredStrategy
 from backend.services.dispatch_optimizer import DispatchOptimizer, DispatchCandidate
 from backend.services.battery_scheduler import BatteryChargeScheduler, BatteryCandidate
@@ -14,7 +14,6 @@ from backend.services.load_advisor import LoadShiftAdvisor, LoadShiftAdvice
 __all__ = [
     "DigitalTwinStore",
     "SchedulerService",
-    "StubDecisionManager",
     "DecisionManager",
     "DecisionResult",
     "ScoredStrategy",

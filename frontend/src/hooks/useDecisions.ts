@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getDecisions } from '../services/apiClient';
 import type { Decision } from '../types';
 
@@ -7,7 +7,7 @@ export function useDecisions(limit: number = 50) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const refetch = async () => {
+  const refetch = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getDecisions(limit);
@@ -17,8 +17,8 @@ export function useDecisions(limit: number = 50) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [limit]);
 
-  useEffect(() => { refetch(); }, []);
+  useEffect(() => { void refetch(); }, [refetch]);
   return { decisions, loading, error, refetch };
 }

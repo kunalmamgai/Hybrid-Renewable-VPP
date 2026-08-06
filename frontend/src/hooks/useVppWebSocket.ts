@@ -3,7 +3,7 @@
  * real-time data to components via React state.
  */
 import { useEffect, useRef, useState } from 'react';
-import VppWebSocketClient, { type MessageHandler } from '../services/websocketClient';
+import VppWebSocketClient from '../services/websocketClient';
 import type {
   BuildingTwin,
   Decision,
@@ -14,7 +14,7 @@ import type {
 
 const WS_URL = (import.meta.env.VITE_WS_URL || 'ws://localhost:8000') + '/ws';
 
-interface VppState {
+export interface VppState {
   buildings: BuildingTwin[];
   latestDecisions: Decision[];
   latestCycle: FullCycleResult | null;
@@ -24,16 +24,18 @@ interface VppState {
   error: string | null;
 }
 
+const INITIAL_STATE: VppState = {
+  buildings: [],
+  latestDecisions: [],
+  latestCycle: null,
+  reliability: null,
+  connected: false,
+  cycleCount: 0,
+  error: null,
+};
+
 export function useVppWebSocket() {
-  const [state, setState] = useState<VppState>({
-    buildings: [],
-    latestDecisions: [],
-    latestCycle: null,
-    reliability: null,
-    connected: false,
-    cycleCount: 0,
-    error: null,
-  });
+  const [state, setState] = useState<VppState>(INITIAL_STATE);
 
   const wsRef = useRef<VppWebSocketClient | null>(null);
 
@@ -41,37 +43,52 @@ export function useVppWebSocket() {
     const ws = new VppWebSocketClient(WS_URL);
     wsRef.current = ws;
 
-    const unsubAll = ws.subscribe('*', (msg: WebSocketMessage) => {
-      // Any valid message means we are connected
+    const updateConnected = (msg: WebSocketMessage) => {
       if (msg.type !== 'error') {
-        setState(prev => ({ ...prev, connected: true, error: null }));
+        setState(prev => (prev.connected && !prev.error ? prev : { ...prev, connected: true, error: null }));
       }
+    };
 
-      if (msg.type === 'twin_update') {
-        const buildings: BuildingTwin[] = Object.values(msg.buildings || {}) as BuildingTwin[];
-        setState(prev => ({
-          ...prev,
-          buildings,
-          cycleCount: msg.cycle_number || prev.cycleCount,
-        }));
-      } else if (msg.type === 'full_cycle') {
-        const result = msg.result as FullCycleResult;
-        setState(prev => ({
-          ...prev,
-          latestCycle: result,
-          latestDecisions: result?.decisions || prev.latestDecisions,
-          reliability: result?.reliability || prev.reliability,
-          cycleCount: msg.cycle_number || prev.cycleCount,
-        }));
-      } else if (msg.type === 'error') {
-        setState(prev => ({ ...prev, connected: false, error: msg.message || 'WebSocket error' }));
-      }
-    });
+    const onTwinUpdate = (msg: WebSocketMessage) => {
+      if (msg.type !== 'twin_update') return;
+      const buildings = Object.values(msg.buildings);
+      setState(prev => ({
+        ...prev,
+        buildings,
+        cycleCount: msg.cycle_number || prev.cycleCount,
+      }));
+    };
+
+    const onFullCycle = (msg: WebSocketMessage) => {
+      if (msg.type !== 'full_cycle') return;
+      const result = msg.result;
+      setState(prev => ({
+        ...prev,
+        latestCycle: result,
+        latestDecisions: result?.decisions || prev.latestDecisions,
+        reliability: result?.reliability || prev.reliability,
+        cycleCount: msg.cycle_number || prev.cycleCount,
+      }));
+    };
+
+    const onError = (msg: WebSocketMessage) => {
+      if (msg.type !== 'error') return;
+      setState(prev => ({ ...prev, connected: false, error: msg.message || 'WebSocket error' }));
+    };
+
+    // Any valid message confirms we are connected
+    const unsubAll = ws.subscribe('*', updateConnected);
+    const unsubTwin = ws.subscribe('twin_update', onTwinUpdate);
+    const unsubCycle = ws.subscribe('full_cycle', onFullCycle);
+    const unsubError = ws.subscribe('error', onError);
 
     ws.connect();
 
     return () => {
       unsubAll();
+      unsubTwin();
+      unsubCycle();
+      unsubError();
       ws.disconnect();
     };
   }, []);

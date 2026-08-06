@@ -168,7 +168,7 @@ export const updateVnmSharingRule = async (
 ): Promise<VnmSharingRule> => {
   const resp = await api.put<VnmSharingRule>(
     `/api/v1/settings/vnm-sharing-rules/${building_id}`,
-    { ...payload, building_id }
+    payload
   );
   return resp.data;
 };

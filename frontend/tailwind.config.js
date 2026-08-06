@@ -16,6 +16,7 @@ module.exports = {
         'vpp-amber-light': '#fbbf24',
         'vpp-teal': '#14b8a6',
         'vpp-blue': '#3b82f6',
+        'vpp-red': '#ef4444',
         
         // Unified Landing Theme (Sunset to Forest Green)
         'hero-sunset-orange': '#ff9f1c',
@@ -48,6 +49,7 @@ module.exports = {
         'glass-lg': '0 20px 60px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.06)',
         'glass-sm': '0 2px 8px rgba(0, 0, 0, 0.06)',
         'emerald-glow': '0 0 20px rgba(16, 185, 129, 0.15)',
+        'emerald-glow-sm': '0 0 10px rgba(16, 185, 129, 0.15)',
         'emerald-glow-lg': '0 0 40px rgba(16, 185, 129, 0.2)',
       },
       animation: {

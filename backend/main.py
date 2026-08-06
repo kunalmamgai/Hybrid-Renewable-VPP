@@ -140,9 +140,9 @@ async def lifespan(app: FastAPI):
 
     # Initialize adapter with simulated data
     config = SimulatedConfig(
-        time_scale=60.0,
+        time_scale=settings.simulator_time_scale,
         interval_seconds=300.0,
-        scenario="mvp_day",
+        scenario=settings.simulator_default_scenario,
     )
     adapter = SimulatedAdapter(config=config, buildings=_create_default_buildings())
     app.state.adapter = adapter

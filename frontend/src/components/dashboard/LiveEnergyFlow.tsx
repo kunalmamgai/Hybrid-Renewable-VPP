@@ -15,12 +15,12 @@ import ReactFlow, {
 } from 'reactflow';
 import { Sun, Wind, Battery, Zap, Home } from 'lucide-react';
 import 'reactflow/dist/style.css';
-import { useVppWebSocket } from '../../hooks/useVppWebSocket';
+import { useVppData } from '../../context/VppDataContext';
 import type { BuildingTwin } from '../../types';
 
 // Custom node component for energy sources — glass style
-function EnergySourceNode({ data }: { data: any }) {
-  const { icon: Icon, label, value, color } = data;
+const EnergySourceNode = React.memo(function EnergySourceNode({ data }: { data: any }) {
+  const { icon: Icon, label, value } = data;
   return (
     <div className={`glass-card-strong rounded-2xl p-3 min-w-[90px] text-center`}>
       <div className="flex justify-center mb-1">{Icon && <Icon size={20} />}</div>
@@ -29,10 +29,10 @@ function EnergySourceNode({ data }: { data: any }) {
       <div className="text-[10px] text-vpp-navy-muted">kW</div>
     </div>
   );
-}
+});
 
 // Custom node for buildings — glass style
-function BuildingNode({ data }: { data: any }) {
+const BuildingNode = React.memo(function BuildingNode({ data }: { data: any }) {
   const { label, value, tier, soc } = data;
   return (
     <div
@@ -55,10 +55,10 @@ function BuildingNode({ data }: { data: any }) {
       )}
     </div>
   );
-}
+});
 
 // Custom node for battery — glass style
-function BatteryNode({ data }: { data: any }) {
+const BatteryNode = React.memo(function BatteryNode({ data }: { data: any }) {
   const { soc, power } = data;
   return (
     <div className="glass-card-strong rounded-2xl p-3 border-vpp-blue/30 text-center min-w-[90px]">
@@ -71,7 +71,7 @@ function BatteryNode({ data }: { data: any }) {
       <div className="text-[9px] text-vpp-navy-muted/60">SOC / 5min</div>
     </div>
   );
-}
+});
 
 const nodeTypes: NodeTypes = {
   energySource: EnergySourceNode,
@@ -148,7 +148,7 @@ const generateEdges = (buildings: BuildingTwin[]): Edge[] => {
 };
 
 export function LiveEnergyFlow() {
-  const { buildings } = useVppWebSocket();
+  const { buildings } = useVppData();
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);

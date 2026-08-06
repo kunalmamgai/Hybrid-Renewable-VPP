@@ -8,7 +8,7 @@ The Decision Manager orchestrates the AI optimization engine every 5 minutes:
 5. Evaluate dispatch × battery × VNM × load-shift candidates
 6. Score by cost + carbon, filter by reliability floor
 7. Select best strategy, execute, log with explanation
-8. Broadcast decision via WebSocket
+8. Broadcast twin update and decision via WebSocket
 """
 from __future__ import annotations
 import asyncio
@@ -32,8 +32,8 @@ logger = logging.getLogger(__name__)
 class SchedulerService:
     """Orchestrates the 5-minute decision cycle.
 
-    Phase 0: reads sensors, updates twin, broadcasts via WebSocket.
-    Phase 1: adds the full AI decision loop before broadcasting.
+    Each cycle: read sensors → update twin (persist to DB) → run the AI
+    decision loop → broadcast the live twin update and decision via WebSocket.
     """
 
     def __init__(self, adapter: SimulatedAdapter, manager: ConnectionManager, db_session_factory=None):
@@ -51,7 +51,7 @@ class SchedulerService:
         self._decision_manager: Optional[DecisionManager] = None
 
     def set_decision_manager(self, decision_manager: DecisionManager) -> None:
-        """Inject the AI Decision Manager (Phase 1)."""
+        """Inject the AI Decision Manager."""
         self._decision_manager = decision_manager
 
     async def start(self) -> None:
@@ -103,8 +103,27 @@ class SchedulerService:
         except Exception as e:
             logger.warning(f"Decision log persist failed: {e}")
 
+    @staticmethod
+    def _build_buildings_payload(twin_snapshot: dict) -> dict:
+        """Filter the twin snapshot down to building entries for WS broadcast."""
+        return {
+            k: v for k, v in twin_snapshot.items()
+            if not k.startswith("turbine_") and not k.startswith("battery_") and k != "timestamp"
+            and isinstance(v, dict)
+        }
+
+    async def _broadcast_twin_update(self, twin_snapshot: dict, cycle_number: int) -> None:
+        """Broadcast the live building twin via WebSocket."""
+        await self.manager.send_to_all({
+            "type": "twin_update",
+            "cycle_number": cycle_number,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "buildings": self._build_buildings_payload(twin_snapshot),
+            "timestamp_of_data": twin_snapshot.get("timestamp", ""),
+        })
+
     async def _run_loop(self) -> None:
-        """Main 5-minute loop: read → update twin → [Phase 1: decide] → broadcast."""
+        """Main cycle: read → update twin → decide → broadcast twin + decision."""
         await asyncio.sleep(1)  # Brief startup delay
 
         while self.is_running:
@@ -123,11 +142,14 @@ class SchedulerService:
                     except Exception as e:
                         logger.warning(f"DB persist failed (non-blocking): {e}")
 
+                # Step 3: Broadcast the live twin update (buildings)
+                await self._broadcast_twin_update(twin_snapshot, self.cycle_count)
+
+                # Step 4: Full decision loop
+                decision = None
                 if self._decision_manager:
-                    # Phase 1: Full decision loop
                     decision = await self._decision_manager.run_cycle(twin_snapshot)
 
-                    # Persist decision logs to DB
                     if decision and decision.get("decisions"):
                         await self._persist_decision_logs(decision["decisions"])
 
@@ -137,28 +159,15 @@ class SchedulerService:
                             "cycle_number": self.cycle_count,
                             "result": decision,
                         })
-                else:
-                    # Phase 0: Broadcast twin update
-                    buildings = {
-                        k: v for k, v in twin_snapshot.items()
-                        if not k.startswith("turbine_") and not k.startswith("battery_") and k != "timestamp"
-                        and isinstance(v, dict)
-                    }
-                    await self.manager.send_to_all({
-                        "type": "twin_update",
-                        "cycle_number": self.cycle_count,
-                        "timestamp": datetime.now(timezone.utc).isoformat(),
-                        "buildings": buildings,
-                        "timestamp_of_data": twin_snapshot.get("timestamp", ""),
-                    })
 
-                    health = await self.adapter.health()
-                    await self.manager.send_to_all({
-                        "type": "health",
-                        "adapter": health,
-                        "scheduler_cycles": self.cycle_count,
-                        "clients": self.manager.client_count,
-                    })
+                # Step 5: Broadcast adapter health
+                health = await self.adapter.health()
+                await self.manager.send_to_all({
+                    "type": "health",
+                    "adapter": health,
+                    "scheduler_cycles": self.cycle_count,
+                    "clients": self.manager.client_count,
+                })
 
                 self.last_cycle = datetime.now(timezone.utc)
 
@@ -188,10 +197,13 @@ class SchedulerService:
             except Exception as e:
                 logger.warning(f"DB persist failed in force_cycle: {e}")
 
+        # Broadcast the live twin update (buildings)
+        await self._broadcast_twin_update(twin_snapshot, self.cycle_count)
+
         decision = None
         if self._decision_manager:
             decision = await self._decision_manager.run_cycle(twin_snapshot)
-            
+
             # Persist decision logs to DB
             if decision and decision.get("decisions"):
                 await self._persist_decision_logs(decision["decisions"])
@@ -211,9 +223,3 @@ class SchedulerService:
             "twin_snapshot": twin_snapshot,
             "decision": decision,
         }
-
-
-class StubDecisionManager:
-    """Phase 0 placeholder — returns None. Replaced by real DecisionManager in Phase 1."""
-    async def run_cycle(self, twin_snapshot: dict) -> None:
-        return None

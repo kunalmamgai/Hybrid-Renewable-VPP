@@ -2,11 +2,12 @@
  * DecisionCard — displays a single AI decision in plain language for technicians.
  * Glass-morphism style matching the landing page aesthetic.
  */
+import { memo } from 'react';
 import { CheckCircle, AlertTriangle, Battery, Leaf, IndianRupee, BarChart3, TrendingUp } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import type { Decision } from '../../types';
 
-export function DecisionCard({ decision }: { decision: Decision }) {
+export const DecisionCard = memo(function DecisionCard({ decision }: { decision: Decision }) {
   const getIcon = () => {
     switch (decision.decision_type) {
       case 'reliability':
@@ -119,4 +120,4 @@ export function DecisionCard({ decision }: { decision: Decision }) {
       )}
     </div>
   );
-}
+});

@@ -2,6 +2,7 @@
  * Reusable energy meter component — displays generation/consumption/import/export.
  * Glass-morphism style matching the landing page aesthetic.
  */
+import { memo } from 'react';
 import { cn } from '../../lib/utils';
 
 export type MeterType = 'solar' | 'wind' | 'battery' | 'grid_import' | 'grid_export' | 'demand';
@@ -26,7 +27,7 @@ const typeConfig: Record<MeterType, { color: string; label: string; glowColor: s
   demand: { color: 'text-vpp-navy-muted', label: 'DEMAND', glowColor: 'rgba(51, 65, 85, 0.08)' },
 };
 
-export function EnergyMeter({
+export const EnergyMeter = memo(function EnergyMeter({
   type,
   value,
   label,
@@ -65,4 +66,4 @@ export function EnergyMeter({
       )}
     </div>
   );
-}
+});

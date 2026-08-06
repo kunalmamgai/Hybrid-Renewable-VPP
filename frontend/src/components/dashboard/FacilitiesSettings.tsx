@@ -16,7 +16,6 @@ import {
   Play,
   RefreshCw,
   Zap,
-  Cloud,
   Wind,
   Shield,
   CheckCircle2,
@@ -28,6 +27,7 @@ import {
   getBuildingTiers,
   updateBuildingTier,
   getVnmSharingRules,
+  updateVnmSharingRule,
   getScenarios,
   switchScenario,
   forceCycle,
@@ -68,11 +68,6 @@ export function FacilitiesSettings() {
   const [saving, setSaving] = useState<Record<string, boolean>>({});
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  // Load all settings on mount
-  useEffect(() => {
-    loadAll();
-  }, []);
-
   const loadAll = useCallback(async () => {
     try {
       const [thresholdsData, tiersData, vnmData, scenarioData] = await Promise.all([
@@ -88,10 +83,15 @@ export function FacilitiesSettings() {
         setScenarios((scenarioData as ScenariosResponse).scenarios);
         setCurrentScenario((scenarioData as ScenariosResponse).current_scenario);
       }
-    } catch (err) {
-      console.error('Failed to load settings:', err);
+    } catch {
+      console.error('Failed to load settings');
     }
   }, []);
+
+  // Load all settings on mount
+  useEffect(() => {
+    void loadAll();
+  }, [loadAll]);
 
   const showNotification = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
@@ -104,7 +104,7 @@ export function FacilitiesSettings() {
       await updateAlertThreshold(id, { threshold_value: value, active });
       await loadAll();
       showNotification('success', `Threshold "${id}" updated to ${value}`);
-    } catch (err) {
+    } catch {
       showNotification('error', `Failed to update threshold "${id}"`);
     } finally {
       setSaving(prev => ({ ...prev, [id]: false }));
@@ -117,7 +117,7 @@ export function FacilitiesSettings() {
       await updateBuildingTier(building_id, { tier });
       await loadAll();
       showNotification('success', `${building_id.replace('_', ' ')} set to ${tier}`);
-    } catch (err) {
+    } catch {
       showNotification('error', `Failed to update tier for ${building_id}`);
     } finally {
       setSaving(prev => ({ ...prev, [`tier_${building_id}`]: false }));
@@ -130,7 +130,7 @@ export function FacilitiesSettings() {
       await updateVnmSharingRule(building_id, { sharing_ratio: ratio });
       await loadAll();
       showNotification('success', `VNM ratio for ${building_id.replace('_', ' ')} set to ${(ratio * 100).toFixed(0)}%`);
-    } catch (err) {
+    } catch {
       showNotification('error', `Failed to update VNM ratio for ${building_id}`);
     } finally {
       setSaving(prev => ({ ...prev, [`vnm_${building_id}`]: false }));
@@ -143,8 +143,12 @@ export function FacilitiesSettings() {
       const result = await switchScenario(scenarioId);
       setCurrentScenario(result.scenario);
       showNotification('success', result.message);
-    } catch (err: any) {
-      showNotification('error', err?.response?.data?.detail || 'Failed to switch scenario');
+    } catch (err: unknown) {
+      const detail =
+        err && typeof err === 'object' && 'response' in err
+          ? ((err as { response?: { data?: { detail?: string } } }).response?.data?.detail ?? null)
+          : null;
+      showNotification('error', detail || 'Failed to switch scenario');
     } finally {
       setSaving(prev => ({ ...prev, [`scenario_${scenarioId}`]: false }));
     }
@@ -155,7 +159,7 @@ export function FacilitiesSettings() {
     try {
       await forceCycle();
       showNotification('success', 'Decision cycle triggered successfully');
-    } catch (err) {
+    } catch {
       showNotification('error', 'Failed to trigger decision cycle');
     } finally {
       setSaving(prev => ({ ...prev, force_cycle: false }));

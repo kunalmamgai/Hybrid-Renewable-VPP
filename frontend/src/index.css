@@ -97,6 +97,32 @@ body {
   border-radius: 1.25rem;
 }
 
+/* ─── Legacy glass card utilities (dashboard surfaces) ─── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+  transition: all 0.2s ease;
+}
+
+.glass-card-strong {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22);
+}
+
+.glass-card-dark {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.24);
+}
+
+.glass-card-emerald {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.1);
+}
+
 /* ─── Glass Nav (forest-green glass + gold hairline, matching sunset-to-forest theme) ─── */
 .glass-nav {
   background: rgba(11, 20, 16, 0.68);

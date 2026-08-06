@@ -94,19 +94,45 @@ export interface DecisionStats {
 // WebSocket Types
 // ============================================================================
 
-export interface WebSocketMessage {
-  type: 'decision' | 'twin_update' | 'health' | 'full_cycle' | 'error';
+type BaseWsMessage = {
   cycle_number?: number;
   timestamp?: string;
-  data?: Decision;
-  result?: FullCycleResult;
-  buildings?: Record<string, BuildingTwin>;
+};
+
+export type TwinUpdateMessage = BaseWsMessage & {
+  type: 'twin_update';
+  buildings: Record<string, BuildingTwin>;
   timestamp_of_data?: string;
+};
+
+export type FullCycleMessage = BaseWsMessage & {
+  type: 'full_cycle';
+  result: FullCycleResult;
+};
+
+export type HealthMessage = BaseWsMessage & {
+  type: 'health';
   adapter?: Record<string, unknown>;
   scheduler_cycles?: number;
   clients?: number;
+};
+
+export type DecisionMessage = BaseWsMessage & {
+  type: 'decision';
+  data?: Decision;
+};
+
+export type ErrorMessage = BaseWsMessage & {
+  type: 'error';
   message?: string;
-}
+};
+
+export type WebSocketMessage =
+  | TwinUpdateMessage
+  | FullCycleMessage
+  | HealthMessage
+  | DecisionMessage
+  | ErrorMessage;
 
 export interface FullCycleResult {
   cycle_number: number;

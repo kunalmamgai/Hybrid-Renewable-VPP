@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { EnergyMeter } from '../common/EnergyMeter';
 import { DecisionCard } from '../common/DecisionCard';
-import { useVppWebSocket } from '../../hooks/useVppWebSocket';
+import { useVppData } from '../../context/VppDataContext';
 import { useDecisionStats, useExportStats } from '../../hooks/useDigitalTwin';
 import { getScenarios, switchScenario, forceCycle } from '../../services/apiClient';
 import type { BuildingTwin } from '../../types';
@@ -35,7 +35,7 @@ const scenarioBadges: Record<string, { icon: React.ReactNode; label: string; act
 };
 
 export function MissionControl() {
-  const { buildings, latestDecisions, connected, cycleCount, reliability } = useVppWebSocket();
+  const { buildings, latestDecisions, connected, cycleCount, reliability } = useVppData();
   const { stats: decisionStats } = useDecisionStats();
   const { stats: exportStats } = useExportStats();
 
@@ -51,7 +51,9 @@ export function MissionControl() {
         setCurrentScenario(resp.current_scenario);
         const s = resp.scenarios.find((x) => x.id === resp.current_scenario);
         setScenarioName(s?.name || '');
-      } catch {}
+      } catch {
+      console.warn('Failed to load scenario info');
+    }
     })();
   }, []);
 
@@ -79,7 +81,9 @@ export function MissionControl() {
       const resp = await getScenarios();
       const s = resp.scenarios.find((x) => x.id === scenarioId);
       setScenarioName(s?.name || '');
-    } catch {}
+    } catch {
+      console.warn('Failed to switch scenario');
+    }
     setActionLoading(null);
   };
 
@@ -87,7 +91,9 @@ export function MissionControl() {
     setActionLoading('force_cycle');
     try {
       await forceCycle();
-    } catch {}
+    } catch {
+      console.warn('Failed to force decision cycle');
+    }
     setActionLoading(null);
   };
 

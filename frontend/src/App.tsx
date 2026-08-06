@@ -3,14 +3,33 @@
  * Routes: Hero → Mission Control → Live Energy Flow → AI Decision Center → Settings
  * Uses Framer Motion for smooth page transitions (fade + slide).
  */
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { lazy, Suspense, type ReactNode } from 'react';
 import { NavBar } from './components/NavBar';
 import { Hero } from './components/landing/Hero';
-import { MissionControl } from './components/dashboard/MissionControl';
-import { LiveEnergyFlow } from './components/dashboard/LiveEnergyFlow';
-import { AIDecisionCenter } from './components/dashboard/AIDecisionCenter';
-import { FacilitiesSettings } from './components/dashboard/FacilitiesSettings';
+import { VppDataProvider } from './context/VppDataContext';
+
+const MissionControl = lazy(() =>
+  import('./components/dashboard/MissionControl').then(m => ({ default: m.MissionControl }))
+);
+const LiveEnergyFlow = lazy(() =>
+  import('./components/dashboard/LiveEnergyFlow').then(m => ({ default: m.LiveEnergyFlow }))
+);
+const AIDecisionCenter = lazy(() =>
+  import('./components/dashboard/AIDecisionCenter').then(m => ({ default: m.AIDecisionCenter }))
+);
+const FacilitiesSettings = lazy(() =>
+  import('./components/dashboard/FacilitiesSettings').then(m => ({ default: m.FacilitiesSettings }))
+);
+
+function PageFallback() {
+  return (
+    <div className="flex items-center justify-center min-h-[50vh]">
+      <div className="animate-pulse text-sm text-vpp-navy-muted">Loading…</div>
+    </div>
+  );
+}
 
 // Page transition variants
 const pageVariants = {
@@ -45,7 +64,7 @@ const routeConfigs: Record<string, { needsNav: boolean }> = {
   '/settings': { needsNav: true },
 };
 
-function AnimatedRoute({ children }: { children: React.ReactNode }) {
+function AnimatedRoute({ children }: { children: ReactNode }) {
   const location = useLocation();
   return (
     <AnimatePresence mode="wait">
@@ -74,12 +93,12 @@ function AppRoutes() {
       {config.needsNav && <NavBar />}
       <AnimatedRoute>
         {config.needsNav ? (
-          <>
+          <Suspense fallback={<PageFallback />}>
             {location.pathname === '/dashboard' && <MissionControl />}
             {location.pathname === '/energy-flow' && <LiveEnergyFlow />}
             {location.pathname === '/decisions' && <AIDecisionCenter />}
             {location.pathname === '/settings' && <FacilitiesSettings />}
-          </>
+          </Suspense>
         ) : (
           <Hero />
         )}
@@ -91,9 +110,11 @@ function AppRoutes() {
 function App() {
   return (
     <Router>
-      <div className="min-h-screen">
-        <AppRoutes />
-      </div>
+      <VppDataProvider>
+        <div className="min-h-screen">
+          <AppRoutes />
+        </div>
+      </VppDataProvider>
     </Router>
   );
 }

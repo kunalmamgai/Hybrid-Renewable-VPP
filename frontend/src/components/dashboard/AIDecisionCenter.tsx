@@ -2,7 +2,7 @@
  * AI Decision Center — history of all AI decisions with filtering and search.
  * Glass-morphism style matching the landing page aesthetic.
  */
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { DecisionCard } from '../common/DecisionCard';
 import { Search, BarChart3, CheckCircle, AlertTriangle, Battery, TrendingUp } from 'lucide-react';
 import { useDecisions } from '../../hooks/useDecisions';
