@@ -1,4 +1,4 @@
-# Hybrid Renewable VPP — Implementation Summary
+# SURYA — Implementation Summary
 
 **Date:** August 1, 2026  
 **Status:** ✅ **COMPLETE** — All core features implemented and tested
@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-The Hybrid Renewable Virtual Power Plant (VPP) platform is a fully functional AI-driven energy optimization system for campus microgrids. All backend AI modules are operational, frontend displays are properly wired, WebSocket communication is robust, and the system emits five distinct decision types covering battery management, load shifting, VNM credit allocation, and reliability protection.
+The SURYA platform is a fully functional AI-driven energy optimization system for campus microgrids. All backend AI modules are operational, frontend displays are properly wired, WebSocket communication is robust, and the system emits five distinct decision types covering battery management, load shifting, VNM credit allocation, and reliability protection.
 
 ---
 

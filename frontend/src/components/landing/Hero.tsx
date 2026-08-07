@@ -81,7 +81,7 @@ export function Hero() {
                   <Zap className="text-white" size={17} />
                 </div>
                 <span className="font-bold text-white text-lg tracking-tight drop-shadow-md whitespace-nowrap">
-                  Hybrid <span className="text-sunset-gradient">VPP</span>
+                  SURYA
                 </span>
               </Link>
 

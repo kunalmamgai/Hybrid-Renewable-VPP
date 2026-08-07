@@ -61,7 +61,7 @@ export function MediaShowcase() {
           </h2>
           <p className="text-white/50 mt-6 text-base md:text-lg font-light max-w-2xl mx-auto leading-relaxed">
             Demand peaks at dusk while solar disappears at night. This is the field — solar, wind,
-            and storage — where the Hybrid VPP turns volatility into autonomy, one 5-minute
+            and storage — where SURYA turns volatility into autonomy, one 5-minute
             decision at a time.
           </p>
         </RevealSection>

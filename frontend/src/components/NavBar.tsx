@@ -24,7 +24,6 @@ export function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
 
-  // Close the mobile menu whenever the route changes
   useEffect(() => {
     setMenuOpen(false);
   }, [location.pathname]);
@@ -33,7 +32,6 @@ export function NavBar() {
     <nav className="glass-nav relative sticky top-0 z-50 px-4 md:px-6 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-6">
-          {/* Logo — sunset gradient ring */}
           <div className="flex items-center space-x-2.5">
             <div
               className="w-9 h-9 rounded-full flex items-center justify-center"
@@ -45,17 +43,15 @@ export function NavBar() {
               <Zap className="text-white" size={17} />
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-white text-lg tracking-tight drop-shadow-md">
-                Hybrid <span className="text-sunset-gradient">VPP</span>
+              <span className="font-bold text-white text-lg tracking-tight drop-shadow-md">SURYA</span>
+              <span className="text-[10px] text-vpp-accent-gold/80 font-medium tracking-wider">
+                Smart Unified Renewable Yield Automation
               </span>
-              <span className="text-[10px] text-vpp-accent-gold/80 font-medium tracking-wider">v1.0</span>
             </div>
           </div>
 
-          {/* Divider */}
           <div className="h-5 w-px bg-vpp-accent-gold/25 hidden lg:block"></div>
 
-          {/* Nav Links */}
           <div className="hidden lg:flex space-x-0.5">
             {navItems.map((item) => (
               <NavLink
@@ -70,13 +66,13 @@ export function NavBar() {
           </div>
         </div>
 
-        {/* Right side */}
         <div className="hidden lg:block text-right">
-          <div className="text-sm text-white/70 font-medium">Rajasthan DTE VPP Platform</div>
-          <div className="text-[11px] text-vpp-accent-gold/70 tracking-wide">Clean & Green Technology</div>
+          <div className="text-sm text-white/70 font-medium">SURYA Platform</div>
+          <div className="text-[11px] text-vpp-accent-gold/70 tracking-wide">
+            Smart Unified Renewable Yield Automation
+          </div>
         </div>
 
-        {/* Mobile menu toggle */}
         <button
           onClick={() => setMenuOpen((o) => !o)}
           aria-label="Toggle navigation menu"
@@ -87,7 +83,6 @@ export function NavBar() {
         </button>
       </div>
 
-      {/* Mobile dropdown */}
       {menuOpen && (
         <div className="glass-nav-panel lg:hidden absolute inset-x-4 top-full mt-2 p-2">
           {navItems.map((item) => (
@@ -102,8 +97,10 @@ export function NavBar() {
             </NavLink>
           ))}
           <div className="mt-1 pt-3 px-3 pb-2 border-t border-white/10">
-            <div className="text-xs text-white/70 font-medium">Rajasthan DTE VPP Platform</div>
-            <div className="text-[10px] text-vpp-accent-gold/70 tracking-wide">Clean & Green Technology</div>
+            <div className="text-xs text-white/70 font-medium">SURYA Platform</div>
+            <div className="text-[10px] text-vpp-accent-gold/70 tracking-wide">
+              Smart Unified Renewable Yield Automation
+            </div>
           </div>
         </div>
       )}

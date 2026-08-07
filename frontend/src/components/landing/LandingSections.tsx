@@ -319,7 +319,7 @@ export function CTAFooter() {
             </div>
             <div className="text-left">
               <div className="text-sm font-bold text-white">
-                Hybrid <span className="text-sunset-gradient">VPP</span>
+                SURYA
               </div>
               <div className="text-[10px] text-white/35 tracking-wide">Rajasthan DTE Smart Energy Platform</div>
             </div>

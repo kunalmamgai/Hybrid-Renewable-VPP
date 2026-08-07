@@ -1,5 +1,5 @@
 /**
- * API client for the Hybrid Renewable VPP Platform backend.
+ * API client for the SURYA backend.
  * Uses Axios for REST calls and native WebSocket for real-time updates.
  */
 import axios from 'axios';

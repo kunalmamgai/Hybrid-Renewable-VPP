@@ -167,7 +167,7 @@ async def lifespan(app: FastAPI):
     await scheduler.start()
     # Seed building tiers and VNM rules from adapter config
     await _seed_building_config()
-    logger.info("Hybrid Renewable VPP Platform started with SimulatedAdapter.")
+    logger.info("SURYA started with SimulatedAdapter.")
 
     yield
 
@@ -175,8 +175,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Hybrid Renewable VPP Platform",
-    description="Virtual Power Plant orchestrating solar, wind, battery, and grid as one dispatchable entity.",
+    title="SURYA",
+    description="Smart Unified Renewable Yield Automation orchestrating solar, wind, battery, and grid as one dispatchable entity.",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -211,7 +211,7 @@ async def websocket_endpoint(websocket: WebSocket):
 @app.get("/")
 async def root():
     return {
-        "name": "Hybrid Renewable VPP Platform",
+        "name": "SURYA",
         "version": "1.0.0",
         "status": "running",
         "docs": "/docs",

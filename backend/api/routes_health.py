@@ -12,7 +12,7 @@ async def health():
     return {
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat() + "Z",
-        "service": "hybrid-renewable-vpp",
+        "service": "surya",
         "version": "1.0.0",
     }
 

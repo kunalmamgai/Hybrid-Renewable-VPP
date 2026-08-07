@@ -1,5 +1,5 @@
 /**
- * TypeScript type definitions for the Hybrid Renewable VPP Platform frontend.
+ * TypeScript type definitions for the SURYA frontend.
  * These mirror the backend's Pydantic schemas.
  */
 
