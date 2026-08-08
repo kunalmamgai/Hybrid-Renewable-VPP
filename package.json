@@ -1,0 +1,29 @@
+{
+  "name": "surya-hybrid-renewable-vpp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n API,WEB,TWIN -c yellow,green,cyan \"npm run dev:api\" \"npm run dev:web\" \"npm run dev:twin\"",
+    "dev:api": "uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000",
+    "dev:web": "npm --prefix frontend run dev",
+    "dev:twin": "npm --prefix simulator run dev -- --host 0.0.0.0 --port 5174",
+    "dev:sim": "python -m backend.simulator.run_simulation --duration 24h --interval 5",
+    "dev:scheduler": "python -m backend.services.scheduler --mode continuous",
+    "install:all": "npm install && npm --prefix frontend install && npm --prefix simulator install",
+    "build": "npm run build:web && npm run build:twin",
+    "build:web": "npm --prefix frontend run build",
+    "build:twin": "npm --prefix simulator run build -- --outDir ../frontend/dist/simulator --emptyOutDir false",
+    "check": "npm run test:simulator && npm run build",
+    "test:simulator": "npm --prefix simulator test",
+    "test": "pytest backend/tests/ -v",
+    "test:24h": "python -m pytest backend/tests/test_24h_simulation.py -v",
+    "lint": "ruff check backend/",
+    "format": "ruff format backend/"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "concurrently": "^10.0.4",
+    "typescript": "^5.5.0"
+  }
+}
