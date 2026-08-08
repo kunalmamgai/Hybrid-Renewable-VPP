@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Sora', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['Marcellus', 'Sora', 'Inter', 'system-ui', 'sans-serif'],
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
       },
       colors: {
@@ -40,6 +40,8 @@ module.exports = {
         'vpp-accent-gold': '#d97706',
         'vpp-accent-orange': '#ff9f1c',
         'vpp-accent-teal': '#14b8a6',
+        'saffron-400': '#F4A300',
+        'saffron-300': '#FFB52E',
         // Frosted glass surfaces
         'glass': 'rgba(255, 255, 255, 0.72)',
         'glass-strong': 'rgba(255, 255, 255, 0.88)',
@@ -56,6 +58,9 @@ module.exports = {
         'emerald-glow': '0 0 20px rgba(16, 185, 129, 0.15)',
         'emerald-glow-sm': '0 0 10px rgba(16, 185, 129, 0.15)',
         'emerald-glow-lg': '0 0 40px rgba(16, 185, 129, 0.2)',
+        'saffron-glow': '0 0 20px rgba(244, 163, 0, 0.18)',
+        'saffron-glow-sm': '0 0 10px rgba(244, 163, 0, 0.18)',
+        'saffron-glow-lg': '0 0 40px rgba(244, 163, 0, 0.26)',
       },
       animation: {
         'pulse-slow': 'pulse 3s ease-in-out infinite',

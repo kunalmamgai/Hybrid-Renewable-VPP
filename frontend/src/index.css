@@ -66,43 +66,64 @@ body {
 
 /* ─── Legacy glass card utilities (dashboard surfaces) ─── */
 .glass-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+  background: rgba(255, 252, 244, 0.6);
+  border: 1px solid rgba(217, 119, 6, 0.22);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
 }
 
-/* ─── VPP Card — warm dark glass, gold hairline (sunset-to-forest theme) ─── */
+/* ─── VPP Card — creamy white surface, gold hairline (premium saffron/white/gold theme) ─── */
 .vpp-card {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.06), rgba(15, 23, 18, 0.28));
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(217, 119, 6, 0.18);
+  background: linear-gradient(160deg, #fffaf0, #f6ecd8);
+  border: 1px solid rgba(217, 119, 6, 0.3);
   border-radius: 1.25rem;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   transition: all 0.25s ease;
 }
 
 .vpp-card:hover {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(15, 23, 18, 0.46));
-  border-color: rgba(217, 119, 6, 0.34);
-  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.34), 0 0 24px rgba(217, 119, 6, 0.08);
+  background: linear-gradient(160deg, #fffdf6, #f9efdc);
+  border-color: rgba(217, 119, 6, 0.52);
+  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.26), 0 0 28px rgba(244, 163, 0, 0.18);
+}
+
+/* Royal serif (Marcellus) for headings inside nav/dashboard cards */
+.vpp-card h1,
+.vpp-card h2,
+.vpp-card h3,
+.stat-card h1,
+.stat-card h2,
+.stat-card h3,
+.glass-card h1,
+.glass-card h2,
+.glass-card h3,
+.glass-card-strong h1,
+.glass-card-strong h2,
+.glass-card-strong h3,
+.glass-card-dark h1,
+.glass-card-dark h2,
+.glass-card-dark h3,
+.glass-card-emerald h1,
+.glass-card-emerald h2,
+.glass-card-emerald h3 {
+  font-family: 'Marcellus', 'Sora', 'Inter', system-ui, sans-serif;
+  letter-spacing: 0.02em;
 }
 
 /* ─── Stat Card — deeper contrast surface with per-metric accent glow ─── */
 .stat-card {
-  --glow: rgba(16, 185, 129, 0.18);
-  --chip: rgba(16, 185, 129, 0.14);
-  --chip-border: rgba(16, 185, 129, 0.3);
+  --glow: rgba(244, 163, 0, 0.16);
+  --chip: rgba(217, 119, 6, 0.12);
+  --chip-border: rgba(217, 119, 6, 0.38);
   position: relative;
   background:
     radial-gradient(60% 80% at 92% -8%, var(--glow), transparent 55%),
-    linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(10, 14, 11, 0.72));
-  border: 1px solid rgba(217, 119, 6, 0.24);
+    linear-gradient(160deg, #fffaf0, #f4e9d2);
+  border: 1px solid rgba(217, 119, 6, 0.3);
   border-radius: 1.25rem;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 18px 48px rgba(0, 0, 0, 0.32);
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 18px 48px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   transition: all 0.25s ease;
 }
@@ -110,11 +131,11 @@ body {
 .stat-card:hover {
   background:
     radial-gradient(60% 80% at 92% -8%, var(--glow), transparent 58%),
-    linear-gradient(160deg, rgba(255, 255, 255, 0.09), rgba(10, 14, 11, 0.82));
-  border-color: rgba(217, 119, 6, 0.34);
+    linear-gradient(160deg, #fffdf6, #f6ecd6);
+  border-color: rgba(217, 119, 6, 0.5);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 22px 56px rgba(0, 0, 0, 0.4);
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 22px 56px rgba(0, 0, 0, 0.26);
   transform: translateY(-2px);
 }
 
@@ -141,30 +162,43 @@ body {
 }
 
 .glass-card-strong {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22);
+  background: linear-gradient(160deg, #fffaf0, #f2e7cf);
+  border: 1px solid rgba(217, 119, 6, 0.3);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16);
 }
 
 .glass-card-dark {
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(30, 15, 5, 0.55);
+  border: 1px solid rgba(244, 163, 0, 0.16);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.24);
 }
 
 .glass-card-emerald {
-  background: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.22);
-  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.1);
+  background: linear-gradient(160deg, #fff6e3, #f7ebd0);
+  border: 1px solid rgba(217, 119, 6, 0.38);
+  box-shadow: 0 10px 30px rgba(244, 163, 0, 0.14);
 }
 
-/* ─── Glass Nav (forest-green glass + gold hairline, matching sunset-to-forest theme) ─── */
+/* ─── Glass Nav (warm saffron-dark glass + gold hairline, saffron/white/gold identity) ─── */
 .glass-nav {
-  background: rgba(11, 20, 16, 0.68);
+  background: linear-gradient(180deg, rgba(56, 29, 8, 0.88), rgba(32, 16, 5, 0.84));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(217, 119, 6, 0.18);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(244, 163, 0, 0.32);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3), 0 10px 36px rgba(244, 163, 0, 0.07);
+}
+
+/* Mobile dropdown panel scoped to the NavBar (landing hero panel keeps its own look) */
+.glass-nav .glass-nav-panel {
+  background: rgba(248, 240, 226, 0.97);
+  border: 1px solid rgba(217, 119, 6, 0.38);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 0 24px rgba(244, 163, 0, 0.1);
+}
+
+.glass-nav a:focus-visible {
+  outline: 2px solid rgba(244, 163, 0, 0.5);
+  outline-offset: 2px;
+  border-radius: 0.75rem;
 }
 
 /* Mobile dropdown panel */
@@ -172,7 +206,7 @@ body {
   background: rgba(10, 17, 14, 0.94);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(217, 119, 6, 0.25);
+  border: 1px solid rgba(244, 163, 0, 0.22);
   border-radius: 1rem;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
   animation: navPanelIn 0.2s ease-out both;
@@ -226,27 +260,27 @@ body {
   box-shadow: 0 0 24px rgba(217, 119, 6, 0.35);
 }
 
-/* ─── Glass Input (dark theme) ─── */
+/* ─── Glass Input (creamy white, used on dashboard cards) ─── */
 .glass-input {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(217, 119, 6, 0.18);
-  color: #f8f0e2;
+  border: 1px solid rgba(217, 119, 6, 0.3);
+  color: #4a2c0a;
   transition: all 0.2s ease;
 }
 .glass-input::placeholder {
-  color: rgba(248, 240, 226, 0.45);
+  color: rgba(74, 44, 10, 0.45);
 }
 .glass-input:focus {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(217, 119, 6, 0.45);
-  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.18);
+  background: #fff;
+  border-color: rgba(217, 119, 6, 0.55);
+  box-shadow: 0 0 0 3px rgba(244, 163, 0, 0.18);
   outline: none;
 }
 .glass-input option {
-  background: #0f1613;
-  color: #f8f0e2;
+  background: #fff;
+  color: #4a2c0a;
 }
 
 /* ─── Glass Button ─── */

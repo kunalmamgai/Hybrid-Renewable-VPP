@@ -42,9 +42,9 @@ export function AIDecisionCenter() {
     return (
       <div className="page-bg min-h-screen p-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold text-white mb-4 drop-shadow-md">AI Decision Center</h1>
+          <h1 className="text-2xl font-bold text-white mb-4 drop-shadow-md font-display">AI Decision Center</h1>
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-vpp-emerald"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-saffron-400"></div>
           </div>
         </div>
       </div>
@@ -55,7 +55,7 @@ export function AIDecisionCenter() {
     return (
       <div className="page-bg min-h-screen p-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold text-white mb-4 drop-shadow-md">AI Decision Center</h1>
+          <h1 className="text-2xl font-bold text-white mb-4 drop-shadow-md font-display">AI Decision Center</h1>
           <div className="glass-card-dark border-red-400/30 rounded-2xl p-4">
             <p className="text-red-300">Error loading decisions: {error}</p>
           </div>
@@ -69,10 +69,10 @@ export function AIDecisionCenter() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-white drop-shadow-md">AI Decision Center</h1>
+          <h1 className="text-2xl font-bold text-white drop-shadow-md font-display">AI Decision Center</h1>
           <button
             onClick={refetch}
-            className="px-4 py-2 text-sm font-semibold bg-vpp-emerald text-white rounded-xl hover:bg-vpp-emerald-light transition-all duration-200 shadow-emerald-glow"
+            className="px-4 py-2 text-sm font-semibold bg-gradient-to-b from-saffron-400 to-amber-600 text-white rounded-xl hover:from-saffron-300 hover:to-amber-500 transition-all duration-200 shadow-saffron-glow"
           >
             Refresh
           </button>
@@ -127,8 +127,8 @@ export function AIDecisionCenter() {
         {/* Decision List */}
         {filtered.length === 0 ? (
           <div className="vpp-card p-8 text-center">
-            <BarChart3 className="mx-auto text-white/20" size={48} />
-            <p className="text-white/50 mt-2 font-medium">No decisions match your filters</p>
+            <BarChart3 className="mx-auto text-amber-950/20" size={48} />
+            <p className="text-amber-950/50 mt-2 font-medium">No decisions match your filters</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -140,12 +140,12 @@ export function AIDecisionCenter() {
 
         {/* Decision Type Legend */}
         <div className="mt-6 vpp-card p-4">
-          <h3 className="font-bold text-vpp-cream mb-3 text-sm font-display">Decision Types</h3>
+          <h3 className="font-bold text-amber-950 mb-3 text-sm font-display">Decision Types</h3>
           <div className="flex flex-wrap gap-4">
             {Object.entries(typeIcons).map(([type, Icon]) => (
               <div key={type} className="flex items-center gap-2">
-                <Icon size={16} className="text-white/50" />
-                <span className="text-sm text-white/60 capitalize">{type}</span>
+                <Icon size={16} className="text-amber-950/50" />
+                <span className="text-sm text-amber-950/60 capitalize">{type}</span>
               </div>
             ))}
           </div>

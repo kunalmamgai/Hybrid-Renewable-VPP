@@ -19,12 +19,12 @@ interface EnergyMeterProps {
 }
 
 const typeConfig: Record<MeterType, { color: string; label: string; glowColor: string }> = {
-  solar: { color: 'text-vpp-amber', label: 'SOLAR', glowColor: 'rgba(245, 158, 11, 0.12)' },
-  wind: { color: 'text-vpp-teal', label: 'WIND', glowColor: 'rgba(20, 184, 166, 0.12)' },
-  battery: { color: 'text-vpp-blue', label: 'BATTERY', glowColor: 'rgba(59, 130, 246, 0.12)' },
-  grid_import: { color: 'text-vpp-amber', label: 'GRID IMPORT', glowColor: 'rgba(245, 158, 11, 0.08)' },
-  grid_export: { color: 'text-vpp-emerald', label: 'GRID EXPORT', glowColor: 'rgba(16, 185, 129, 0.12)' },
-  demand: { color: 'text-vpp-amber', label: 'DEMAND', glowColor: 'rgba(217, 119, 6, 0.1)' },
+  solar: { color: 'text-amber-600', label: 'SOLAR', glowColor: 'rgba(217, 119, 6, 0.12)' },
+  wind: { color: 'text-amber-700', label: 'WIND', glowColor: 'rgba(180, 83, 9, 0.1)' },
+  battery: { color: 'text-amber-800', label: 'BATTERY', glowColor: 'rgba(146, 64, 14, 0.1)' },
+  grid_import: { color: 'text-amber-700', label: 'GRID IMPORT', glowColor: 'rgba(180, 83, 9, 0.08)' },
+  grid_export: { color: 'text-amber-600', label: 'GRID EXPORT', glowColor: 'rgba(217, 119, 6, 0.1)' },
+  demand: { color: 'text-amber-800', label: 'DEMAND', glowColor: 'rgba(146, 64, 14, 0.1)' },
 };
 
 export const EnergyMeter = memo(function EnergyMeter({
@@ -38,7 +38,7 @@ export const EnergyMeter = memo(function EnergyMeter({
   onClick,
 }: EnergyMeterProps) {
   const config = typeConfig[type];
-  const trendColor = trend === 'up' ? 'text-emerald-400' : trend === 'down' ? 'text-red-400' : 'text-white/40';
+  const trendColor = trend === 'up' ? 'text-amber-600' : trend === 'down' ? 'text-red-600' : 'text-amber-950/40';
 
   return (
     <div
@@ -56,8 +56,8 @@ export const EnergyMeter = memo(function EnergyMeter({
         </span>
         {icon}
       </div>
-      <div className="text-2xl font-bold text-vpp-cream font-display">
-        {value.toFixed(1)} <span className="text-sm font-medium text-white/55">{unit}</span>
+      <div className="text-2xl font-bold text-amber-950 font-display">
+        {value.toFixed(1)} <span className="text-sm font-medium text-amber-950/55">{unit}</span>
       </div>
       {trend !== 'neutral' && (
         <div className={`text-xs ${trendColor} mt-1 font-medium`}>

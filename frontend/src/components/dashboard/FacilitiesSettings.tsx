@@ -172,8 +172,8 @@ export function FacilitiesSettings() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-2 drop-shadow-md">
-              <Settings size={24} className="text-vpp-emerald" />
+            <h1 className="text-2xl font-bold text-white flex items-center gap-2 drop-shadow-md font-display">
+              <Settings size={24} className="text-saffron-400" />
               Facilities Settings
             </h1>
             <p className="text-sm text-white/50 mt-1.5">
@@ -183,7 +183,7 @@ export function FacilitiesSettings() {
           <button
             onClick={handleForceCycle}
             disabled={saving.force_cycle}
-            className="px-4 py-2 bg-vpp-emerald text-white rounded-xl hover:bg-vpp-emerald-light flex items-center gap-2 text-sm font-semibold disabled:opacity-50 transition-all duration-200 shadow-emerald-glow"
+            className="px-4 py-2 bg-gradient-to-b from-saffron-400 to-amber-600 text-white rounded-xl hover:from-saffron-300 hover:to-amber-500 flex items-center gap-2 text-sm font-semibold disabled:opacity-50 transition-all duration-200 shadow-saffron-glow"
           >
             {saving.force_cycle ? (
               <Loader2 size={15} className="animate-spin" />
@@ -220,8 +220,8 @@ export function FacilitiesSettings() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                 activeTab === tab.id
-                  ? 'bg-vpp-emerald text-white shadow-emerald-glow-sm'
-                  : 'text-white/60 hover:text-white hover:bg-white/8'
+                  ? 'bg-gradient-to-b from-saffron-400 to-amber-600 text-white shadow-saffron-glow-sm'
+                  : 'text-white/60 hover:text-white hover:bg-saffron-400/10'
               }`}
             >
               {tab.icon}
@@ -343,7 +343,7 @@ function ThresholdTab({
                   <input
                     type="checkbox"
                     defaultChecked={t.active}
-                    className="rounded border-white/30 text-vpp-emerald focus:ring-vpp-emerald"
+                    className="rounded border-white/30 text-saffron-400 focus:ring-saffron-400"
                   />
                   Active
                 </label>
@@ -354,7 +354,7 @@ function ThresholdTab({
                     onSave(t.id, parseFloat(el?.value || String(t.threshold_value)), activeEl?.checked ?? true);
                   }}
                   disabled={isSaving}
-                  className="px-3 py-1.5 bg-vpp-emerald text-white rounded-xl text-sm font-semibold hover:bg-vpp-emerald-light disabled:opacity-50 flex items-center gap-1 transition-all"
+                  className="px-3 py-1.5 bg-gradient-to-b from-saffron-400 to-amber-600 text-white rounded-xl text-sm font-semibold hover:from-saffron-300 hover:to-amber-500 disabled:opacity-50 flex items-center gap-1 transition-all shadow-saffron-glow-sm"
                 >
                   {isSaving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
                   Save
@@ -391,7 +391,7 @@ function TiersTab({
   return (
     <div>
       <h2 className="text-lg font-bold text-vpp-cream mb-2 flex items-center gap-2">
-        <BarChart3 size={18} className="text-vpp-blue" />
+        <BarChart3 size={18} className="text-saffron-400" />
         Building Criticality Tiers
       </h2>
       <p className="text-sm text-white/60 mb-6">
@@ -443,7 +443,7 @@ function TiersTab({
                         onSave(tier.building_id, el?.value || tier.tier);
                       }}
                       disabled={isSaving}
-                      className="px-3 py-1.5 bg-vpp-emerald text-white rounded-xl text-xs font-semibold hover:bg-vpp-emerald-light disabled:opacity-50 flex items-center gap-1 ml-auto transition-all"
+                      className="px-3 py-1.5 bg-gradient-to-b from-saffron-400 to-amber-600 text-white rounded-xl text-xs font-semibold hover:from-saffron-300 hover:to-amber-500 disabled:opacity-50 flex items-center gap-1 ml-auto transition-all shadow-saffron-glow-sm"
                     >
                       {isSaving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
                       Save
@@ -500,7 +500,7 @@ function VnmTab({
   return (
     <div>
       <h2 className="text-lg font-bold text-vpp-cream mb-2 flex items-center gap-2">
-        <Zap size={18} className="text-vpp-emerald" />
+        <Zap size={18} className="text-saffron-400" />
         VNM/GNM Sharing Rules
       </h2>
       <p className="text-sm text-white/60 mb-6">
@@ -527,10 +527,10 @@ function VnmTab({
                   step="0.05"
                   defaultValue={r.sharing_ratio}
                   id={`vnm-input-${r.building_id}`}
-                  className="flex-1 accent-vpp-emerald"
+                  className="flex-1 accent-saffron-400"
                 />
                 <span
-                  className="text-sm font-bold text-vpp-emerald font-mono w-12 text-right"
+                  className="text-sm font-bold text-saffron-300 font-mono w-12 text-right"
                   id={`vnm-label-${r.building_id}`}
                 >
                   {(r.sharing_ratio * 100).toFixed(0)}%
@@ -541,7 +541,7 @@ function VnmTab({
                     onSave(r.building_id, parseFloat(el?.value || String(r.sharing_ratio)));
                   }}
                   disabled={isSaving}
-                  className="px-3 py-1.5 bg-vpp-emerald text-white rounded-xl text-sm font-semibold hover:bg-vpp-emerald-light disabled:opacity-50 flex items-center gap-1 transition-all"
+                  className="px-3 py-1.5 bg-gradient-to-b from-saffron-400 to-amber-600 text-white rounded-xl text-sm font-semibold hover:from-saffron-300 hover:to-amber-500 disabled:opacity-50 flex items-center gap-1 transition-all shadow-saffron-glow-sm"
                 >
                   {isSaving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
                   Save
@@ -570,7 +570,7 @@ function ShieldIcon({ size }: { size: number }) {
 }
 
 function WindIcon({ size }: { size: number }) {
-  return <Wind size={size} className="text-vpp-teal" />;
+  return <Wind size={size} className="text-saffron-300" />;
 }
 
 function ScenariosTab({
@@ -594,16 +594,16 @@ function ScenariosTab({
   }
 
   const scenarioDescriptions: Record<string, { icon: React.ReactNode; color: string; activeColor: string }> = {
-    mvp_day: { icon: <SunIcon size={24} />, color: 'border-vpp-amber/30 bg-vpp-amber/5', activeColor: 'border-vpp-emerald bg-vpp-emerald/10' },
-    cloudy_still_afternoon: { icon: <CloudIcon size={24} />, color: 'border-white/15 bg-white/5', activeColor: 'border-vpp-emerald bg-vpp-emerald/10' },
-    wind_fills_solar_gap: { icon: <WindIcon size={24} />, color: 'border-vpp-teal/30 bg-vpp-teal/5', activeColor: 'border-vpp-emerald bg-vpp-emerald/10' },
-    shortfall_protects_hostel: { icon: <ShieldIcon size={24} />, color: 'border-vpp-blue/30 bg-vpp-blue/5', activeColor: 'border-vpp-emerald bg-vpp-emerald/10' },
+    mvp_day: { icon: <SunIcon size={24} />, color: 'border-saffron-400/30 bg-saffron-400/5', activeColor: 'border-saffron-400 bg-saffron-400/10' },
+    cloudy_still_afternoon: { icon: <CloudIcon size={24} />, color: 'border-white/15 bg-white/5', activeColor: 'border-saffron-400 bg-saffron-400/10' },
+    wind_fills_solar_gap: { icon: <WindIcon size={24} />, color: 'border-saffron-300/30 bg-saffron-300/5', activeColor: 'border-saffron-400 bg-saffron-400/10' },
+    shortfall_protects_hostel: { icon: <ShieldIcon size={24} />, color: 'border-vpp-blue/30 bg-vpp-blue/5', activeColor: 'border-saffron-400 bg-saffron-400/10' },
   };
 
   return (
     <div>
       <h2 className="text-lg font-bold text-vpp-cream mb-2 flex items-center gap-2">
-        <Play size={18} className="text-vpp-emerald" />
+        <Play size={18} className="text-saffron-400" />
         Demo Scenarios
       </h2>
       <p className="text-sm text-white/60 mb-6">
@@ -615,14 +615,14 @@ function ScenariosTab({
         {scenarios.map((s) => {
           const isActive = currentScenario === s.id;
           const isSaving = saving[`scenario_${s.id}`];
-          const desc = scenarioDescriptions[s.id] || { icon: <Zap size={24} />, color: 'border-white/20', activeColor: 'border-vpp-emerald bg-vpp-emerald/10' };
+          const desc = scenarioDescriptions[s.id] || { icon: <Zap size={24} />, color: 'border-white/20', activeColor: 'border-saffron-400 bg-saffron-400/10' };
 
           return (
             <div
               key={s.id}
               className={`border-2 rounded-2xl p-5 transition-all duration-200 ${
                 isActive
-                  ? desc.activeColor + ' shadow-emerald-glow-sm'
+                  ? desc.activeColor + ' shadow-saffron-glow-sm'
                   : desc.color
               }`}
             >
@@ -637,7 +637,7 @@ function ScenariosTab({
                   </div>
                 </div>
                 {isActive && (
-                  <span className="px-2.5 py-0.5 bg-vpp-emerald text-white rounded-full text-[10px] font-bold flex items-center gap-1 tracking-wider">
+                  <span className="px-2.5 py-0.5 bg-gradient-to-b from-saffron-400 to-amber-600 text-white rounded-full text-[10px] font-bold flex items-center gap-1 tracking-wider">
                     <CheckCircle2 size={12} /> ACTIVE
                   </span>
                 )}
@@ -662,7 +662,7 @@ function ScenariosTab({
                 className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 ${
                   isActive
                     ? 'bg-white/10 text-white/60 cursor-default'
-                    : 'bg-vpp-emerald text-white hover:bg-vpp-emerald-light shadow-emerald-glow-sm'
+                    : 'bg-gradient-to-b from-saffron-400 to-amber-600 text-white hover:from-saffron-300 hover:to-amber-500 shadow-saffron-glow-sm'
                 }`}
               >
                 {isSaving ? (
@@ -688,7 +688,7 @@ function ExportTab() {
   return (
     <div>
       <h2 className="text-lg font-bold text-vpp-cream mb-2 flex items-center gap-2">
-        <Download size={18} className="text-vpp-emerald" />
+        <Download size={18} className="text-saffron-400" />
         Statutory Export
       </h2>
       <p className="text-sm text-white/60 mb-6">
@@ -699,10 +699,10 @@ function ExportTab() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <button
           onClick={downloadCSV}
-          className="vpp-card rounded-2xl p-6 flex items-center gap-4 hover:border-vpp-emerald/40 transition-all duration-200 group text-left"
+          className="vpp-card rounded-2xl p-6 flex items-center gap-4 hover:border-saffron-400/50 transition-all duration-200 group text-left"
         >
-          <div className="w-14 h-14 rounded-xl bg-vpp-emerald/15 flex items-center justify-center group-hover:bg-vpp-emerald/25 transition-colors">
-            <FileSpreadsheet size={28} className="text-vpp-emerald" />
+          <div className="w-14 h-14 rounded-xl bg-saffron-400/15 flex items-center justify-center group-hover:bg-saffron-400/25 transition-colors">
+            <FileSpreadsheet size={28} className="text-saffron-300" />
           </div>
           <div>
             <h3 className="font-bold text-vpp-cream">Export as CSV</h3>
@@ -714,10 +714,10 @@ function ExportTab() {
 
         <button
           onClick={downloadPDF}
-          className="vpp-card rounded-2xl p-6 flex items-center gap-4 hover:border-vpp-blue/40 transition-all duration-200 group text-left"
+          className="vpp-card rounded-2xl p-6 flex items-center gap-4 hover:border-saffron-300/50 transition-all duration-200 group text-left"
         >
-          <div className="w-14 h-14 rounded-xl bg-vpp-blue/15 flex items-center justify-center group-hover:bg-vpp-blue/25 transition-colors">
-            <FileText size={28} className="text-vpp-blue" />
+          <div className="w-14 h-14 rounded-xl bg-saffron-400/15 flex items-center justify-center group-hover:bg-saffron-400/25 transition-colors">
+            <FileText size={28} className="text-amber-200" />
           </div>
           <div>
             <h3 className="font-bold text-vpp-cream">Export as PDF</h3>
@@ -732,23 +732,23 @@ function ExportTab() {
         <h3 className="text-sm font-bold text-vpp-cream mb-2">Report Contents</h3>
         <ul className="text-xs text-white/60 space-y-1.5">
           <li className="flex items-start gap-2">
-            <span className="text-vpp-emerald mt-0.5">•</span>
+            <span className="text-saffron-300 mt-0.5">•</span>
             <span>Building snapshot: solar gen, wind gen, consumption, grid import/export, battery SoC</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-vpp-emerald mt-0.5">•</span>
+            <span className="text-saffron-300 mt-0.5">•</span>
             <span>Decision log: action, confidence %, expected savings (INR), carbon reduction (kg CO₂)</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-vpp-emerald mt-0.5">•</span>
+            <span className="text-saffron-300 mt-0.5">•</span>
             <span>Executive summary: total savings, total carbon reduction, renewable self-consumption %</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-vpp-emerald mt-0.5">•</span>
+            <span className="text-saffron-300 mt-0.5">•</span>
             <span>Grounds: RERC Third Amendment Regulations, 2025</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-vpp-emerald mt-0.5">•</span>
+            <span className="text-saffron-300 mt-0.5">•</span>
             <span>Emission factor: 0.74 kg CO₂/kWh (Rajasthan central grid average)</span>
           </li>
         </ul>

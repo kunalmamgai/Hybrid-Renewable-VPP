@@ -13,11 +13,31 @@ const navItems = [
 ];
 
 function navLinkClass(isActive: boolean) {
-  return `flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${
+  return `flex items-center gap-2.5 px-3.5 py-2 rounded-xl border transition-all duration-200 ${
     isActive
-      ? 'bg-vpp-accent-gold/15 text-amber-100 border-vpp-accent-gold/30 shadow-[0_0_14px_rgba(217,119,6,0.15)]'
-      : 'text-white/60 hover:text-white hover:bg-white/8 border-transparent'
+      ? 'bg-gradient-to-b from-saffron-400 to-amber-600 border-saffron-400/60 text-white shadow-saffron-glow-sm'
+      : 'border-transparent text-amber-950/70 hover:text-amber-950 hover:bg-saffron-400/15 hover:border-saffron-400/30'
   }`;
+}
+
+function NavLinkContent({ item, isActive }: { item: (typeof navItems)[number]; isActive: boolean }) {
+  return (
+    <>
+      <item.icon size={16} className={isActive ? 'text-white' : 'text-amber-700'} />
+      <span className="leading-tight">
+        <span
+          className={`block font-display text-[13px] font-bold tracking-wide ${
+            isActive ? 'text-white' : 'text-amber-950/80'
+          }`}
+        >
+          {item.label}
+        </span>
+        <span className={`block text-[10px] font-normal ${isActive ? 'text-white/70' : 'text-amber-950/45'}`}>
+          {item.desc}
+        </span>
+      </span>
+    </>
+  );
 }
 
 export function NavBar() {
@@ -43,7 +63,7 @@ export function NavBar() {
               <Zap className="text-white" size={17} />
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-white text-lg tracking-tight drop-shadow-md">SURYA</span>
+              <span className="font-display font-bold text-white text-lg tracking-tight drop-shadow-md">SURYA</span>
               <span className="text-[10px] text-vpp-accent-gold/80 font-medium tracking-wider">
                 Smart Unified Renewable Yield Automation
               </span>
@@ -52,22 +72,21 @@ export function NavBar() {
 
           <div className="h-5 w-px bg-vpp-accent-gold/25 hidden lg:block"></div>
 
-          <div className="hidden lg:flex space-x-0.5">
+          <div className="hidden lg:flex items-center gap-1 rounded-2xl bg-vpp-cream/90 border border-amber-600/20 px-1.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.65),0_6px_20px_rgba(0,0,0,0.28)]">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) => navLinkClass(isActive)}
               >
-                <item.icon size={15} />
-                <span>{item.label}</span>
+                {({ isActive }) => <NavLinkContent item={item} isActive={isActive} />}
               </NavLink>
             ))}
           </div>
         </div>
 
         <div className="hidden lg:block text-right">
-          <div className="text-sm text-white/70 font-medium">SURYA Platform</div>
+          <div className="text-sm text-white/70 font-medium font-display">SURYA Platform</div>
           <div className="text-[11px] text-vpp-accent-gold/70 tracking-wide">
             Smart Unified Renewable Yield Automation
           </div>
@@ -91,14 +110,12 @@ export function NavBar() {
               to={item.to}
               className={({ isActive }) => `${navLinkClass(isActive)} mb-1`}
             >
-              <item.icon size={15} />
-              <span>{item.label}</span>
-              <span className="ml-auto text-[10px] text-white/35 font-normal">{item.desc}</span>
+              {({ isActive }) => <NavLinkContent item={item} isActive={isActive} />}
             </NavLink>
           ))}
-          <div className="mt-1 pt-3 px-3 pb-2 border-t border-white/10">
-            <div className="text-xs text-white/70 font-medium">SURYA Platform</div>
-            <div className="text-[10px] text-vpp-accent-gold/70 tracking-wide">
+          <div className="mt-1 pt-3 px-3 pb-2 border-t border-amber-950/10">
+            <div className="text-xs text-amber-950/80 font-medium font-display">SURYA Platform</div>
+            <div className="text-[10px] text-amber-800/70 tracking-wide">
               Smart Unified Renewable Yield Automation
             </div>
           </div>

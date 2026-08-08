@@ -11,17 +11,17 @@ export const DecisionCard = memo(function DecisionCard({ decision }: { decision:
   const getIcon = () => {
     switch (decision.decision_type) {
       case 'reliability':
-        return <AlertTriangle className="text-vpp-red" size={20} />;
+        return <AlertTriangle className="text-red-500" size={20} />;
       case 'battery':
-        return <Battery className="text-vpp-blue" size={20} />;
+        return <Battery className="text-amber-600" size={20} />;
       case 'dispatch':
-        return <BarChart3 className="text-vpp-amber" size={20} />;
+        return <BarChart3 className="text-amber-700" size={20} />;
       case 'vnm':
-        return <TrendingUp className="text-vpp-teal" size={20} />;
+        return <TrendingUp className="text-amber-700" size={20} />;
       case 'load_shift':
-        return <CheckCircle className="text-vpp-emerald" size={20} />;
+        return <CheckCircle className="text-amber-700" size={20} />;
       default:
-        return <CheckCircle className="text-vpp-emerald" size={20} />;
+        return <CheckCircle className="text-amber-700" size={20} />;
     }
   };
 
@@ -37,9 +37,9 @@ export const DecisionCard = memo(function DecisionCard({ decision }: { decision:
   };
 
   const borderClass =
-    decision.decision_type === 'reliability' ? 'border-vpp-red' :
-    decision.confidence_pct > 80 ? 'border-vpp-emerald' :
-    decision.confidence_pct > 60 ? 'border-vpp-amber' : 'border-white/30';
+    decision.decision_type === 'reliability' ? 'border-red-500' :
+    decision.confidence_pct > 80 ? 'border-amber-600' :
+    decision.confidence_pct > 60 ? 'border-amber-700' : 'border-amber-950/20';
 
   return (
     <div
@@ -52,10 +52,10 @@ export const DecisionCard = memo(function DecisionCard({ decision }: { decision:
         <div className="flex items-center gap-3">
           {getIcon()}
           <div>
-            <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">
+            <span className="text-[10px] font-bold text-amber-950/50 uppercase tracking-wider">
               {getTypeLabel()}
             </span>
-            <div className="text-xs text-white/45 mt-0.5">
+            <div className="text-xs text-amber-950/45 mt-0.5">
               {decision.timestamp && new Date(decision.timestamp).toLocaleTimeString('en-IN', {
                 hour: '2-digit', minute: '2-digit', hour12: true
               })}
@@ -63,18 +63,18 @@ export const DecisionCard = memo(function DecisionCard({ decision }: { decision:
           </div>
         </div>
         <div className="text-right">
-          <div className="text-lg font-bold text-vpp-cream font-display">
+          <div className="text-lg font-bold text-amber-950 font-display">
             {decision.confidence_pct.toFixed(0)}%
           </div>
-          <span className="text-[10px] text-white/45 uppercase tracking-wider">CONFIDENCE</span>
+          <span className="text-[10px] text-amber-950/45 uppercase tracking-wider">CONFIDENCE</span>
         </div>
       </div>
 
       <div className="mt-3 space-y-2">
-        <p className="text-sm text-vpp-cream font-semibold leading-relaxed">{decision.action}</p>
+        <p className="text-sm text-amber-950 font-semibold leading-relaxed">{decision.action}</p>
 
         {decision.reason && (
-          <p className="text-xs text-white/60 leading-relaxed">{decision.reason}</p>
+          <p className="text-xs text-amber-950/60 leading-relaxed">{decision.reason}</p>
         )}
 
         {decision.building_id && (
@@ -82,40 +82,40 @@ export const DecisionCard = memo(function DecisionCard({ decision }: { decision:
             "inline-block text-[10px] font-semibold px-2.5 py-0.5 rounded-full tracking-wide",
             decision.context?.criticality === 'critical'
               ? "bg-vpp-blue/15 text-vpp-blue"
-              : "bg-white/10 text-white/60",
+              : "bg-amber-950/8 text-amber-950/60",
           )}>
             {decision.building_id.replace('_', ' ').toUpperCase()}
           </span>
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-white/10">
+      <div className="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-amber-950/10">
         <div className="text-center">
-          <div className="flex items-center justify-center gap-1 text-vpp-emerald">
+          <div className="flex items-center justify-center gap-1 text-amber-700">
             <IndianRupee size={14} />
             <span className="text-sm font-bold font-display">{decision.expected_savings_inr.toFixed(1)}</span>
           </div>
-          <span className="text-[10px] text-white/50">Savings (INR)</span>
+          <span className="text-[10px] text-amber-950/50">Savings (INR)</span>
         </div>
         <div className="text-center">
-          <div className="flex items-center justify-center gap-1 text-vpp-teal">
+          <div className="flex items-center justify-center gap-1 text-amber-700">
             <Leaf size={14} />
             <span className="text-sm font-bold font-display">{decision.expected_carbon_reduction_kg.toFixed(2)}</span>
           </div>
-          <span className="text-[10px] text-white/50">Carbon (kg)</span>
+          <span className="text-[10px] text-amber-950/50">Carbon (kg)</span>
         </div>
         <div className="text-center">
-          <div className="text-sm font-bold text-vpp-cream font-display">
+          <div className="text-sm font-bold text-amber-950 font-display">
             {decision.battery_soc_after_pct.toFixed(0)}%
           </div>
-          <span className="text-[10px] text-white/50">SoC After</span>
+          <span className="text-[10px] text-amber-950/50">SoC After</span>
         </div>
       </div>
 
       {decision.alternative_considered && (
-        <div className="mt-3 pt-2 border-t border-white/10">
-          <span className="text-[10px] text-white/50 font-medium">Alternative:</span>
-          <p className="text-xs text-white/60 mt-1 leading-relaxed">{decision.alternative_considered}</p>
+        <div className="mt-3 pt-2 border-t border-amber-950/10">
+          <span className="text-[10px] text-amber-950/50 font-medium">Alternative:</span>
+          <p className="text-xs text-amber-950/60 mt-1 leading-relaxed">{decision.alternative_considered}</p>
         </div>
       )}
     </div>
