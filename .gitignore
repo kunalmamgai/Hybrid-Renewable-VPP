@@ -1,0 +1,25 @@
+﻿# Dependencies
+node_modules/
+.pnpm-store/
+simulator/node_modules/
+
+# Build output
+frontend/dist/
+simulator/dist/
+
+# Databases
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Environment
+.env
+.env.local
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
