@@ -12,6 +12,7 @@ from backend.adapters.simulated import (
     SimulatedBuilding,
     SimulatedConfig,
 )
+from backend.api.routes_auth import router as auth_router
 from backend.api.routes_decisions import router as decisions_router
 from backend.api.routes_export import router as export_router
 from backend.api.routes_health import router as health_router
@@ -193,6 +194,7 @@ app.include_router(health_router)
 app.include_router(decisions_router)
 app.include_router(export_router)
 app.include_router(settings_router)
+app.include_router(auth_router)
 
 # WebSocket endpoint
 from fastapi import WebSocket

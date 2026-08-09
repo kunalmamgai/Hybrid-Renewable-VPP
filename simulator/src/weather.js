@@ -294,7 +294,7 @@ async function fetchJson(url, signal) {
 }
 
 export async function fetchCampusWeather(latitude, longitude, signal) {
-  const cacheKey = `urja-weather:${Number(latitude).toFixed(4)}:${Number(longitude).toFixed(4)}`;
+  const cacheKey = `surya-weather:${Number(latitude).toFixed(4)}:${Number(longitude).toFixed(4)}`;
   let cachedWeather = null;
   let persistedFailure = 0;
   try {

@@ -1,4 +1,4 @@
-# URJA Multi-Campus Energy Digital Twins
+# SURYA Multi-Campus Energy Digital Twins
 
 A local dashboard of interactive campus energy simulators for Rajasthan institutions,
 with the detailed VIT Bhopal twin preserved as an independent reference campus.

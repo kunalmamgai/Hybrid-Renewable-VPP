@@ -29,6 +29,7 @@ import { BUILDINGS, CampusScene } from "./CampusScene";
 import CampusDashboard from "./CampusDashboard";
 import EngineeringLab, { HazardStatusBanner } from "./EngineeringLab";
 import RegionalCampusSimulator from "./RegionalCampusSimulator";
+import SuryaMark from "./SuryaMark";
 import { getCampus } from "./campuses";
 import {
   aggregateProposals,
@@ -418,7 +419,7 @@ function VitBhopalSimulator({ onBack, embedded = false }) {
             <ArrowLeft size={18} />
           </button>
           <div className="brand-mark">
-            <Zap size={19} fill="currentColor" />
+            <SuryaMark size={38} />
           </div>
           <div>
             <strong>VIT Bhopal</strong>

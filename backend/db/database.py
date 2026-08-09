@@ -9,6 +9,7 @@ from backend.config import settings
 from backend.models.config import Base as ConfigBase
 from backend.models.decision_log import Base as LogBase
 from backend.models.digital_twin import Base as TwinBase
+from backend.models.user import Base as UserBase
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
 
 async def init_db():
     """Create all tables and enable WAL mode for SQLite."""
-    for base in [TwinBase, LogBase, ConfigBase]:
+    for base in [TwinBase, LogBase, ConfigBase, UserBase]:
         async with engine.begin() as conn:
             await conn.run_sync(base.metadata.create_all)
 

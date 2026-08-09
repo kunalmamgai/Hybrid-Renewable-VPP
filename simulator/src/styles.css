@@ -6022,6 +6022,36 @@ a:focus-visible {
   }
 }
 
+/* Unified SURYA identity across the network dashboard and every campus twin. */
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  overflow: visible;
+  color: inherit;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+}
+
+.brand-mark svg,
+.dashboard-brand > span svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 9px rgba(246, 184, 75, 0.3));
+}
+
+.dashboard-brand > span,
+.dashboard-brand:hover > span {
+  width: 42px;
+  height: 42px;
+  overflow: visible;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
 /* Energy Intelligence workspace */
 .engineering-lab.tab-energy {
   width: min(470px, calc(100vw - 44px));

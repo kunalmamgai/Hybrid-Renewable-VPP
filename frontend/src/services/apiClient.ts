@@ -19,6 +19,57 @@ const api = axios.create({
   timeout: 10000,
 });
 
+export const AUTH_TOKEN_KEY = 'surya_access_token';
+
+api.interceptors.request.use((config) => {
+  const token = window.localStorage.getItem(AUTH_TOKEN_KEY);
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export type AuthUser = {
+  id: string;
+  email: string;
+  full_name: string;
+  avatar_url: string | null;
+  auth_provider: string;
+};
+
+export type AuthResponse = {
+  access_token: string;
+  token_type: 'bearer';
+  user: AuthUser;
+};
+
+export const signUp = async (payload: {
+  full_name: string;
+  email: string;
+  password: string;
+}): Promise<AuthResponse> => {
+  const response = await api.post<AuthResponse>('/api/v1/auth/signup', payload);
+  return response.data;
+};
+
+export const signIn = async (payload: {
+  email: string;
+  password: string;
+}): Promise<AuthResponse> => {
+  const response = await api.post<AuthResponse>('/api/v1/auth/login', payload);
+  return response.data;
+};
+
+export const signInWithGoogle = async (credential: string): Promise<AuthResponse> => {
+  const response = await api.post<AuthResponse>('/api/v1/auth/google', { credential });
+  return response.data;
+};
+
+export const getCurrentUser = async (): Promise<AuthUser> => {
+  const response = await api.get<AuthUser>('/api/v1/auth/me');
+  return response.data;
+};
+
 // ============================================================
 // Decisions
 // ============================================================

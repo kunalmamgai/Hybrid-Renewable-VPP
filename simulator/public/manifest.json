@@ -1,6 +1,6 @@
 {
-  "name": "URJA Multi-Campus Energy Digital Twins",
-  "short_name": "URJA Twins",
+  "name": "SURYA Multi-Campus Energy Digital Twins",
+  "short_name": "SURYA Twins",
   "description": "Interactive renewable-energy digital twins for Indian university campuses.",
   "start_url": "./",
   "scope": "./",

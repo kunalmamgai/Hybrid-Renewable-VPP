@@ -12,7 +12,6 @@ import {
   Cog,
   Battery,
   Building2,
-  Zap,
   IndianRupee,
   Leaf,
   Target,
@@ -20,6 +19,7 @@ import {
   ArrowRight,
   ChevronDown,
 } from 'lucide-react';
+import { SuryaMark } from '../common/SuryaMark';
 
 // ─── Scroll Reveal Wrapper (Framer Motion) ───
 export function RevealSection({ children, className = '', delay = 0 }: {
@@ -287,15 +287,16 @@ export function CTAFooter() {
           </p>
 
           <div className="mt-12 flex flex-wrap items-center justify-center gap-6">
-            <button
+            <Link
+              to="/signup"
               className="text-white px-10 py-4 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shadow-lg shadow-vpp-accent-gold/20"
               style={{
                 background: 'linear-gradient(135deg, #ff9f1c, #d97706)',
               }}
             >
-              Book a Demo
+              Get Started
               <ArrowRight size={16} />
-            </button>
+            </Link>
             <Link
               to="/dashboard"
               className="text-white/90 px-10 py-4 rounded-full text-sm font-bold transition-all duration-300 border border-white/20 backdrop-blur-md hover:bg-white/10 hover:text-white"
@@ -307,25 +308,21 @@ export function CTAFooter() {
 
         {/* Compact footer bar */}
         <div className="mt-24 pt-8 border-t border-white/8 relative z-10 flex flex-col md:flex-row items-center justify-between gap-5">
-          <div className="flex items-center gap-2.5">
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center"
-              style={{
-                background: 'linear-gradient(135deg, #d97706, #f59e0b)',
-                boxShadow: '0 0 14px rgba(217, 119, 6, 0.35)',
-              }}
-            >
-              <Zap size={14} className="text-white" />
-            </div>
+          <Link
+            to="/"
+            aria-label="Go to SURYA home page"
+            className="flex items-center gap-2.5 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
+          >
+            <SuryaMark size={34} className="shrink-0 drop-shadow-[0_0_8px_rgba(217,119,6,0.3)]" />
             <div className="text-left">
               <div className="text-sm font-bold text-white">
                 SURYA
               </div>
               <div className="text-[10px] text-white/35 tracking-wide">Rajasthan DTE Smart Energy Platform</div>
             </div>
-          </div>
+          </Link>
 
-          <div className="flex items-center gap-6 text-xs text-white/45">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-xs text-white/45">
             <Link to="/dashboard" className="hover:text-amber-200 transition-colors duration-300">Platform</Link>
             <Link to="/energy-flow" className="hover:text-amber-200 transition-colors duration-300">Live Demo</Link>
             <Link to="/decisions" className="hover:text-amber-200 transition-colors duration-300">Impact</Link>
