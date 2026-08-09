@@ -18,6 +18,7 @@ import {
   Zap,
 } from "lucide-react";
 import { CAMPUSES, RAJASTHAN_CAMPUSES } from "./campuses";
+import SuryaMark from "./SuryaMark";
 
 const FILTERS = ["All campuses", "Technical", "Medical", "University"];
 
@@ -83,9 +84,9 @@ export default function CampusDashboard({ onSelect }) {
     <main className="dashboard-shell">
       <header className="dashboard-header">
         <div className="dashboard-brand">
-          <span><Zap size={21} fill="currentColor" /></span>
+          <span><SuryaMark size={42} /></span>
           <div>
-            <strong>URJA CAMPUS NETWORK</strong>
+            <strong>SURYA CAMPUS NETWORK</strong>
             <small>Rajasthan Campus Energy Digital Twin Programme</small>
           </div>
         </div>

@@ -3,12 +3,14 @@
  * Routes: Hero → Mission Control → Live Energy Flow → AI Decision Center → Settings
  * Uses Framer Motion for smooth page transitions (fade + slide).
  */
-import { HashRouter as Router, useLocation } from 'react-router-dom';
+import { HashRouter as Router, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { lazy, Suspense, type CSSProperties, type ReactNode } from 'react';
 import { NavBar } from './components/NavBar';
 import { Hero } from './components/landing/Hero';
 import { VppDataProvider } from './context/VppDataContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthPage } from './components/auth/AuthPage';
 
 const MissionControl = lazy(() =>
   import('./components/dashboard/MissionControl').then(m => ({ default: m.MissionControl }))
@@ -83,7 +85,24 @@ function AnimatedRoute({ children }: { children: ReactNode }) {
 
 function AppRoutes() {
   const location = useLocation();
+  const { user, loading } = useAuth();
   const config = routeConfigs[location.pathname] || { needsNav: false };
+  const isProtected = Boolean(routeConfigs[location.pathname]?.needsNav);
+  const isKnownRoute = location.pathname === '/'
+    || location.pathname === '/login'
+    || location.pathname === '/signup'
+    || isProtected;
+
+  if (loading) {
+    return <PageFallback />;
+  }
+
+  if (!isKnownRoute) return <Navigate to="/" replace />;
+  if (location.pathname === '/login') return <AuthPage mode="login" />;
+  if (location.pathname === '/signup') return <AuthPage mode="signup" />;
+  if (isProtected && !user) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
 
   return (
     <>
@@ -114,11 +133,13 @@ function App() {
 
   return (
     <Router>
-      <VppDataProvider>
-        <div className="min-h-screen" style={appStyle}>
-          <AppRoutes />
-        </div>
-      </VppDataProvider>
+      <AuthProvider>
+        <VppDataProvider>
+          <div className="min-h-screen" style={appStyle}>
+            <AppRoutes />
+          </div>
+        </VppDataProvider>
+      </AuthProvider>
     </Router>
   );
 }

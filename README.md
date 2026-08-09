@@ -20,6 +20,25 @@ npm run dev
 
 Open `http://localhost:5173/#/energy-flow`. The command starts the API, website and campus twin together. The simulator runs internally on port `5174`.
 
+## Authentication
+
+Email/password sign-up works locally after the normal setup above. Passwords are stored as Argon2 hashes, and the API issues signed, expiring access tokens.
+
+To enable **Continue with Google**:
+
+1. In [Google Auth Platform](https://console.cloud.google.com/auth/clients), create an OAuth 2.0 client of type **Web application**.
+2. Add `http://localhost:5173` under **Authorized JavaScript origins**.
+3. Copy the Web client ID into both values in the root `.env` file:
+
+```env
+GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+```
+
+4. Restart `npm run dev` after changing `.env`.
+
+The frontend receives a Google ID credential and sends it to the backend, which verifies its signature, audience, issuer and expiry before signing the user into SURYA. No Google client secret is required for this sign-in flow.
+
 ## Verify the project
 
 ```bash

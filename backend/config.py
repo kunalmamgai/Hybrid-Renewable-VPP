@@ -3,7 +3,7 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=BASE_DIR / ".env", env_file_encoding="utf-8")
@@ -11,6 +11,11 @@ class Settings(BaseSettings):
     # Server
     backend_host: str = "0.0.0.0"
     backend_port: int = 8000
+
+    # Authentication
+    jwt_secret_key: str = "change-me-before-production"
+    jwt_access_token_expire_minutes: int = 1440
+    google_client_id: str = ""
 
     # Database
     database_url: str = "sqlite+aiosqlite:///./vpp.db"

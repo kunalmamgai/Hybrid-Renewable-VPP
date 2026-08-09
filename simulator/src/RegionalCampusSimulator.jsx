@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import EngineeringLab, { HazardStatusBanner } from "./EngineeringLab";
 import RegionalCampusScene from "./RegionalCampusScene";
+import SuryaMark from "./SuryaMark";
 import {
   aggregateProposals,
   getHazardImpact,
@@ -266,7 +267,7 @@ export default function RegionalCampusSimulator({ campus, onBack, embedded = fal
       <header className="topbar">
         <div className="brand regional-brand">
           <button className="hub-back" onClick={onBack} aria-label="Back to all campus simulators"><ArrowLeft size={18} /></button>
-          <div className="brand-mark"><Zap size={19} fill="currentColor" /></div>
+          <div className="brand-mark"><SuryaMark size={38} /></div>
           <div><strong>{campus.shortName}</strong><span>Flagship Campus Energy Twin</span></div>
         </div>
         <div className="topbar-center">
