@@ -28,9 +28,18 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+const STATIC_DEMO_MODE = import.meta.env.PROD && !import.meta.env.VITE_API_URL;
+const STATIC_DEMO_USER: AuthUser = {
+  id: 'static-demo',
+  email: 'demo@surya.vpp',
+  full_name: 'Demo Visitor',
+  avatar_url: null,
+  auth_provider: 'demo',
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<AuthUser | null>(STATIC_DEMO_MODE ? STATIC_DEMO_USER : null);
+  const [loading, setLoading] = useState(!STATIC_DEMO_MODE);
 
   const acceptAuth = useCallback((response: AuthResponse) => {
     window.localStorage.setItem(AUTH_TOKEN_KEY, response.access_token);
@@ -38,6 +47,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (STATIC_DEMO_MODE) return;
+
     const token = window.localStorage.getItem(AUTH_TOKEN_KEY);
     if (!token) {
       setLoading(false);
@@ -64,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(() => {
     window.localStorage.removeItem(AUTH_TOKEN_KEY);
-    setUser(null);
+    setUser(STATIC_DEMO_MODE ? STATIC_DEMO_USER : null);
   }, []);
 
   const value = useMemo(() => ({
