@@ -28,7 +28,8 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const STATIC_DEMO_MODE = import.meta.env.PROD && !import.meta.env.VITE_API_URL;
+const STATIC_DEMO_MODE = import.meta.env.PROD
+  && (import.meta.env.VITE_DEMO_MODE === 'true' || !import.meta.env.VITE_API_URL);
 const STATIC_DEMO_USER: AuthUser = {
   id: 'static-demo',
   email: 'demo@surya.vpp',
