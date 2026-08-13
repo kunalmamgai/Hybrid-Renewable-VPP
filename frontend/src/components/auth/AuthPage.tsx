@@ -10,7 +10,7 @@ function errorMessage(error: unknown): string {
   if (error instanceof AxiosError) {
     const detail = (error.response?.data as { detail?: string } | undefined)?.detail;
     if (detail) return detail;
-    if (!error.response) return 'Unable to reach the server. Make sure the local API is running.';
+    if (!error.response) return 'Unable to reach the authentication server. Please try again in a moment.';
   }
   return 'Something went wrong. Please try again.';
 }

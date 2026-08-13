@@ -14,5 +14,7 @@ services:
         value: "10"
       - key: JWT_SECRET_KEY
         generateValue: true
+      - key: GOOGLE_CLIENT_ID
+        sync: false
       - key: PYTHON_VERSION
         value: 3.12.11

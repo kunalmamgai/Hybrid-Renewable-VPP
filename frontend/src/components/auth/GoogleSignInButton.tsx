@@ -15,6 +15,7 @@ type GoogleAccounts = {
       options: Record<string, string | number | boolean>,
     ) => void;
     cancel: () => void;
+    disableAutoSelect?: () => void;
   };
 };
 

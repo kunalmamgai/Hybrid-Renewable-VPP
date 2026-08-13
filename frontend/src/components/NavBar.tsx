@@ -35,10 +35,8 @@ export function NavBar() {
   }, [location.pathname]);
 
   function handleSignOut() {
-    // Leave the protected route before clearing the session so the route guard
-    // cannot redirect a deliberate sign-out to the login page.
-    navigate('/', { replace: true });
-    window.setTimeout(signOut, 0);
+    signOut();
+    navigate('/login', { replace: true });
   }
 
   return (
