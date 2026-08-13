@@ -1,0 +1,17 @@
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["backend/tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+src = ["backend"]
+
+[tool.ruff.lint]
+# F/E catch unused & bug-prone code; intentional style rules below are disabled.
+ignore = [
+    "B008",  # FastAPI `Depends()` in argument defaults is idiomatic
+    "BLE001",  # top-level guard clauses intentionally catch broad exceptions
+    "DTZ003",  # datetime.utcnow() retained for py3.11 runtime compatibility
+    "RUF012",  # mutable class-attribute defaults are intentional in load_advisor
+    "SIM103",  # explicit `return True`/`return False` kept for readability
+]
