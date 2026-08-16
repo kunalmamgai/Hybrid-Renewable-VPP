@@ -7039,7 +7039,8 @@ a:focus-visible {
 }
 
 .engineering-lab.tab-energy {
-  width: min(700px, calc(100vw - 44px));
+  width: clamp(500px, 34vw, 560px);
+  max-width: calc(100vw - 44px);
 }
 
 .engineering-lab-head {
