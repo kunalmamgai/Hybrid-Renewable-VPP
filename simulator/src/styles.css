@@ -7031,3 +7031,409 @@ a:focus-visible {
     max-height: calc(100vh - 80px);
   }
 }
+
+/* Engineering Lab readability — intentionally last so compact legacy sizes
+   cannot override this accessible presentation. */
+.engineering-lab {
+  width: min(480px, calc(100vw - 44px));
+}
+
+.engineering-lab.tab-energy {
+  width: min(700px, calc(100vw - 44px));
+}
+
+.engineering-lab-head {
+  min-height: 96px;
+  padding: 20px 22px;
+}
+
+.engineering-lab-head span {
+  font-size: 11px;
+  letter-spacing: 0.055em;
+}
+
+.engineering-lab-head h2 {
+  margin-top: 4px;
+  font-size: 27px;
+  line-height: 1.08;
+}
+
+.engineering-lab-head p {
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.engineering-tabs {
+  top: 96px;
+  min-height: 64px;
+}
+
+.engineering-tabs button {
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+.engineering-lab-body,
+.engineering-lab.tab-energy .engineering-lab-body {
+  gap: 16px;
+  padding: 16px;
+}
+
+.engineering-section,
+.engineering-lab.tab-energy .engineering-section {
+  padding: 18px;
+}
+
+.engineering-section-title {
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.engineering-section-title > div {
+  gap: 10px;
+}
+
+.engineering-section-title b,
+.engineering-lab.tab-energy .engineering-section-title b {
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.engineering-section-title > div > span > small,
+.engineering-lab.tab-energy .engineering-section-title > div > span > small {
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.engineering-model-tag {
+  padding: 6px 8px;
+  font-size: 9px;
+  line-height: 1.2;
+}
+
+.engineering-form-grid,
+.engineering-results-grid {
+  gap: 12px;
+}
+
+.engineering-field,
+.engineering-range {
+  gap: 7px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.engineering-field input,
+.engineering-field select {
+  height: 44px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.engineering-field em {
+  right: 12px;
+  font-size: 11px;
+}
+
+.engineering-range b {
+  font-size: 13px;
+}
+
+.engineering-result {
+  min-height: 104px;
+  gap: 5px;
+  padding: 14px;
+}
+
+.engineering-result > span {
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.engineering-result strong {
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.engineering-result small,
+.engineering-lab.tab-energy .engineering-result small {
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.flow-node {
+  min-height: 62px;
+  gap: 10px;
+  padding: 11px;
+}
+
+.flow-node > span {
+  gap: 4px;
+  font-size: 10px;
+}
+
+.flow-node b {
+  font-size: 13px;
+}
+
+.energy-bus > span {
+  font-size: 10px;
+}
+
+.energy-bus > b {
+  font-size: 20px;
+}
+
+.energy-bus > small {
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.dispatch-rule-list {
+  gap: 8px;
+  margin-top: 13px;
+}
+
+.dispatch-rule-list p,
+.engineering-lab.tab-energy .dispatch-rule-list p {
+  grid-template-columns: 8px 1fr;
+  gap: 9px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.dispatch-rule-list p i {
+  width: 6px;
+  height: 6px;
+  margin-top: 5px;
+}
+
+.engineering-reset-action {
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 10px;
+}
+
+.array-warning {
+  gap: 9px;
+  padding: 11px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.energy-smart-toggle {
+  min-height: 62px;
+  padding: 11px 12px;
+}
+
+.energy-smart-toggle b {
+  font-size: 12px;
+}
+
+.energy-smart-toggle small {
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.precharge-decision {
+  gap: 11px;
+  padding: 13px;
+}
+
+.precharge-decision b {
+  font-size: 13px;
+}
+
+.precharge-decision small {
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.forecast-strip {
+  grid-auto-columns: 132px;
+  gap: 9px;
+}
+
+.forecast-strip > div {
+  min-height: 110px;
+  gap: 7px;
+  padding: 11px;
+}
+
+.forecast-strip span,
+.forecast-strip small {
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.forecast-strip b {
+  font-size: 12px;
+}
+
+.projection-chart span {
+  font-size: 9px;
+}
+
+.projection-legend span {
+  font-size: 10px;
+}
+
+.projection-summary span {
+  gap: 4px;
+  padding: 11px;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.projection-summary b {
+  font-size: 13px;
+}
+
+.scenario-comparison > div {
+  min-height: 50px;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.scenario-comparison span {
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.scenario-comparison b,
+.scenario-comparison strong {
+  font-size: 12px;
+}
+
+.scenario-comparison .scenario-comparison-head {
+  min-height: 38px;
+}
+
+.scenario-comparison-head span,
+.scenario-comparison-head b,
+.scenario-comparison-head strong {
+  font-size: 10px;
+}
+
+.cost-basis-note {
+  padding: 11px 12px;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.model-provenance-grid span {
+  font-size: 9px;
+}
+
+.model-provenance-grid b {
+  font-size: 12px;
+}
+
+.model-provenance-grid small {
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.loss-bars span,
+.loss-bars span b {
+  font-size: 11px;
+}
+
+.engineering-model-details summary {
+  min-height: 54px;
+  padding: 13px 15px;
+  font-size: 12px;
+}
+
+.engineering-model-details h3 {
+  font-size: 10px;
+}
+
+.engineering-model-details code {
+  padding: 11px;
+  font-size: 10.5px;
+  line-height: 1.6;
+}
+
+.engineering-model-details p,
+.model-flow li {
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.engineering-advisory {
+  gap: 10px;
+  padding: 13px;
+}
+
+.engineering-advisory span,
+.engineering-advisory b {
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.engineering-primary-action,
+.engineering-danger-action,
+.hazard-actions button {
+  min-height: 44px;
+  font-size: 12px;
+}
+
+.engineering-portfolio span {
+  font-size: 10px;
+}
+
+.engineering-portfolio b {
+  font-size: 13px;
+}
+
+.engineering-proposal-list b {
+  font-size: 12px;
+}
+
+.engineering-proposal-list small,
+.engineering-empty,
+.hazard-description span,
+.hazard-timeline li,
+.engineering-safety-note,
+.engineering-lab.tab-energy .engineering-safety-note {
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.hazard-description b {
+  font-size: 13px;
+}
+
+@media (max-width: 760px) {
+  .engineering-lab,
+  .engineering-lab.tab-energy {
+    top: 72px;
+    right: 8px;
+    width: calc(100vw - 16px);
+    max-height: calc(100vh - 80px);
+  }
+
+  .engineering-lab-head {
+    min-height: 88px;
+    padding: 16px 18px;
+  }
+
+  .engineering-tabs {
+    top: 88px;
+  }
+
+  .engineering-tabs button {
+    min-height: 48px;
+    font-size: 11px;
+  }
+
+  .engineering-lab-body,
+  .engineering-lab.tab-energy .engineering-lab-body {
+    padding: 12px;
+  }
+}
