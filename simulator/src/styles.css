@@ -6022,6 +6022,234 @@ a:focus-visible {
   }
 }
 
+/* Clear, auditable energy-model presentation */
+.engineering-lab.tab-energy {
+  width: min(620px, calc(100vw - 44px));
+}
+
+.engineering-lab.tab-energy .engineering-lab-body {
+  gap: 14px;
+  padding: 14px;
+}
+
+.engineering-lab.tab-energy .engineering-section {
+  padding: 16px;
+}
+
+.engineering-lab.tab-energy .engineering-section-title b {
+  font-size: 12px;
+}
+
+.engineering-lab.tab-energy .engineering-section-title > div > span > small,
+.engineering-lab.tab-energy .engineering-result small,
+.engineering-lab.tab-energy .engineering-safety-note,
+.engineering-lab.tab-energy .dispatch-rule-list p {
+  font-size: 9px;
+}
+
+.engineering-reset-action {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+  border: 1px solid rgba(126, 199, 207, 0.2);
+  border-radius: 7px;
+  color: #9fc4ca;
+  background: rgba(111, 181, 191, 0.06);
+  font: 700 8px/1 "Inter", sans-serif;
+  cursor: pointer;
+}
+
+.engineering-reset-action:hover {
+  border-color: rgba(101, 216, 184, 0.42);
+  color: #dff5ef;
+  background: rgba(68, 166, 139, 0.13);
+}
+
+.projection-chart {
+  height: 142px;
+  display: grid;
+  grid-template-columns: repeat(24, minmax(7px, 1fr));
+  align-items: end;
+  gap: 3px;
+  padding: 10px 8px 23px;
+  border: 1px solid rgba(151, 207, 217, 0.11);
+  border-radius: 9px;
+  background:
+    linear-gradient(rgba(139, 190, 201, 0.06) 1px, transparent 1px) 0 0 / 100% 25%,
+    rgba(3, 15, 24, 0.62);
+}
+
+.projection-chart > div {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1px;
+}
+
+.projection-chart i {
+  width: 29%;
+  min-height: 2px;
+  border-radius: 2px 2px 0 0;
+}
+
+.projection-demand { background: #f0b968; }
+.projection-renewable { background: #5ed6b0; }
+.projection-grid { background: #6ab8dc; }
+
+.projection-chart span {
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 50%;
+  color: #718b95;
+  font: 650 7px/1 "IBM Plex Mono", monospace;
+  transform: translateX(-50%);
+}
+
+.projection-legend,
+.projection-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px 15px;
+  margin-top: 9px;
+}
+
+.projection-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #849ca5;
+  font-size: 8px;
+}
+
+.projection-legend i {
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+}
+
+.projection-legend .is-demand { background: #f0b968; }
+.projection-legend .is-renewable { background: #5ed6b0; }
+.projection-legend .is-grid { background: #6ab8dc; }
+
+.projection-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.projection-summary span {
+  display: grid;
+  gap: 2px;
+  padding: 8px;
+  border-radius: 7px;
+  color: #79929c;
+  background: rgba(255, 255, 255, 0.025);
+  font-size: 8px;
+}
+
+.projection-summary b {
+  color: #d9e8eb;
+  font-size: 10px;
+}
+
+.cost-basis-note {
+  margin: 0 0 10px;
+  padding: 9px 10px;
+  border-left: 2px solid #66cdb2;
+  color: #859da6;
+  background: rgba(74, 167, 143, 0.07);
+  font-size: 8.5px;
+  line-height: 1.55;
+}
+
+.model-provenance-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.model-provenance-grid > div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  padding: 10px;
+  border: 1px solid rgba(151, 207, 217, 0.1);
+  border-radius: 8px;
+  background: rgba(3, 15, 24, 0.48);
+}
+
+.model-provenance-grid span {
+  color: #6f8b95;
+  font-size: 7px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.model-provenance-grid b {
+  overflow: hidden;
+  color: #d9e9ec;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.model-provenance-grid small {
+  color: #7f98a1;
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.engineering-model-tag.is-live-data {
+  border-color: rgba(101, 216, 184, 0.35);
+  color: #75ddbd;
+  background: rgba(62, 158, 130, 0.12);
+}
+
+.engineering-model-tag.is-assumed-data {
+  border-color: rgba(239, 183, 96, 0.28);
+  color: #eab66a;
+  background: rgba(168, 109, 39, 0.1);
+}
+
+.control-panel .range-field small {
+  display: block;
+  margin-top: 7px;
+  color: var(--text-soft);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.energy-bar .bar-battery {
+  background: #a783d7;
+}
+
+.energy-bar .bar-diesel {
+  background: #e58e58;
+}
+
+@media (max-width: 680px) {
+  .engineering-lab.tab-energy {
+    width: calc(100vw - 16px);
+  }
+
+  .projection-chart {
+    min-width: 500px;
+  }
+
+  .projection-section {
+    overflow-x: auto;
+  }
+
+  .model-provenance-grid,
+  .projection-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Unified SURYA identity across the network dashboard and every campus twin. */
 .brand-mark {
   width: 38px;

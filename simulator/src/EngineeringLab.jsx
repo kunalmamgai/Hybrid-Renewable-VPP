@@ -28,7 +28,7 @@ import {
   aggregateProposals,
   predictBuilding,
 } from "./engineeringEngine";
-import { TOPOLOGY_OPTIONS } from "./energyIntelligence";
+import { createDefaultEnergyConfig, TOPOLOGY_OPTIONS } from "./energyIntelligence";
 
 const power = (value) => `${Math.abs(value || 0).toFixed(Math.abs(value || 0) >= 10 ? 1 : 2)} MW`;
 const energy = (value) => `${Math.abs(value || 0).toFixed(Math.abs(value || 0) >= 10 ? 1 : 2)} MWh`;
@@ -63,11 +63,19 @@ function EnergyIntelligence({
   energyConfig,
   onEnergyConfigChange,
   batterySoc,
+  weather,
 }) {
   const comparison = currentEnergy?.comparison;
   const losses = currentEnergy?.losses;
   const risk = currentEnergy?.forecastRisk;
   const forecast = (currentEnergy?.forecast || []).filter((_, index) => index % 4 === 0).slice(0, 12);
+  const dailyProfile = currentEnergy?.dailyProfile || [];
+  const comparisonBasis = comparison?.basis;
+  const profileCeiling = Math.max(
+    0.1,
+    ...dailyProfile.map((item) => Math.max(item.demand || 0, item.renewable || 0, item.gridImport || 0)),
+  );
+  const weatherIsLive = /open-meteo|wttr\.in/i.test(weather?.source || "");
 
   const updateConfig = (field, value) => {
     onEnergyConfigChange((current) => ({ ...current, [field]: value }));
@@ -94,7 +102,7 @@ function EnergyIntelligence({
     <div className="engineering-lab-body energy-intelligence">
       <section className="engineering-section energy-dispatch-section">
         <div className="engineering-section-title">
-          <div><Network size={16} /><span><b>Live multi-source dispatch</b><small>Metered routing after conversion losses</small></span></div>
+          <div><Network size={16} /><span><b>Modelled multi-source dispatch</b><small>Calculated routing after conversion losses</small></span></div>
           <span className={`engineering-model-tag risk-${risk?.level || "low"}`}>{currentEnergy?.gridOffline ? "Island mode" : "Grid connected"}</span>
         </div>
         <div className="energy-flow-board">
@@ -120,7 +128,13 @@ function EnergyIntelligence({
       <section className="engineering-section">
         <div className="engineering-section-title">
           <div><SlidersHorizontal size={16} /><span><b>PV and storage configuration</b><small>Editable parameters recalculate the entire twin</small></span></div>
-          <span className="engineering-model-tag">Live inputs</span>
+          <button
+            type="button"
+            className="engineering-reset-action"
+            onClick={() => onEnergyConfigChange(createDefaultEnergyConfig(campus))}
+          >
+            <RotateCcw size={11} /> Reset defaults
+          </button>
         </div>
         <div className="engineering-form-grid energy-config-grid">
           {numberField("Panel count", "panelCount", "qty", 1, 100000, 1)}
@@ -142,6 +156,9 @@ function EnergyIntelligence({
           {numberField("Diesel backup capacity", "dieselCapacityMw", "MW", 0, 30, 0.1)}
           {numberField("Off-peak grid tariff", "offPeakTariff", "₹/kWh", 0, 30, 0.1)}
           {numberField("Peak grid tariff", "peakTariff", "₹/kWh", 0, 40, 0.1)}
+          {numberField("Export credit", "exportTariff", "₹/kWh", 0, 20, 0.1)}
+          {numberField("Daily fixed charge", "fixedDailyCharge", "₹/day", 0, 100000, 500)}
+          {numberField("Demand charge", "demandChargePerKwMonth", "₹/kW-mo", 0, 2000, 10)}
         </div>
         {currentEnergy?.array?.unwiredPanels > 0 && energyConfig.topology !== "microinverter" && (
           <div className="array-warning">
@@ -183,23 +200,72 @@ function EnergyIntelligence({
         </div>
       </section>
 
+      <section className="engineering-section projection-section">
+        <div className="engineering-section-title">
+          <div><Activity size={16} /><span><b>Next 24-hour operating trace</b><small>Hourly load, renewable output and utility import — not a snapshot multiplied by 24</small></span></div>
+          <span className="engineering-model-tag">{dailyProfile.length} hourly steps</span>
+        </div>
+        <div className="projection-chart" role="img" aria-label="Hourly projection of demand, renewable generation and grid import">
+          {dailyProfile.map((item, index) => {
+            const hour = new Date(item.time).toLocaleTimeString("en-IN", { hour: "2-digit", hour12: false });
+            return (
+              <div
+                key={item.time}
+                title={`${hour}:00 • load ${power(item.demand)} • renewable ${power(item.renewable)} • grid import ${power(item.gridImport)} • battery ${item.batterySoc}%`}
+              >
+                <i className="projection-demand" style={{ height: `${item.demand / profileCeiling * 100}%` }} />
+                <i className="projection-renewable" style={{ height: `${item.renewable / profileCeiling * 100}%` }} />
+                <i className="projection-grid" style={{ height: `${item.gridImport / profileCeiling * 100}%` }} />
+                {index % 3 === 0 && <span>{hour}</span>}
+              </div>
+            );
+          })}
+        </div>
+        <div className="projection-legend">
+          <span><i className="is-demand" />Campus load</span>
+          <span><i className="is-renewable" />Renewables</span>
+          <span><i className="is-grid" />Grid import</span>
+        </div>
+        <div className="projection-summary">
+          <span><b>{comparisonBasis?.demandMwhDay || 0} MWh</b>forecast load</span>
+          <span><b>{comparisonBasis?.renewableMwhDay || 0} MWh</b>renewable output</span>
+          <span><b>{comparisonBasis?.startSocPct || 0}% → {comparisonBasis?.endSocPct || 0}%</b>battery SoC</span>
+        </div>
+      </section>
+
       <section className="engineering-section">
         <div className="engineering-section-title">
-          <div><GitCompareArrows size={16} /><span><b>Before vs after integration</b><small>Legacy grid-only baseline compared with the configured hybrid system</small></span></div>
+          <div><GitCompareArrows size={16} /><span><b>24-hour baseline vs hybrid forecast</b><small>Same hourly load and weather in both cases; only the energy system changes</small></span></div>
         </div>
         <div className="scenario-comparison">
-          <div className="scenario-comparison-head"><span>Metric</span><b>Legacy</b><strong>Hybrid</strong></div>
-          <div><span>Daily grid energy</span><b>{comparison?.baseline.gridMwhDay || 0} MWh</b><strong>{comparison?.hybrid.gridMwhDay || 0} MWh</strong></div>
-          <div><span>Estimated daily cost</span><b>{currency(comparison?.baseline.costDay)}</b><strong>{currency(comparison?.hybrid.costDay)}</strong></div>
-          <div><span>Delivered efficiency</span><b>{comparison?.baseline.efficiencyPct || 0}%</b><strong>{comparison?.hybrid.efficiencyPct || 0}%</strong></div>
+          <div className="scenario-comparison-head"><span>Metric</span><b>Grid-only</b><strong>Hybrid plan</strong></div>
+          <div><span>Utility import</span><b>{comparison?.baseline.gridMwhDay || 0} MWh</b><strong>{comparison?.hybrid.gridMwhDay || 0} MWh</strong></div>
+          <div><span>Utility bill estimate</span><b>{currency(comparison?.baseline.costDay)}</b><strong>{currency(comparison?.hybrid.costDay)}</strong></div>
+          <div><span>Network efficiency</span><b>{comparison?.baseline.efficiencyPct || 0}%</b><strong>{comparison?.hybrid.efficiencyPct || 0}%</strong></div>
         </div>
+        <p className="cost-basis-note">
+          Includes {currency(comparisonBasis?.fixedChargeDay)} daily fixed charge plus demand charges of {currency(comparisonBasis?.baselineDemandCharge)} (grid-only) and {currency(comparisonBasis?.hybridDemandCharge)} (hybrid). Export: {comparisonBasis?.gridExportMwhDay || 0} MWh credited at the configured rate.
+        </p>
         <div className="efficiency-matrix">
-          <PredictionValue label="Solar self-consumption" value={`${comparison?.solarSelfConsumptionPct || 0}%`} detail="PV used directly or stored on campus" tone="solar" />
-          <PredictionValue label="Grid autonomy index" value={`${comparison?.autonomyPct || 0}%`} detail="Demand served without utility import" tone="safe" />
-          <PredictionValue label="Efficiency shift" value={`${(comparison?.efficiencyGainPct || 0) >= 0 ? "+" : ""}${comparison?.efficiencyGainPct || 0}%`} detail="Hybrid versus legacy delivery efficiency" />
-          <PredictionValue label="Peak shaving" value={`${comparison?.peakShavingPct || 0}%`} detail="Reduction in instantaneous grid demand" />
-          <PredictionValue label="Utility bill reduction" value={`${comparison?.billReductionPct || 0}%`} detail="Current-state annualised comparison" tone="safe" />
-          <PredictionValue label="Carbon offset" value={`${comparison?.carbonOffsetTonsYear || 0} t/year`} detail="Avoided grid and diesel CO₂ equivalent" tone="safe" />
+          <PredictionValue label="Renewable utilization" value={`${comparison?.solarSelfConsumptionPct || 0}%`} detail="24h renewable energy used directly or stored" tone="solar" />
+          <PredictionValue label="Energy autonomy" value={`${comparison?.autonomyPct || 0}%`} detail="24h load served without utility import" tone="safe" />
+          <PredictionValue label="Efficiency shift" value={`${(comparison?.efficiencyGainPct || 0) >= 0 ? "+" : ""}${comparison?.efficiencyGainPct || 0}%`} detail="Conversion-loss difference versus grid-only" />
+          <PredictionValue label="Peak shaving" value={`${comparison?.peakShavingPct || 0}%`} detail="Reduction in forecast maximum grid import" />
+          <PredictionValue label="Estimated bill reduction" value={`${comparison?.billReductionPct || 0}%`} detail="Includes energy, fixed and demand charges" tone="safe" />
+          <PredictionValue label="Estimated carbon offset" value={`${comparison?.carbonOffsetTonsYear || 0} t/year`} detail="24h forecast annualised; not a verified credit" tone="safe" />
+        </div>
+      </section>
+
+      <section className="engineering-section model-confidence-section">
+        <div className="engineering-section-title">
+          <div><ShieldCheck size={16} /><span><b>Data quality and model limits</b><small>What is measured, forecast and assumed</small></span></div>
+          <span className={`engineering-model-tag ${weatherIsLive ? "is-live-data" : "is-assumed-data"}`}>{weatherIsLive ? "Live weather" : "Scenario data"}</span>
+        </div>
+        <div className="model-provenance-grid">
+          <div><span>Weather input</span><b>{weather?.source || "Local forecast model"}</b><small>Current conditions + hourly forecast</small></div>
+          <div><span>Demand input</span><b>Engineering load profile</b><small>Occupancy, schedule, HVAC and proposed buildings — not a campus smart meter</small></div>
+          <div><span>Financial model</span><b>Editable tariff assumptions</b><small>Energy, export, fixed and monthly demand charges</small></div>
+          <div><span>Confidence</span><b>Planning-grade estimate</b><small>Calibrate with 12 months of bills and interval-meter data before investment</small></div>
         </div>
       </section>
 
@@ -279,6 +345,7 @@ export default function EngineeringLab({
   energyConfig,
   onEnergyConfigChange,
   batterySoc,
+  weather,
   proposals,
   onAddProposal,
   onRemoveProposal,
@@ -398,6 +465,10 @@ export default function EngineeringLab({
                 <span>Floors</span>
                 <input type="number" min="1" max="15" value={draft.floors} onChange={(event) => updateDraft("floors", Number(event.target.value))} />
               </label>
+              <label className="engineering-field">
+                <span>Operating schedule</span>
+                <div><input type="number" min="4" max="24" value={draft.operatingHours} onChange={(event) => updateDraft("operatingHours", Number(event.target.value))} /><em>h/day</em></div>
+              </label>
               <label className="engineering-range is-wide">
                 <span><span>Expected occupancy</span><b>{draft.occupancy}%</b></span>
                 <input type="range" min="10" max="100" value={draft.occupancy} onChange={(event) => updateDraft("occupancy", Number(event.target.value))} />
@@ -411,7 +482,7 @@ export default function EngineeringLab({
 
           <section className="engineering-section">
             <div className="engineering-section-title">
-              <div><Gauge size={16} /><span><b>Predicted electrical impact</b><small>Weather and campus demand are included</small></span></div>
+              <div><Gauge size={16} /><span><b>Predicted electrical impact</b><small>Area, occupancy, schedule, efficiency and feeder distance are included</small></span></div>
             </div>
             <div className="engineering-results-grid">
               <PredictionValue label="Additional peak demand" value={power(prediction.peakDemandMw)} detail={`${energy(prediction.dailyEnergyMwh)} per operating day`} />
@@ -420,6 +491,8 @@ export default function EngineeringLab({
               <PredictionValue label="Rooftop / ground split" value={`${prediction.rooftopPanels.toLocaleString("en-IN")} / ${prediction.groundPanels.toLocaleString("en-IN")}`} detail="Panels based on available roof area" />
               <PredictionValue label="Battery recommendation" value={`${prediction.recommendedBatteryMwh.toFixed(1)} MWh`} detail="Two-hour peak-load support" />
               <PredictionValue label="Transformer requirement" value={`${prediction.transformerUnits} × 1.25 MVA`} detail={prediction.reserveMarginMw < 0 ? "Campus network upgrade required" : `${power(prediction.reserveMarginMw)} estimated margin`} tone={prediction.reserveMarginMw < 0 ? "danger" : "safe"} />
+              <PredictionValue label="Annual consumption" value={`${prediction.annualEnergyMwh.toLocaleString("en-IN", { maximumFractionDigits: 0 })} MWh`} detail="330 operating days per year" />
+              <PredictionValue label="Annual energy cost" value={`₹${prediction.estimatedAnnualCostLakh.toFixed(1)} lakh`} detail="Screening estimate at ₹8.20/kWh" />
             </div>
             <div className={`engineering-advisory ${prediction.reserveMarginMw < 0 ? "is-warning" : "is-ready"}`}>
               {prediction.reserveMarginMw < 0 ? <AlertTriangle size={16} /> : <ShieldCheck size={16} />}
@@ -468,6 +541,7 @@ export default function EngineeringLab({
           energyConfig={energyConfig}
           onEnergyConfigChange={onEnergyConfigChange}
           batterySoc={batterySoc}
+          weather={weather}
         />
       ) : (
         <div className="engineering-lab-body">

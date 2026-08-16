@@ -169,10 +169,23 @@ function Toggle({ checked, onChange, label, icon: Icon }) {
 }
 
 function EnergyBalance({ energy, batterySoc, gridOutage, proposalVisible }) {
-  const total = Math.max(energy.demand + Math.max(0, energy.batteryFlow), 0.1);
-  const solarWidth = clamp((energy.solar / total) * 100, 0, 100);
-  const windWidth = clamp((energy.wind / total) * 100, 0, 100 - solarWidth);
-  const gridWidth = clamp(100 - solarWidth - windWidth, 0, 100);
+  const servedDemand = Math.max(energy.demand - energy.unmet, 0.1);
+  const solarToLoad = Math.min(energy.solar, servedDemand);
+  const windToLoad = Math.min(energy.wind, Math.max(0, servedDemand - solarToLoad));
+  const batteryToLoad = Math.min(
+    energy.batteryDischarge || 0,
+    Math.max(0, servedDemand - solarToLoad - windToLoad),
+  );
+  const dieselToLoad = Math.min(
+    energy.diesel || 0,
+    Math.max(0, servedDemand - solarToLoad - windToLoad - batteryToLoad),
+  );
+  const gridToLoad = Math.max(0, servedDemand - solarToLoad - windToLoad - batteryToLoad - dieselToLoad);
+  const solarWidth = clamp((solarToLoad / servedDemand) * 100, 0, 100);
+  const windWidth = clamp((windToLoad / servedDemand) * 100, 0, 100);
+  const batteryWidth = clamp((batteryToLoad / servedDemand) * 100, 0, 100);
+  const dieselWidth = clamp((dieselToLoad / servedDemand) * 100, 0, 100);
+  const gridWidth = clamp((gridToLoad / servedDemand) * 100, 0, 100);
 
   return (
     <section className="balance-card" aria-label="Campus energy balance">
@@ -192,6 +205,8 @@ function EnergyBalance({ energy, batterySoc, gridOutage, proposalVisible }) {
       <div className="energy-bar" aria-hidden="true">
         <span className="bar-solar" style={{ width: `${solarWidth}%` }} />
         <span className="bar-wind" style={{ width: `${windWidth}%` }} />
+        <span className="bar-battery" style={{ width: `${batteryWidth}%` }} />
+        <span className="bar-diesel" style={{ width: `${dieselWidth}%` }} />
         <span className="bar-grid" style={{ width: `${gridWidth}%` }} />
       </div>
       <div className="balance-legend">
@@ -296,6 +311,7 @@ function VitBhopalSimulator({ onBack, embedded = false }) {
       source: "scenario simulation",
     };
   }, [liveWeather, scenario, weatherMode]);
+  const weatherIsMeasured = /open-meteo|wttr\.in/i.test(weather.source || "");
 
   const planningSummary = useMemo(
     () => aggregateProposals(planningProposals),
@@ -363,12 +379,14 @@ function VitBhopalSimulator({ onBack, embedded = false }) {
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setBatterySoc((previous) =>
-        clamp(previous + energy.batteryFlow * 0.025, 5, 100),
-      );
+      // Advance storage by 15 simulated minutes every three real seconds so
+      // charge/discharge decisions are visible while remaining energy-based.
+      const batteryCapacityMwh = Math.max(0.1, energyConfig.batteryKwh / 1_000);
+      const deltaSoc = energy.batteryFlow * 0.25 / batteryCapacityMwh * 100;
+      setBatterySoc((previous) => clamp(previous + deltaSoc, 5, 100));
     }, 3000);
     return () => window.clearInterval(timer);
-  }, [energy.batteryFlow]);
+  }, [energy.batteryFlow, energyConfig.batteryKwh]);
 
   const selectAsset = (id) => {
     setSelected(id);
@@ -427,9 +445,13 @@ function VitBhopalSimulator({ onBack, embedded = false }) {
           </div>
         </div>
         <div className="topbar-center">
-          <StatusPill tone={weatherMode === "live" ? "live" : "scenario"}>
+          <StatusPill tone={weatherMode === "live" && weatherIsMeasured ? "live" : "scenario"}>
             <span className="pulse-dot" />
-            {weatherMode === "live" ? "Live campus" : "Scenario mode"}
+            {weatherMode === "live"
+              ? weatherIsMeasured
+                ? "Live weather • modelled load"
+                : "Offline weather model • modelled load"
+              : "Scenario mode"}
           </StatusPill>
           <span className="location">
             <LocateFixed size={14} />
@@ -580,9 +602,9 @@ function VitBhopalSimulator({ onBack, embedded = false }) {
         />
         <Metric
           icon={Zap}
-          label="Renewable share"
+          label="Direct renewable share"
           value={`${energy.renewableShare.toFixed(0)}%`}
-          detail={`${formatPower(energy.renewable)} available`}
+          detail="Battery supply shown separately below"
           accent="magenta"
         />
       </div>
@@ -662,11 +684,26 @@ function VitBhopalSimulator({ onBack, embedded = false }) {
           </span>
         </label>
 
+        <label className="range-field">
+          <span>
+            <span>Battery state of charge</span>
+            <strong>{batterySoc.toFixed(0)}%</strong>
+          </span>
+          <input
+            type="range"
+            min="5"
+            max="100"
+            value={batterySoc}
+            onChange={(event) => setBatterySoc(Number(event.target.value))}
+          />
+          <small>Drag to test dispatch decisions • simulation advances 15 minutes every 3 seconds</small>
+        </label>
+
         <div className="control-switches">
           <Toggle
             checked={proposalVisible}
             onChange={setProposalVisible}
-            label="Renewable proposal"
+            label="Hybrid generation assets"
             icon={Layers3}
           />
           <Toggle

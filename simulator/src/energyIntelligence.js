@@ -43,6 +43,8 @@ export function createDefaultEnergyConfig(campus = {}) {
     offPeakTariff: 5.2,
     peakTariff: 9.4,
     exportTariff: 3.1,
+    fixedDailyCharge: campus.category === "Medical" ? 18_000 : 12_000,
+    demandChargePerKwMonth: 300,
     gridEmissionKgKwh: 0.71,
     dieselEmissionKgKwh: 0.82,
   };
@@ -56,7 +58,7 @@ export function buildForecast(weather = {}) {
       .map((time, index) => ({ time, index }))
       .filter((item) => new Date(item.time).getTime() >= cutoff)
       .slice(0, 48);
-    return futureIndexes.map(({ time, index }) => ({
+    const normalisedForecast = futureIndexes.map(({ time, index }) => ({
       time,
       temperature: hourly.temperature_2m?.[index] ?? weather.temperature ?? 28,
       cloudCover: hourly.cloud_cover?.[index] ?? weather.cloudCover ?? 30,
@@ -64,10 +66,12 @@ export function buildForecast(weather = {}) {
       windSpeed: hourly.wind_speed_10m?.[index] ?? weather.windSpeed ?? 10,
       radiation: hourly.shortwave_radiation?.[index] ?? 0,
     }));
+    if (normalisedForecast.length >= 24) return normalisedForecast;
   }
 
   const stormy = (weather.precipitation || 0) > 1 || (weather.cloudCover || 0) > 80;
-  const start = new Date();
+  const startCandidate = new Date(weather.time || Date.now());
+  const start = Number.isNaN(startCandidate.getTime()) ? new Date() : startCandidate;
   return Array.from({ length: 48 }, (_, index) => {
     const hour = (start.getHours() + index) % 24;
     const daylight = Math.max(0, Math.sin(((hour - 6) / 12) * Math.PI));
@@ -221,9 +225,14 @@ export function calculateCampusEnergy({
     offPeak &&
     batteryChargeMw < batteryPowerLimitMw
   ) {
+    const prechargeHeadroom = Math.max(
+      0,
+      baseDemand * medicalFactor * 1.05 - (shortfall + batteryChargeMw),
+    );
     prechargeMw = Math.min(
       batteryPowerLimitMw - batteryChargeMw,
       availableChargeMwh / chargeEfficiency,
+      prechargeHeadroom,
     );
     batteryChargeMw += prechargeMw;
   }
@@ -252,34 +261,211 @@ export function calculateCampusEnergy({
   const totalLossMw = inverterLossMw + lineLossMw + batteryLossMw;
   const renewableUsed = directRenewable + batteryChargeMw - prechargeMw;
   const renewableShare = demand
-    ? clamp((directRenewable + batteryDischargeMw * dischargeEfficiency) / demand * 100, 0, 100)
+    ? clamp(directRenewable / demand * 100, 0, 100)
     : 0;
 
-  const tariff = offPeak ? settings.offPeakTariff : settings.peakTariff;
-  const hoursPerDay = 24;
-  const baselineGridMwhDay = demand * hoursPerDay / lineEfficiency;
-  const recurringGridImportMw = Math.max(0, gridImport - prechargeMw);
-  const hybridGridMwhDay = recurringGridImportMw * hoursPerDay + prechargeMw * 4;
-  const dieselMwhDay = diesel * hoursPerDay;
-  const exportMwhDay = gridExport * hoursPerDay;
-  const baselineCostDay = baselineGridMwhDay * 1_000 * tariff;
-  const hybridCostDay =
-    recurringGridImportMw * hoursPerDay * 1_000 * tariff +
-    prechargeMw * 4 * 1_000 * settings.offPeakTariff +
-    dieselMwhDay * 1_000 * 22 -
-    exportMwhDay * 1_000 * settings.exportTariff;
-  const baselineEmissionsKgDay = baselineGridMwhDay * 1_000 * settings.gridEmissionKgKwh;
-  const hybridEmissionsKgDay =
-    hybridGridMwhDay * 1_000 * settings.gridEmissionKgKwh +
-    dieselMwhDay * 1_000 * settings.dieselEmissionKgKwh;
-  const sourceInputMw = renewable + gridImport + diesel + batteryDischargeMw;
-  const hybridEfficiency = sourceInputMw > 0
-    ? clamp((demand + batteryChargeMw + gridExport) / sourceInputMw * 100, 0, 100)
-    : 100;
+  // Project the next 24 hours one hour at a time. The previous implementation
+  // multiplied the current instant by 24, so a sunny moment could incorrectly
+  // become a zero-grid, zero-bill day. This rolling dispatch keeps weather,
+  // time-of-use load, storage state and utility charges coupled.
+  const dailyProfile = [];
+  const dayTotals = {
+    demandMwh: 0,
+    baselineGridMwh: 0,
+    gridImportMwh: 0,
+    gridExportMwh: 0,
+    dieselMwh: 0,
+    renewableGeneratedMwh: 0,
+    renewableUsedMwh: 0,
+    baselineEnergyCost: 0,
+    hybridEnergyCost: 0,
+    exportCredit: 0,
+    dieselCost: 0,
+    baselineEmissionsKg: 0,
+    hybridEmissionsKg: 0,
+    conversionLossMwh: 0,
+    sourceInputMwh: 0,
+    peakDemandMw: 0,
+    peakGridImportMw: 0,
+  };
+  let projectedBatteryMwh = batteryCapacityMwh * clamp(batterySoc / 100, 0, 1);
+  const reserveBatteryMwh = batteryCapacityMwh * settings.reserveSocPct / 100;
+  const targetBatteryMwh = batteryCapacityMwh * settings.targetSocPct / 100;
+  const projection = forecast.slice(0, 24);
+
+  projection.forEach((item) => {
+    const itemTime = new Date(item.time);
+    const profileHour = Number.isNaN(itemTime.getTime()) ? 12 : itemTime.getHours();
+    const profileTimeFactor = profileHour >= 9 && profileHour <= 17
+      ? 1
+      : profileHour >= 18 && profileHour <= 23
+        ? 0.82
+        : 0.54;
+    const profileComfortDelta = Math.max(0, (item.temperature || 25) - 24);
+    const profileColdDelta = Math.max(0, 18 - (item.temperature || 25));
+    const profileDemand =
+      (baseDemand * (0.43 + occupancy / 145) * profileTimeFactor +
+        profileComfortDelta * 0.13 + profileColdDelta * 0.07) * medicalFactor +
+      (planningSummary.peakDemandMw || 0) * (0.46 + occupancy / 190) * profileTimeFactor;
+
+    const profileTemperatureFactor = clamp(
+      1 - Math.max(0, (item.temperature || 25) - 25) * 0.004,
+      0.82,
+      1,
+    );
+    const profileShadingFactor = clamp(
+      topology.shadeTolerance - (item.cloudCover || 0) *
+        (settings.topology === "series" ? 0.00035 : 0.00016),
+      0.82,
+      1,
+    );
+    const profilePvDc = proposalVisible
+      ? dcCapacityMw * clamp((item.radiation || 0) / 1_000, 0, 1.1) *
+        profileTemperatureFactor * tiltFactor * profileShadingFactor
+      : 0;
+    const profileSolarBase = profilePvDc * topology.efficiency * inverterEfficiency * lineEfficiency;
+    const profilePlannedSolar = proposalVisible
+      ? (planningSummary.requiredSolarMw || 0) *
+        clamp((item.radiation || 0) / 1_000, 0, 1.05) * 0.91
+      : 0;
+    const profileSolar = (profileSolarBase + profilePlannedSolar) *
+      (hazardImpact.solarFactor ?? 1);
+    const profileWindGross = proposalVisible
+      ? settings.windCapacityMw * windCapacityFactor(item.windSpeed)
+      : 0;
+    const profileWind = profileWindGross * 0.94 * lineEfficiency *
+      (hazardImpact.windFactor ?? 1);
+    const profileRenewable = profileSolar + profileWind;
+    let profileSurplus = Math.max(0, profileRenewable - profileDemand);
+    let profileShortfall = Math.max(0, profileDemand - profileRenewable);
+    let profileCharge = 0;
+    let profileDischarge = 0;
+    let profileGridPrecharge = 0;
+
+    if (
+      batteryAvailable && batteryMode !== "reserve" &&
+      profileSurplus > 0 && projectedBatteryMwh < targetBatteryMwh
+    ) {
+      profileCharge = Math.min(
+        profileSurplus,
+        batteryPowerLimitMw,
+        (targetBatteryMwh - projectedBatteryMwh) / chargeEfficiency,
+      );
+      projectedBatteryMwh += profileCharge * chargeEfficiency;
+      profileSurplus -= profileCharge;
+    }
+    if (
+      batteryAvailable && batteryMode !== "charge" &&
+      profileShortfall > 0 && projectedBatteryMwh > reserveBatteryMwh
+    ) {
+      const maxFromStoredEnergy = (projectedBatteryMwh - reserveBatteryMwh) * dischargeEfficiency;
+      profileDischarge = Math.min(profileShortfall, batteryPowerLimitMw, maxFromStoredEnergy);
+      projectedBatteryMwh -= profileDischarge / dischargeEfficiency;
+      profileShortfall -= profileDischarge;
+    }
+
+    const profileOffPeak = isOffPeakHour(profileHour);
+    if (
+      !effectiveGridOutage && batteryAvailable && settings.smartPrecharge &&
+      forecastRisk.poorSolarExpected && profileOffPeak &&
+      projectedBatteryMwh < targetBatteryMwh && profileCharge < batteryPowerLimitMw
+    ) {
+      const profilePrechargeHeadroom = Math.max(
+        0,
+        baseDemand * medicalFactor * 1.05 - profileShortfall,
+      );
+      profileGridPrecharge = Math.min(
+        batteryPowerLimitMw - profileCharge,
+        (targetBatteryMwh - projectedBatteryMwh) / chargeEfficiency,
+        profilePrechargeHeadroom,
+      );
+      projectedBatteryMwh += profileGridPrecharge * chargeEfficiency;
+      profileCharge += profileGridPrecharge;
+    }
+
+    let profileDiesel = 0;
+    if (effectiveGridOutage && profileShortfall > 0) {
+      profileDiesel = Math.min(profileShortfall, settings.dieselCapacityMw);
+      if (profileDiesel > 0) {
+        const minimumStable = settings.dieselCapacityMw * settings.dieselMinLoadPct / 100;
+        profileDiesel = Math.min(settings.dieselCapacityMw, Math.max(profileDiesel, minimumStable));
+        profileShortfall = Math.max(0, profileShortfall - profileDiesel);
+      }
+    }
+
+    const profileGridImport = effectiveGridOutage
+      ? 0
+      : profileShortfall + profileGridPrecharge;
+    const profileGridExport = effectiveGridOutage ? 0 : profileSurplus;
+    const profileTariff = profileOffPeak ? settings.offPeakTariff : settings.peakTariff;
+    const profileBaselineGrid = profileDemand / lineEfficiency;
+    const profileRenewableUsed = Math.min(profileRenewable, profileDemand) +
+      Math.max(0, profileCharge - profileGridPrecharge);
+    const profileBatteryLoss =
+      profileCharge * (1 - chargeEfficiency) +
+      profileDischarge * (1 / dischargeEfficiency - 1);
+    const profileConversionLoss =
+      profilePvDc * Math.max(0, 1 - topology.efficiency * inverterEfficiency) +
+      (profileSolarBase + profileWindGross) * Math.max(0, 1 - lineEfficiency) +
+      profileBatteryLoss;
+
+    dayTotals.demandMwh += profileDemand;
+    dayTotals.baselineGridMwh += profileBaselineGrid;
+    dayTotals.gridImportMwh += profileGridImport;
+    dayTotals.gridExportMwh += profileGridExport;
+    dayTotals.dieselMwh += profileDiesel;
+    dayTotals.renewableGeneratedMwh += profileRenewable;
+    dayTotals.renewableUsedMwh += profileRenewableUsed;
+    dayTotals.baselineEnergyCost += profileBaselineGrid * 1_000 * profileTariff;
+    dayTotals.hybridEnergyCost += profileGridImport * 1_000 * profileTariff;
+    dayTotals.exportCredit += profileGridExport * 1_000 * settings.exportTariff;
+    dayTotals.dieselCost += profileDiesel * 1_000 * 22;
+    dayTotals.baselineEmissionsKg += profileBaselineGrid * 1_000 * settings.gridEmissionKgKwh;
+    dayTotals.hybridEmissionsKg +=
+      profileGridImport * 1_000 * settings.gridEmissionKgKwh +
+      profileDiesel * 1_000 * settings.dieselEmissionKgKwh;
+    dayTotals.conversionLossMwh += profileConversionLoss;
+    dayTotals.sourceInputMwh += profileRenewable + profileGridImport + profileDiesel + profileDischarge;
+    dayTotals.peakDemandMw = Math.max(dayTotals.peakDemandMw, profileDemand);
+    dayTotals.peakGridImportMw = Math.max(dayTotals.peakGridImportMw, profileGridImport);
+
+    dailyProfile.push({
+      time: item.time,
+      demand: round(profileDemand),
+      renewable: round(profileRenewable),
+      gridImport: round(profileGridImport),
+      gridExport: round(profileGridExport),
+      battery: round(profileDischarge - profileCharge),
+      batterySoc: round(projectedBatteryMwh / batteryCapacityMwh * 100, 1),
+    });
+  });
+
+  const fixedDailyCharge = Math.max(0, Number(settings.fixedDailyCharge) || 0);
+  const demandRateDaily = Math.max(0, Number(settings.demandChargePerKwMonth) || 0) / 30;
+  const baselineDemandCharge = dayTotals.peakDemandMw * 1_000 * demandRateDaily;
+  // A 25% contract-demand ratchet prevents an unrealistic zero network bill
+  // while the campus remains grid connected.
+  const billedHybridDemandMw = effectiveGridOutage
+    ? 0
+    : Math.max(dayTotals.peakGridImportMw, dayTotals.peakDemandMw * 0.25);
+  const hybridDemandCharge = billedHybridDemandMw * 1_000 * demandRateDaily;
+  const baselineCostDay = dayTotals.baselineEnergyCost + fixedDailyCharge + baselineDemandCharge;
+  const hybridCostDay = Math.max(
+    fixedDailyCharge + hybridDemandCharge,
+    dayTotals.hybridEnergyCost + dayTotals.dieselCost - dayTotals.exportCredit +
+      fixedDailyCharge + hybridDemandCharge,
+  );
+  const baselineGridMwhDay = dayTotals.baselineGridMwh;
+  const hybridGridMwhDay = dayTotals.gridImportMwh;
+  const baselineEmissionsKgDay = dayTotals.baselineEmissionsKg;
+  const hybridEmissionsKgDay = dayTotals.hybridEmissionsKg;
   const baselineEfficiency = lineEfficiency * 100;
-  const solarSelfConsumption = solar > 0
-    ? clamp((Math.min(solar, demand) + Math.min(batteryChargeMw, Math.max(0, solar - demand))) / solar * 100, 0, 100)
+  const solarSelfConsumption = dayTotals.renewableGeneratedMwh > 0
+    ? clamp(dayTotals.renewableUsedMwh / dayTotals.renewableGeneratedMwh * 100, 0, 100)
     : 0;
+  const projectedHybridEfficiency = dayTotals.sourceInputMwh > 0
+    ? clamp((1 - dayTotals.conversionLossMwh / dayTotals.sourceInputMwh) * 100, 0, 100)
+    : 100;
 
   return {
     solar: round(solar),
@@ -304,6 +490,7 @@ export function calculateCampusEnergy({
     prechargeMw: round(prechargeMw),
     forecast,
     forecastRisk,
+    dailyProfile,
     config: settings,
     topology,
     array: {
@@ -327,16 +514,33 @@ export function calculateCampusEnergy({
       },
       hybrid: {
         gridMwhDay: round(hybridGridMwhDay, 1),
-        costDay: round(Math.max(0, hybridCostDay), 0),
-        efficiencyPct: round(hybridEfficiency, 1),
+        costDay: round(hybridCostDay, 0),
+        efficiencyPct: round(projectedHybridEfficiency, 1),
         emissionsKgDay: round(hybridEmissionsKgDay, 0),
       },
       solarSelfConsumptionPct: round(solarSelfConsumption, 1),
-      autonomyPct: round(demand ? clamp((1 - recurringGridImportMw / demand) * 100, 0, 100) : 100, 1),
-      efficiencyGainPct: round(hybridEfficiency - baselineEfficiency, 1),
-      peakShavingPct: round(demand ? clamp((1 - recurringGridImportMw / demand) * 100, 0, 100) : 100, 1),
-      billReductionPct: round(baselineCostDay ? clamp((baselineCostDay - hybridCostDay) / baselineCostDay * 100, -100, 100) : 0, 1),
+      autonomyPct: round(dayTotals.demandMwh
+        ? clamp((1 - dayTotals.gridImportMwh / dayTotals.demandMwh) * 100, 0, 100)
+        : 0, 1),
+      efficiencyGainPct: round(projectedHybridEfficiency - baselineEfficiency, 1),
+      peakShavingPct: round(dayTotals.peakDemandMw
+        ? clamp((1 - dayTotals.peakGridImportMw / dayTotals.peakDemandMw) * 100, 0, 100)
+        : 0, 1),
+      billReductionPct: round(baselineCostDay
+        ? clamp((baselineCostDay - hybridCostDay) / baselineCostDay * 100, -100, 99.9)
+        : 0, 1),
       carbonOffsetTonsYear: round(Math.max(0, baselineEmissionsKgDay - hybridEmissionsKgDay) * 365 / 1_000, 1),
+      basis: {
+        hours: projection.length,
+        demandMwhDay: round(dayTotals.demandMwh, 1),
+        renewableMwhDay: round(dayTotals.renewableGeneratedMwh, 1),
+        gridExportMwhDay: round(dayTotals.gridExportMwh, 1),
+        startSocPct: round(batterySoc, 1),
+        endSocPct: round(projectedBatteryMwh / batteryCapacityMwh * 100, 1),
+        fixedChargeDay: round(fixedDailyCharge, 0),
+        baselineDemandCharge: round(baselineDemandCharge, 0),
+        hybridDemandCharge: round(hybridDemandCharge, 0),
+      },
     },
     dispatchRules: [
       renewable >= demand
