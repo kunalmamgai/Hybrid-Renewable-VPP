@@ -14,10 +14,38 @@ import type {
   ForceCycleResponse,
 } from '../types';
 
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+const API_REQUEST_TIMEOUT_MS = 30_000;
+const API_COLD_START_TIMEOUT_MS = 120_000;
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
-  timeout: 10000,
+  baseURL: API_BASE_URL,
+  timeout: API_REQUEST_TIMEOUT_MS,
 });
+
+let apiReadyPromise: Promise<void> | null = null;
+
+/**
+ * Wake the API before sending an authentication request. Render free services can
+ * take 50 seconds or more to resume, so a shared readiness request prevents every
+ * sign-in attempt from failing at the old 10-second client timeout.
+ */
+export const prepareApi = (): Promise<void> => {
+  if (!apiReadyPromise) {
+    apiReadyPromise = api
+      .get('/health', {
+        timeout: API_COLD_START_TIMEOUT_MS,
+        validateStatus: (status) => status >= 200 && status < 500,
+      })
+      .then(() => undefined)
+      .catch((error: unknown) => {
+        apiReadyPromise = null;
+        throw error;
+      });
+  }
+
+  return apiReadyPromise;
+};
 
 export const AUTH_TOKEN_KEY = 'surya_access_token';
 
@@ -48,6 +76,7 @@ export const signUp = async (payload: {
   email: string;
   password: string;
 }): Promise<AuthResponse> => {
+  await prepareApi();
   const response = await api.post<AuthResponse>('/api/v1/auth/signup', payload);
   return response.data;
 };
@@ -56,11 +85,13 @@ export const signIn = async (payload: {
   email: string;
   password: string;
 }): Promise<AuthResponse> => {
+  await prepareApi();
   const response = await api.post<AuthResponse>('/api/v1/auth/login', payload);
   return response.data;
 };
 
 export const signInWithGoogle = async (credential: string): Promise<AuthResponse> => {
+  await prepareApi();
   const response = await api.post<AuthResponse>('/api/v1/auth/google', { credential });
   return response.data;
 };
@@ -98,13 +129,11 @@ export const getExportStats = async (): Promise<ExportStats> => {
 };
 
 export const downloadCSV = (): void => {
-  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-  window.open(`${baseUrl}/api/v1/export/csv`, '_blank');
+  window.open(`${API_BASE_URL}/api/v1/export/csv`, '_blank');
 };
 
 export const downloadPDF = (): void => {
-  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-  window.open(`${baseUrl}/api/v1/export/pdf`, '_blank');
+  window.open(`${API_BASE_URL}/api/v1/export/pdf`, '_blank');
 };
 
 // ============================================================
