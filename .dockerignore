@@ -1,0 +1,34 @@
+# Version control
+.git/
+.gitignore
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Databases (never bake into the image)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Node / frontend (built in its own stage)
+node_modules/
+frontend/node_modules/
+frontend/dist/
+simulator/
+
+# Environment & secrets
+.env
+.env.local
+
+# Tooling / docs not needed at runtime
+.opencode/
+.freebuff/
+.github/
+docs/
+*.md
+!README.md

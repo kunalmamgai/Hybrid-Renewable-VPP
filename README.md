@@ -69,6 +69,24 @@ npm run dev            # API + web dashboard + 3D twin concurrently
 
 Web dashboard: http://localhost:5173 · 3D twin: http://localhost:5174
 
+## Deployment (Docker)
+
+```bash
+# 1. Set a strong secret in your shell or root .env:
+JWT_SECRET_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
+
+# 2. Bring up Postgres + backend + frontend
+docker compose up --build
+```
+
+- Backend: http://localhost:8000 (`/health` for healthchecks) — schema migrations
+  run automatically at container start via `alembic upgrade head`
+- Frontend: http://localhost:8080 (nginx, SPA fallback)
+- The frontend build bakes `VITE_API_URL` / `VITE_WS_URL` at image build time —
+  set them to your public backend origin when deploying beyond localhost.
+
+CI: `.github/workflows/backend-ci.yml` runs ruff + pytest on every push/PR.
+
 ## Simulation & Operations
 
 ```bash

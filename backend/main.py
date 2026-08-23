@@ -1,6 +1,5 @@
 """FastAPI application entry point."""
 import logging
-import sys
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -9,6 +8,11 @@ from sqlalchemy import select
 
 from backend.adapters.simulated import SimulatedAdapter, SimulatedConfig
 from backend.adapters.site_config import default_buildings
+from backend.api.middleware import (
+    RequestContextMiddleware,
+    configure_logging,
+    unhandled_exception_handler,
+)
 from backend.api.routes_auth import decode_access_token
 from backend.api.routes_auth import router as auth_router
 from backend.api.routes_decisions import router as decisions_router
@@ -21,11 +25,7 @@ from backend.services.decision_manager import DecisionManager
 from backend.services.scheduler import SchedulerService
 from backend.ws.websocket_manager import ConnectionManager
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    stream=sys.stdout,
-)
+configure_logging()
 logger = logging.getLogger(__name__)
 
 manager = ConnectionManager()
@@ -146,8 +146,12 @@ app.add_middleware(
     # credential flag when an explicit allowlist is configured.
     allow_credentials=bool(_allowed_origins),
     allow_methods=["GET", "POST", "PUT", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
 )
+# Request correlation IDs + access logging (outermost)
+app.add_middleware(RequestContextMiddleware)
+# Safe generic 500s with request_id instead of leaking tracebacks
+app.add_exception_handler(Exception, unhandled_exception_handler)
 
 app.include_router(health_router)
 app.include_router(decisions_router)
