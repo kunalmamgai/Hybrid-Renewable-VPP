@@ -49,6 +49,17 @@ uvicorn backend.main:app --reload
 Sign up at `/signup` in the frontend, or `POST /api/v1/auth/signup` — all `/api/v1`
 routes require a Bearer token.
 
+**Database:** SQLite (default) auto-creates its schema for development. For
+PostgreSQL, set `DATABASE_URL=postgresql+asyncpg://user:pass@host/db` and run
+`alembic upgrade head` before starting the server — the server refuses to boot in
+production against an unmigrated database. After changing any model, generate and
+apply a migration:
+
+```bash
+alembic revision --autogenerate -m "describe change"
+alembic upgrade head
+```
+
 ### Frontend
 
 ```bash

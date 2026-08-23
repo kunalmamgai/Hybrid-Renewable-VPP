@@ -7,7 +7,9 @@ All config is loaded from environment variables via `.env`. Copy `.env.example` 
 |----------|---------|-------------|
 | `BACKEND_HOST` | `0.0.0.0` | API server bind address |
 | `BACKEND_PORT` | `8000` | API server port |
-| `DATABASE_URL` | `sqlite+aiosqlite:///./vpp.db` | SQLAlchemy connection |
+| `ENVIRONMENT` | `development` | `production` enforces strong JWT secret + migrated DB at startup |
+| `CORS_ORIGINS` | *(empty)* | Comma-separated CORS origin allowlist |
+| `DATABASE_URL` | `sqlite+aiosqlite:///./vpp.db` | SQLAlchemy async connection (`postgresql+asyncpg://...` for Postgres) |
 | `SIMULATOR_TIME_SCALE` | `60.0` | 1 real second = 60 simulated minutes |
 | `ALERT_BATTERY_LOW` | `20` | Low battery % threshold |
 | `ALERT_BATTERY_CRITICAL` | `15` | Critical battery % threshold |
@@ -17,6 +19,21 @@ All config is loaded from environment variables via `.env`. Copy `.env.example` 
 
 ## Architecture
 See the Mermaid diagrams in `docs/ARCHITECTURE.md` for full detail.
+
+## Database Migrations
+Schema is managed by Alembic (config in `alembic.ini`, env in `backend/db/migrations/`).
+
+- **SQLite dev:** tables are auto-created at startup — no migration step needed.
+- **PostgreSQL/production:** run `alembic upgrade head` before starting the server.
+  The server refuses to boot in production against an unmigrated database.
+
+```bash
+# After changing a model in backend/models/, generate + apply:
+alembic revision --autogenerate -m "describe change"
+alembic upgrade head
+```
+
+The DB URL always comes from `DATABASE_URL` (env / `.env`) — never edit `alembic.ini`.
 
 ## Development
 ```bash
