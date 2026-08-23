@@ -13,7 +13,7 @@ cost and carbon objectives — with an immutable audit trail of every automated 
 - **AI decision loop** — 8-module optimizer (forecast → reliability guard → dispatch ×
   battery × VNM × load-shift), scored by configurable cost/carbon weights
 - **Digital twin** — live per-building state persisted to the database
-- **VNM/GNM optimizer** — RERC Third Amendment Regulations (2025) net-metering credits
+- **VNM/GNM optimizer** — RERC Third Amendment Regulations (2025) net-metering credits.
 - **Statutory export** — CSV/PDF cost & carbon savings reports
 - **Realtime dashboard** — React + WebSocket push updates
 - **3D campus twins** — standalone three.js visualization (`simulator/`)
