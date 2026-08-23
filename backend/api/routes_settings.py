@@ -4,11 +4,12 @@ from __future__ import annotations
 import logging
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.adapters.simulated import SCENARIOS
 from backend.api.routes_auth import get_current_user
 from backend.db.database import get_session
 from backend.models.config import AlertThreshold, BuildingTier, VnmSharingRule
@@ -159,69 +160,47 @@ async def update_vnm_sharing_rule(
 # ─── Scenario Control ────────────────────────────────────────────────
 
 @router.get("/scenarios")
-async def get_scenarios():
+async def get_scenarios(request: Request):
     """Return available simulation scenarios."""
     return {
         "scenarios": [
             {
-                "id": "mvp_day",
-                "name": "Normal Day",
-                "description": "Typical sunny day with moderate wind and normal demand",
-                "cloud_cover_base": 0.15,
-                "wind_base": 5.5,
-                "demand_peak_kw": 180,
-            },
-            {
-                "id": "cloudy_still_afternoon",
-                "name": "Cloudy Still Afternoon",
-                "description": "Heavy clouds reduce solar, wind is calm — battery must compensate",
-                "cloud_cover_base": 0.8,
-                "wind_base": 3.2,
-                "demand_peak_kw": 160,
-            },
-            {
-                "id": "wind_fills_solar_gap",
-                "name": "Wind Fills Solar Gap",
-                "description": "Overcast day but strong winds keep the campus powered",
-                "cloud_cover_base": 0.6,
-                "wind_base": 8.0,
-                "demand_peak_kw": 150,
-            },
-            {
-                "id": "shortfall_protects_hostel",
-                "name": "Shortfall Protects Hostel",
-                "description": "Severe weather — system sheds admin block to protect hostel",
-                "cloud_cover_base": 0.9,
-                "wind_base": 2.8,
-                "demand_peak_kw": 200,
-            },
+                "id": scenario_id,
+                "name": definition["name"],
+                "description": definition["description"],
+                "cloud_cover_base": definition["cloud_cover_base"],
+                "wind_base": definition["wind_base"],
+                "demand_peak_kw": definition["demand_peak_kw"],
+            }
+            for scenario_id, definition in SCENARIOS.items()
         ],
-        "current_scenario": _get_current_scenario(),
+        "current_scenario": _get_current_scenario(request),
     }
 
 
-def _get_current_scenario() -> str:
+def _get_adapter(request: Request):
+    return request.app.state.adapter if hasattr(request.app.state, "adapter") else None
+
+
+def _get_current_scenario(request: Request) -> str:
     """Get the current active scenario from the adapter."""
-    from backend.main import app
-    adapter = app.state.adapter if hasattr(app.state, 'adapter') else None
+    adapter = _get_adapter(request)
     if adapter:
         return adapter.config.scenario
     return "mvp_day"
 
 
 @router.post("/scenarios/{scenario_id}")
-async def switch_scenario(scenario_id: str):
+async def switch_scenario(scenario_id: str, request: Request):
     """Switch the simulator to a different weather scenario."""
-    from backend.main import app
-    adapter = app.state.adapter if hasattr(app.state, 'adapter') else None
+    adapter = _get_adapter(request)
     if not adapter:
         raise HTTPException(status_code=503, detail="No adapter available")
 
-    valid_scenarios = ["mvp_day", "cloudy_still_afternoon", "wind_fills_solar_gap", "shortfall_protects_hostel"]
-    if scenario_id not in valid_scenarios:
+    if scenario_id not in SCENARIOS:
         raise HTTPException(
             status_code=400,
-            detail=f"Unknown scenario: {scenario_id}. Valid: {valid_scenarios}"
+            detail=f"Unknown scenario: {scenario_id}. Valid: {list(SCENARIOS.keys())}"
         )
 
     adapter.config.scenario = scenario_id
@@ -235,10 +214,9 @@ async def switch_scenario(scenario_id: str):
 # ─── Force Cycle ─────────────────────────────────────────────────────
 
 @router.post("/force-cycle")
-async def force_cycle():
+async def force_cycle(request: Request):
     """Manually trigger one decision cycle."""
-    from backend.main import app
-    scheduler = app.state.scheduler if hasattr(app.state, 'scheduler') else None
+    scheduler = request.app.state.scheduler if hasattr(request.app.state, "scheduler") else None
     if not scheduler:
         raise HTTPException(status_code=503, detail="Scheduler not initialized")
 

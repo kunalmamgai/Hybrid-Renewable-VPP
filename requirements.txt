@@ -8,7 +8,7 @@ reportlab>=4.2.0
 PyJWT>=2.10.0
 pwdlib[argon2]>=0.3.0
 google-auth>=2.38.0
-requests>=2.32.0
+requests>=2.32.0  # required by google.auth.transport.requests (Google sign-in)
 email-validator>=2.2.0
 
 # Development

@@ -28,6 +28,47 @@ from backend.simulator.wind_curve import WindCurve
 
 logger = logging.getLogger(__name__)
 
+# Canonical scenario definitions (single source of truth, also served by
+# the /api/v1/settings/scenarios endpoint).
+SCENARIOS: dict[str, dict[str, Any]] = {
+    "mvp_day": {
+        "name": "Normal Day",
+        "description": "Typical sunny day with moderate wind and normal demand",
+        "cloud_cover_base": 0.15,
+        "cloud_cover_variability": 0.05,
+        "wind_base": 5.5,
+        "wind_gust_factor": 0.3,
+        "demand_peak_kw": 180,
+    },
+    "cloudy_still_afternoon": {
+        "name": "Cloudy Still Afternoon",
+        "description": "Heavy clouds reduce solar, wind is calm — battery must compensate",
+        "cloud_cover_base": 0.8,
+        "cloud_cover_variability": 0.1,
+        "wind_base": 3.2,
+        "wind_gust_factor": 0.1,
+        "demand_peak_kw": 160,
+    },
+    "wind_fills_solar_gap": {
+        "name": "Wind Fills Solar Gap",
+        "description": "Overcast day but strong winds keep the campus powered",
+        "cloud_cover_base": 0.6,
+        "cloud_cover_variability": 0.15,
+        "wind_base": 8.0,
+        "wind_gust_factor": 0.4,
+        "demand_peak_kw": 150,
+    },
+    "shortfall_protects_hostel": {
+        "name": "Shortfall Protects Hostel",
+        "description": "Severe weather — system sheds admin block to protect hostel",
+        "cloud_cover_base": 0.9,
+        "cloud_cover_variability": 0.05,
+        "wind_base": 2.8,
+        "wind_gust_factor": 0.05,
+        "demand_peak_kw": 200,
+    },
+}
+
 
 @dataclass
 class SimulatedConfig:
@@ -78,36 +119,10 @@ class SimulatedAdapter(EnergyAdapter):
         return "simulated"
 
     def _build_scenarios(self) -> dict[str, dict]:
-        """Predefined weather + demand scenarios for demo playback."""
+        """Per-instance copy of the canonical scenario definitions."""
         return {
-            "mvp_day": {
-                "cloud_cover_base": 0.15,
-                "cloud_cover_variability": 0.05,
-                "wind_base": 5.5,
-                "wind_gust_factor": 0.3,
-                "demand_peak_kw": 180,
-            },
-            "cloudy_still_afternoon": {
-                "cloud_cover_base": 0.8,
-                "cloud_cover_variability": 0.1,
-                "wind_base": 3.2,
-                "wind_gust_factor": 0.1,
-                "demand_peak_kw": 160,
-            },
-            "wind_fills_solar_gap": {
-                "cloud_cover_base": 0.6,
-                "cloud_cover_variability": 0.15,
-                "wind_base": 8.0,
-                "wind_gust_factor": 0.4,
-                "demand_peak_kw": 150,
-            },
-            "shortfall_protects_hostel": {
-                "cloud_cover_base": 0.9,
-                "cloud_cover_variability": 0.05,
-                "wind_base": 2.8,
-                "wind_gust_factor": 0.05,
-                "demand_peak_kw": 200,
-            },
+            scenario_id: {k: v for k, v in definition.items() if k not in ("name", "description")}
+            for scenario_id, definition in SCENARIOS.items()
         }
 
     def _get_scenario_params(self, sim_time: datetime) -> dict:

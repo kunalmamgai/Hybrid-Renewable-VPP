@@ -140,8 +140,45 @@ class SchedulerService:
             "timestamp_of_data": twin_snapshot.get("timestamp", ""),
         })
 
+    async def _execute_cycle(self) -> dict:
+        """One full cycle: read → persist twin → broadcast twin + decision.
+
+        Shared by the background loop and manual force-cycle triggers.
+        """
+        # Step 1: Read sensors once
+        twin_snapshot = await self.adapter.read_sensors()
+
+        # Step 2: Persist twin to DB
+        if self.db_session_factory:
+            try:
+                async with self.db_session_factory() as session:
+                    await self.twin_store.update_twin_with_data(session, twin_snapshot)
+            except Exception as e:
+                logger.warning(f"DB persist failed (non-blocking): {e}")
+
+        # Step 3: Broadcast the live twin update (buildings)
+        await self._broadcast_twin_update(twin_snapshot, self.cycle_count)
+
+        # Step 4: Full decision loop
+        decision = None
+        if self._decision_manager:
+            decision = await self._decision_manager.run_cycle(twin_snapshot)
+
+            if decision and decision.get("decisions"):
+                await self._persist_decision_logs(decision["decisions"])
+
+            if decision:
+                await self.manager.send_to_all({
+                    "type": "full_cycle",
+                    "cycle_number": self.cycle_count,
+                    "result": decision,
+                })
+
+        self.last_cycle = datetime.now(timezone.utc)
+        return {"twin_snapshot": twin_snapshot, "decision": decision}
+
     async def _run_loop(self) -> None:
-        """Main cycle: read → update twin → decide → broadcast twin + decision."""
+        """Main loop: run one decision cycle per interval."""
         await asyncio.sleep(1)  # Brief startup delay
 
         while self.is_running:
@@ -157,36 +194,9 @@ class SchedulerService:
                 self._last_prune = time.time()
 
             try:
-                # Step 1: Read sensors once
-                twin_snapshot = await self.adapter.read_sensors()
+                await self._execute_cycle()
 
-                # Step 2: Persist twin to DB
-                if self.db_session_factory:
-                    try:
-                        async with self.db_session_factory() as session:
-                            await self.twin_store.update_twin_with_data(session, twin_snapshot)
-                    except Exception as e:
-                        logger.warning(f"DB persist failed (non-blocking): {e}")
-
-                # Step 3: Broadcast the live twin update (buildings)
-                await self._broadcast_twin_update(twin_snapshot, self.cycle_count)
-
-                # Step 4: Full decision loop
-                decision = None
-                if self._decision_manager:
-                    decision = await self._decision_manager.run_cycle(twin_snapshot)
-
-                    if decision and decision.get("decisions"):
-                        await self._persist_decision_logs(decision["decisions"])
-
-                    if decision:
-                        await self.manager.send_to_all({
-                            "type": "full_cycle",
-                            "cycle_number": self.cycle_count,
-                            "result": decision,
-                        })
-
-                # Step 5: Broadcast adapter health
+                # Broadcast adapter health
                 health = await self.adapter.health()
                 await self.manager.send_to_all({
                     "type": "health",
@@ -194,8 +204,6 @@ class SchedulerService:
                     "scheduler_cycles": self.cycle_count,
                     "clients": self.manager.client_count,
                 })
-
-                self.last_cycle = datetime.now(timezone.utc)
 
             except Exception:
                 logger.exception(f"Scheduler cycle {self.cycle_count} failed")
@@ -213,41 +221,12 @@ class SchedulerService:
     async def force_cycle(self) -> dict:
         """Manually trigger one cycle (for testing/demo)."""
         self.cycle_count += 1
-        twin_snapshot = await self.adapter.read_sensors()
-
-        # Step 2: Persist twin to DB
-        if self.db_session_factory:
-            try:
-                async with self.db_session_factory() as session:
-                    await self.twin_store.update_twin_with_data(session, twin_snapshot)
-            except Exception as e:
-                logger.warning(f"DB persist failed in force_cycle: {e}")
-
-        # Broadcast the live twin update (buildings)
-        await self._broadcast_twin_update(twin_snapshot, self.cycle_count)
-
-        decision = None
-        if self._decision_manager:
-            decision = await self._decision_manager.run_cycle(twin_snapshot)
-
-            # Persist decision logs to DB
-            if decision and decision.get("decisions"):
-                await self._persist_decision_logs(decision["decisions"])
-
-            if decision:
-                await self.manager.send_to_all({
-                    "type": "full_cycle",
-                    "cycle_number": self.cycle_count,
-                    "result": decision,
-                })
-
-        self.last_cycle = datetime.now(timezone.utc)
-
+        result = await self._execute_cycle()
         return {
             "cycle_number": self.cycle_count,
             "timestamp": self.last_cycle.isoformat(),
-            "twin_snapshot": twin_snapshot,
-            "decision": decision,
+            "twin_snapshot": result["twin_snapshot"],
+            "decision": result["decision"],
         }
 
 
@@ -263,14 +242,14 @@ def parse_args() -> argparse.Namespace:
 
 
 async def _standalone_main(mode: str) -> None:
-    from backend.main import _create_default_buildings
+    from backend.adapters.site_config import default_buildings
 
     adapter = SimulatedAdapter(
         SimulatedConfig(
             time_scale=settings.simulator_time_scale,
             scenario=settings.simulator_default_scenario,
         ),
-        _create_default_buildings(),
+        default_buildings(),
     )
     manager = ConnectionManager()
     scheduler = SchedulerService(adapter, manager, db_session_factory=SessionFactory)

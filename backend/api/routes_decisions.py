@@ -26,7 +26,7 @@ async def get_decisions(
         stmt = stmt.where(DecisionLog.building_id == building_id)
     result = await session.execute(stmt)
     logs = result.scalars().all()
-    return [DecisionResponse(decision_id=log.decision_id, timestamp=log.timestamp, decision_type=log.decision_type, action=log.action, confidence_pct=log.confidence_pct, reason=log.reason, alternative_considered=log.alternative_considered, expected_savings_inr=log.expected_savings_inr, expected_carbon_reduction_kg=log.expected_carbon_reduction_kg, building_id=log.building_id, battery_soc_after_pct=log.battery_soc_after_pct) for log in logs]
+    return [DecisionResponse.model_validate(log) for log in logs]
 
 
 @router.get("/decisions/stats")

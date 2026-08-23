@@ -23,3 +23,7 @@ __pycache__/
 .pytest_cache/
 .venv/
 venv/
+
+# Local AI tool state
+.opencode/
+.freebuff/

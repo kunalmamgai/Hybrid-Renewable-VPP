@@ -6,10 +6,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from backend.config import settings
-from backend.models.config import Base as ConfigBase
-from backend.models.decision_log import Base as LogBase
-from backend.models.digital_twin import Base as TwinBase
-from backend.models.user import Base as UserBase
+from backend.models.base import Base
 
 logger = logging.getLogger(__name__)
 
@@ -24,9 +21,11 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
 
 async def init_db():
     """Create all tables and enable WAL mode for SQLite."""
-    for base in [TwinBase, LogBase, ConfigBase, UserBase]:
-        async with engine.begin() as conn:
-            await conn.run_sync(base.metadata.create_all)
+    # Import every model module so its tables register on the shared Base.metadata
+    from backend.models import config, decision_log, digital_twin, user  # noqa: F401
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
     if "sqlite" in settings.database_url:
         async with engine.connect() as conn:
