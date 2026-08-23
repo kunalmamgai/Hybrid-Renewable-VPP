@@ -191,7 +191,7 @@ hostels: {
     name: "Wind Generation",
     type: "Proposed energy layer",
     description:
-      "Three proposed wind turbines positioned beyond the academic precinct. Rotor speed follows live wind at VIT Bhopal.",
+      "A hybrid wind layer with rooftop vertical-axis turbines on campus buildings and three perimeter turbines. Rotor speed follows live wind at VIT Bhopal.",
     load: "4.2 MW",
     energy: "Wind-speed power curve",
   },
