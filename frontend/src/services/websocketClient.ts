@@ -4,6 +4,7 @@
  * messages to registered callbacks.
  */
 import type { WebSocketMessage } from '../types';
+import { AUTH_TOKEN_KEY } from './apiClient';
 
 export type MessageHandler = (msg: WebSocketMessage) => void;
 
@@ -25,7 +26,11 @@ class VppWebSocketClient {
       return;
     }
 
-    this.ws = new WebSocket(this.url);
+    // The backend requires a valid JWT on /ws (?token=<JWT>).
+    const token = window.localStorage.getItem(AUTH_TOKEN_KEY);
+    const url = token ? `${this.url}?token=${encodeURIComponent(token)}` : this.url;
+
+    this.ws = new WebSocket(url);
 
     this.ws.onopen = () => {
       this.reconnectAttempts = 0;
@@ -40,7 +45,12 @@ class VppWebSocketClient {
       this.dispatch({ type: 'error', message: String(error) } as WebSocketMessage);
     };
 
-    this.ws.onclose = () => {
+    this.ws.onclose = (event) => {
+      // 4401 = authentication rejected; retrying with the same token is futile
+      if (event.code === 4401) {
+        this.dispatch({ type: 'error', message: 'WebSocket authentication failed' } as WebSocketMessage);
+        return;
+      }
       if (this.reconnectAttempts < this.maxReconnectAttempts) {
         this.reconnectAttempts++;
         const delay = this.reconnectDelay * this.reconnectAttempts;

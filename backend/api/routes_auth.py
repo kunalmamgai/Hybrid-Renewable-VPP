@@ -15,6 +15,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.api.rate_limit import rate_limit_auth
 from backend.config import settings
 from backend.db.database import get_session
 from backend.models.user import User
@@ -81,6 +82,20 @@ def _auth_response(user: User) -> AuthResponse:
     )
 
 
+def decode_access_token(token: str) -> str | None:
+    """Return the user_id encoded in a valid, non-expired token, else None."""
+    try:
+        payload = jwt.decode(
+            token,
+            settings.jwt_secret_key,
+            algorithms=["HS256"],
+        )
+    except InvalidTokenError:
+        return None
+    user_id = payload.get("sub")
+    return user_id if isinstance(user_id, str) else None
+
+
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
     session: AsyncSession = Depends(get_session),
@@ -93,17 +108,9 @@ async def get_current_user(
     if credentials is None or credentials.scheme.lower() != "bearer":
         raise unauthorized
 
-    try:
-        payload = jwt.decode(
-            credentials.credentials,
-            settings.jwt_secret_key,
-            algorithms=["HS256"],
-        )
-        user_id = payload.get("sub")
-        if not isinstance(user_id, str):
-            raise unauthorized
-    except InvalidTokenError as exc:
-        raise unauthorized from exc
+    user_id = decode_access_token(credentials.credentials)
+    if user_id is None:
+        raise unauthorized
 
     user = await session.get(User, user_id)
     if user is None or not user.is_active:
@@ -111,7 +118,12 @@ async def get_current_user(
     return user
 
 
-@router.post("/signup", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/signup",
+    response_model=AuthResponse,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(rate_limit_auth)],
+)
 async def signup(
     payload: SignUpRequest,
     session: AsyncSession = Depends(get_session),
@@ -135,7 +147,7 @@ async def signup(
     return _auth_response(user)
 
 
-@router.post("/login", response_model=AuthResponse)
+@router.post("/login", response_model=AuthResponse, dependencies=[Depends(rate_limit_auth)])
 async def login(
     payload: LoginRequest,
     session: AsyncSession = Depends(get_session),
@@ -156,7 +168,7 @@ async def login(
     return _auth_response(user)
 
 
-@router.post("/google", response_model=AuthResponse)
+@router.post("/google", response_model=AuthResponse, dependencies=[Depends(rate_limit_auth)])
 async def google_auth(
     payload: GoogleAuthRequest,
     session: AsyncSession = Depends(get_session),

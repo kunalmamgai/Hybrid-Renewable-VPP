@@ -2,34 +2,40 @@
 from __future__ import annotations
 
 import logging
+from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.api.routes_auth import get_current_user
 from backend.db.database import get_session
 from backend.models.config import AlertThreshold, BuildingTier, VnmSharingRule
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/v1/settings", tags=["settings"])
+router = APIRouter(
+    prefix="/api/v1/settings",
+    tags=["settings"],
+    dependencies=[Depends(get_current_user)],
+)
 
 
 # ─── Pydantic Schemas ────────────────────────────────────────────────
 
 class AlertThresholdUpdate(BaseModel):
-    threshold_value: float
+    threshold_value: float = Field(ge=0.0, le=1_000_000.0)
     active: bool = True
 
 
 class BuildingTierUpdate(BaseModel):
-    tier: str
-    description: str | None = None
+    tier: Literal["critical", "non_critical"]
+    description: str | None = Field(default=None, max_length=255)
 
 
 class VnmSharingRuleUpdate(BaseModel):
-    sharing_ratio: float
+    sharing_ratio: float = Field(ge=0.0, le=1.0)
 
 
 # ─── Alert Thresholds ────────────────────────────────────────────────

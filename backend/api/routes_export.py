@@ -5,11 +5,12 @@ from fastapi import APIRouter, Depends, Response
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.api.routes_auth import get_current_user
 from backend.db.database import get_session
 from backend.models.decision_log import DecisionLog
 from backend.models.digital_twin import BuildingTwin
 
-router = APIRouter(prefix="/api/v1", tags=["export"])
+router = APIRouter(prefix="/api/v1", tags=["export"], dependencies=[Depends(get_current_user)])
 
 
 def generate_csv(building_data: list, decision_data: list) -> str:

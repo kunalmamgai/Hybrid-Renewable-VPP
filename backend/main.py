@@ -12,6 +12,7 @@ from backend.adapters.simulated import (
     SimulatedBuilding,
     SimulatedConfig,
 )
+from backend.api.routes_auth import decode_access_token
 from backend.api.routes_auth import router as auth_router
 from backend.api.routes_decisions import router as decisions_router
 from backend.api.routes_export import router as export_router
@@ -137,6 +138,14 @@ async def _seed_building_config():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Fail fast on insecure configuration in production
+    if settings.is_production and settings.jwt_secret_is_insecure:
+        raise RuntimeError(
+            "Refusing to start: JWT_SECRET_KEY must be set to a strong random "
+            "value (>= 32 characters) when ENVIRONMENT=production. Generate one with: "
+            'python -c "import secrets; print(secrets.token_hex(32))"'
+        )
+
     # Initialize database
     await init_db()
 
@@ -182,12 +191,15 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+_allowed_origins = settings.cors_origin_list
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=_allowed_origins or ["*"],
+    # Browsers reject credentials with wildcard origins; only send the
+    # credential flag when an explicit allowlist is configured.
+    allow_credentials=bool(_allowed_origins),
+    allow_methods=["GET", "POST", "PUT", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 app.include_router(health_router)
@@ -201,7 +213,13 @@ from fastapi import WebSocket
 
 
 @app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
+async def websocket_endpoint(websocket: WebSocket, token: str = ""):
+    # Reject unauthenticated connections (token supplied as ?token=<JWT>)
+    if decode_access_token(token) is None:
+        await websocket.accept()
+        await websocket.close(code=4401)
+        logger.warning("Rejected WebSocket connection: invalid or missing token")
+        return
     await manager.connect(websocket)
     try:
         while True:

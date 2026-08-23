@@ -5,17 +5,27 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+INSECURE_DEFAULT_JWT_SECRET = "change-me-before-production"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=BASE_DIR / ".env", env_file_encoding="utf-8")
 
     # Server
     backend_host: str = "0.0.0.0"
     backend_port: int = 8000
+    environment: str = "development"  # "development" or "production"
+
+    # CORS (comma-separated origin allowlist, e.g. "http://localhost:5173,https://surya.example.com")
+    cors_origins: str = ""
 
     # Authentication
-    jwt_secret_key: str = "change-me-before-production"
+    jwt_secret_key: str = INSECURE_DEFAULT_JWT_SECRET
     jwt_access_token_expire_minutes: int = 1440
     google_client_id: str = ""
+
+    # Rate limiting (auth endpoints, per client IP)
+    rate_limit_auth_per_minute: int = 10
 
     # Database
     database_url: str = "sqlite+aiosqlite:///./vpp.db"
@@ -48,5 +58,22 @@ class Settings(BaseSettings):
 
     # Data retention
     decision_retention_days: int = 30
+
+    @property
+    def is_production(self) -> bool:
+        return self.environment.lower() in {"production", "prod"}
+
+    @property
+    def cors_origin_list(self) -> list[str]:
+        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+
+    @property
+    def jwt_secret_is_insecure(self) -> bool:
+        return (
+            not self.jwt_secret_key
+            or self.jwt_secret_key == INSECURE_DEFAULT_JWT_SECRET
+            or len(self.jwt_secret_key) < 32
+        )
+
 
 settings = Settings()

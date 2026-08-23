@@ -29,6 +29,25 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// On 401 from a protected endpoint, clear the stale token and send the
+// user to the login page (auth endpoints themselves are exempt).
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    const url: string = error?.config?.url || '';
+    const isAuthEndpoint = url.includes('/api/v1/auth/');
+    if (status === 401 && !isAuthEndpoint) {
+      window.localStorage.removeItem(AUTH_TOKEN_KEY);
+      const hash = window.location.hash;
+      if (!hash.startsWith('#/login') && !hash.startsWith('#/signup')) {
+        window.location.hash = '#/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export type AuthUser = {
   id: string;
   email: string;
@@ -97,14 +116,27 @@ export const getExportStats = async (): Promise<ExportStats> => {
   return resp.data;
 };
 
-export const downloadCSV = (): void => {
-  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-  window.open(`${baseUrl}/api/v1/export/csv`, '_blank');
+const triggerBlobDownload = (blob: Blob, filename: string): void => {
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
 };
 
-export const downloadPDF = (): void => {
-  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-  window.open(`${baseUrl}/api/v1/export/pdf`, '_blank');
+// Downloads go through axios (not window.open) so the Authorization
+// header is sent — the export endpoints require authentication.
+export const downloadCSV = async (): Promise<void> => {
+  const resp = await api.get<Blob>('/api/v1/export/csv', { responseType: 'blob' });
+  triggerBlobDownload(resp.data, 'statutory_export.csv');
+};
+
+export const downloadPDF = async (): Promise<void> => {
+  const resp = await api.get<Blob>('/api/v1/export/pdf', { responseType: 'blob' });
+  triggerBlobDownload(resp.data, 'statutory_report.pdf');
 };
 
 // ============================================================
