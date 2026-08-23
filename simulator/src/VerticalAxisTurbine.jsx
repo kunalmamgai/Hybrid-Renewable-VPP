@@ -21,7 +21,7 @@ export default function VerticalAxisTurbine({
           Math.sin(angle) * 1.36,
         );
       }),
-      true,
+      false,
       "centripetal",
     ))
   ), []);
@@ -56,7 +56,7 @@ export default function VerticalAxisTurbine({
         </mesh>
         {bladeCurves.map((curve, index) => (
           <mesh key={index} castShadow>
-            <tubeGeometry args={[curve, 64, 0.105, 8, true]} />
+            <tubeGeometry args={[curve, 64, 0.105, 8, false]} />
             <meshStandardMaterial color="#eef4f1" metalness={0.72} roughness={0.2} />
           </mesh>
         ))}
