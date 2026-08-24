@@ -94,8 +94,8 @@ export function TopBar({ onOpenMobileNav, onOpenCopilot }: TopBarProps) {
         <Menu size={18} />
       </button>
 
-      {/* Brand */}
-      <NavLink to="/app" className="flex items-center gap-2 mr-1 shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400/60 rounded-lg" aria-label="SURYA overview">
+      {/* Brand — exits the console to the public landing page */}
+      <NavLink to="/" className="flex items-center gap-2 mr-1 shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400/60 rounded-lg" aria-label="SURYA — back to home">
         <SuryaMark size={30} className="shrink-0" />
         <span className="hidden lg:inline font-display font-bold text-[14px] tracking-wide text-white">SURYA</span>
       </NavLink>

@@ -2,7 +2,7 @@
  * MobileNavDrawer — slide-in navigation for phones/tablets.
  * Opened by the TopBar hamburger or the bottom-nav "More" button.
  */
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, X } from 'lucide-react';
 import { NAV_ITEMS } from './nav';
@@ -34,13 +34,19 @@ export function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
             className="fixed inset-y-0 left-0 z-50 w-64 flex flex-col bg-ops-surface border-r border-ops-line md:hidden"
             aria-label="Navigation"
           >
-            {/* Brand */}
+            {/* Brand — exits the console to the public landing page */}
             <div className="flex items-center gap-2.5 px-3 h-14 border-b border-ops-line shrink-0">
-              <SuryaMark className="w-7 h-7 shrink-0" />
-              <div className="min-w-0">
-                <div className="font-display font-bold text-[13px] tracking-wide text-white leading-tight">SURYA</div>
-                <div className="tech-label" style={{ fontSize: '0.52rem' }}>VPP Control</div>
-              </div>
+              <Link
+                to="/"
+                className="flex items-center gap-2.5 min-w-0 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400/60"
+                aria-label="SURYA — back to home"
+              >
+                <SuryaMark className="w-7 h-7 shrink-0" />
+                <div className="min-w-0">
+                  <div className="font-display font-bold text-[13px] tracking-wide text-white leading-tight">SURYA</div>
+                  <div className="tech-label" style={{ fontSize: '0.52rem' }}>VPP Control</div>
+                </div>
+              </Link>
               <button
                 type="button"
                 aria-label="Close navigation"
