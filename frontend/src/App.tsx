@@ -16,14 +16,11 @@ const AppShell = lazy(() => import('./components/shell/AppShell').then(m => ({ d
 
 const OverviewPage = lazy(() => import('./pages/OverviewPage'));
 const DigitalTwinPage = lazy(() => import('./pages/DigitalTwinPage'));
-const ForecastPage = lazy(() => import('./pages/ForecastPage'));
 const OptimizerPage = lazy(() => import('./pages/OptimizerPage'));
 const RenewablesPage = lazy(() => import('./pages/RenewablesPage'));
 const BatteryPage = lazy(() => import('./pages/BatteryPage'));
 const GridPage = lazy(() => import('./pages/GridPage'));
 const SchedulerPage = lazy(() => import('./pages/SchedulerPage'));
-const CarbonPage = lazy(() => import('./pages/CarbonPage'));
-const GanttPage = lazy(() => import('./pages/GanttPage'));
 const AlertsPage = lazy(() => import('./pages/AlertsPage'));
 const ReportsPage = lazy(() => import('./pages/ReportsPage'));
 const FacilitiesSettings = lazy(() =>
@@ -85,14 +82,15 @@ function AppRoutes() {
       >
         <Route index element={<SectionBoundary><Suspense fallback={<PageFallback />}><OverviewPage /></Suspense></SectionBoundary>} />
         <Route path="twin" element={<SectionBoundary><Suspense fallback={<PageFallback />}><DigitalTwinPage /></Suspense></SectionBoundary>} />
-        <Route path="forecast" element={<SectionBoundary><Suspense fallback={<PageFallback />}><ForecastPage /></Suspense></SectionBoundary>} />
+        {/* Removed sections redirect back to Overview */}
+        <Route path="forecast" element={<Navigate to="/app" replace />} />
+        <Route path="carbon" element={<Navigate to="/app" replace />} />
+        <Route path="gantt" element={<Navigate to="/app" replace />} />
         <Route path="optimizer" element={<SectionBoundary><Suspense fallback={<PageFallback />}><OptimizerPage /></Suspense></SectionBoundary>} />
         <Route path="renewables" element={<SectionBoundary><Suspense fallback={<PageFallback />}><RenewablesPage /></Suspense></SectionBoundary>} />
         <Route path="battery" element={<SectionBoundary><Suspense fallback={<PageFallback />}><BatteryPage /></Suspense></SectionBoundary>} />
         <Route path="grid" element={<SectionBoundary><Suspense fallback={<PageFallback />}><GridPage /></Suspense></SectionBoundary>} />
         <Route path="scheduler" element={<SectionBoundary><Suspense fallback={<PageFallback />}><SchedulerPage /></Suspense></SectionBoundary>} />
-        <Route path="carbon" element={<SectionBoundary><Suspense fallback={<PageFallback />}><CarbonPage /></Suspense></SectionBoundary>} />
-        <Route path="gantt" element={<SectionBoundary><Suspense fallback={<PageFallback />}><GanttPage /></Suspense></SectionBoundary>} />
         <Route path="alerts" element={<SectionBoundary><Suspense fallback={<PageFallback />}><AlertsPage /></Suspense></SectionBoundary>} />
         <Route path="reports" element={<SectionBoundary><Suspense fallback={<PageFallback />}><ReportsPage /></Suspense></SectionBoundary>} />
         <Route path="settings" element={<SectionBoundary><Suspense fallback={<PageFallback />}><div className="settings-host"><FacilitiesSettings /></div></Suspense></SectionBoundary>} />

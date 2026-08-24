@@ -141,7 +141,7 @@ export function askCopilot(question: string, ctx: CopilotContext): string {
       for (const d of recent) {
         parts.push(`• ${d.decision_type.toUpperCase()} — ${d.action}`);
       }
-      parts.push('See Scheduler for the block-by-block timeline, or Gantt Timeline for the full 24-hour operational view.');
+      parts.push('See Scheduler for the block-by-block timeline of today\'s operations.');
     }
     return parts.join(' ');
   }

@@ -1,7 +1,7 @@
 /**
  * GanttTimeline — 24-hour operational timeline (SVG).
  * Rows of horizontal blocks communicating scheduled operations.
- * Used by the Scheduler and Gantt Timeline pages.
+ * Used by the Scheduler page.
  */
 export interface GanttRow {
   id: string;
