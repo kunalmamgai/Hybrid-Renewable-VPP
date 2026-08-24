@@ -4,6 +4,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import VppWebSocketClient from '../services/websocketClient';
+import { AUTH_TOKEN_KEY } from '../services/apiClient';
 import { DEMO_BUILDINGS } from '../data/demoBuildings';
 import type {
   BuildingTwin,
@@ -25,6 +26,8 @@ export interface VppState {
   connected: boolean;
   cycleCount: number;
   error: string | null;
+  /** Live grid frequency (Hz) from adapter health telemetry */
+  gridFrequencyHz: number | null;
 }
 
 const INITIAL_STATE: VppState = {
@@ -35,6 +38,7 @@ const INITIAL_STATE: VppState = {
   connected: STATIC_DEMO_MODE,
   cycleCount: STATIC_DEMO_MODE ? 1 : 0,
   error: null,
+  gridFrequencyHz: null,
 };
 
 export function useVppWebSocket() {
@@ -44,6 +48,11 @@ export function useVppWebSocket() {
 
   useEffect(() => {
     if (STATIC_DEMO_MODE) return undefined;
+
+    // The backend rejects unauthenticated /ws connections — skip connecting
+    // entirely on public pages so the landing stays clean until login.
+    const token = window.localStorage.getItem(AUTH_TOKEN_KEY);
+    if (!token) return undefined;
 
     const ws = new VppWebSocketClient(WS_URL);
     wsRef.current = ws;
@@ -81,10 +90,20 @@ export function useVppWebSocket() {
       setState(prev => ({ ...prev, connected: false, error: msg.message || 'WebSocket error' }));
     };
 
+    // Grid frequency rides on the adapter health broadcast
+    const onHealth = (msg: WebSocketMessage) => {
+      if (msg.type !== 'health') return;
+      const freq = msg.adapter?.grid_frequency_hz;
+      if (typeof freq === 'number' && Number.isFinite(freq)) {
+        setState(prev => ({ ...prev, gridFrequencyHz: freq }));
+      }
+    };
+
     // Any valid message confirms we are connected
     const unsubAll = ws.subscribe('*', updateConnected);
     const unsubTwin = ws.subscribe('twin_update', onTwinUpdate);
     const unsubCycle = ws.subscribe('full_cycle', onFullCycle);
+    const unsubHealth = ws.subscribe('health', onHealth);
     const unsubError = ws.subscribe('error', onError);
 
     ws.connect();
@@ -93,6 +112,7 @@ export function useVppWebSocket() {
       unsubAll();
       unsubTwin();
       unsubCycle();
+      unsubHealth();
       unsubError();
       ws.disconnect();
     };

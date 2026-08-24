@@ -342,6 +342,19 @@ class SimulatedAdapter(EnergyAdapter):
                 }
         return True
 
+    def _grid_frequency(self) -> float:
+        """Simulated grid frequency (Hz) — Indian nominal 50 Hz with smooth drift.
+
+        Models the small excursions a healthy grid exhibits, derived
+        deterministically from sim time so consecutive cycles stay coherent.
+        """
+        t = (self._sim_time or datetime.now(timezone.utc)).timestamp()
+        drift = (
+            0.045 * math.sin(t / 37.0)
+            + 0.02 * math.sin(t / 11.0 + 1.3)
+        )
+        return round(50.0 + drift, 3)
+
     async def health(self) -> dict[str, Any]:
         return {
             "status": "online",
@@ -349,6 +362,7 @@ class SimulatedAdapter(EnergyAdapter):
             "adapter_type": self.adapter_type,
             "sim_time": self._sim_time.isoformat() if self._sim_time else None,
             "read_count": self._read_count,
+            "grid_frequency_hz": self._grid_frequency(),
         }
 
     async def start_stream(self, interval_seconds: float = 300.0) -> None:

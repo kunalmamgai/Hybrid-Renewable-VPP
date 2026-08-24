@@ -14,6 +14,7 @@ export interface VppDataContextValue {
   connected: VppState['connected'];
   cycleCount: VppState['cycleCount'];
   error: VppState['error'];
+  gridFrequencyHz: VppState['gridFrequencyHz'];
 }
 
 const VppDataContext = createContext<VppDataContextValue | undefined>(undefined);

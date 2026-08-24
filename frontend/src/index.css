@@ -14,8 +14,8 @@ html {
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: radial-gradient(circle at top, rgba(217, 119, 6, 0.12), transparent 40%), #0a0d0f;
-  color: #f8f0e2;
+  background: radial-gradient(circle at top, rgba(217, 119, 6, 0.07), transparent 40%), #0e0c09;
+  color: #f3ede4;
 }
 
 /* Custom scrollbar */
@@ -26,17 +26,17 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(217, 119, 6, 0.32);
+  background: rgba(217, 119, 6, 0.28);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(217, 119, 6, 0.5);
+  background: rgba(217, 119, 6, 0.45);
 }
 
 /* Selection color */
 ::selection {
-  background: rgba(217, 119, 6, 0.28);
-  color: #fff6e6;
+  background: rgba(217, 119, 6, 0.26);
+  color: #eafcff;
 }
 
 /* ─── VPP Sheet — seamless connected panel (no floating box) ─── */
@@ -169,10 +169,10 @@ body {
 
 /* Mobile dropdown panel */
 .glass-nav-panel {
-  background: rgba(10, 17, 14, 0.94);
+  background: rgba(16, 12, 9, 0.94);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(217, 119, 6, 0.25);
+  border: 1px solid rgba(217, 119, 6, 0.26);
   border-radius: 1rem;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
   animation: navPanelIn 0.2s ease-out both;
@@ -180,12 +180,12 @@ body {
 
 /* Floating hero nav pill (landing page) */
 .glass-nav-hero {
-  background: rgba(11, 20, 16, 0.55);
+  background: rgba(20, 15, 11, 0.55);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(217, 119, 6, 0.25);
+  border: 1px solid rgba(217, 119, 6, 0.26);
   border-radius: 9999px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 0 24px rgba(217, 119, 6, 0.06);
 }
 
 @keyframes navPanelIn {
@@ -213,17 +213,17 @@ body {
 
 /* ─── Media Cards (landing media showcase) ─── */
 .glass-video-frame {
-  background: rgba(11, 20, 16, 0.6);
-  border: 1px solid rgba(217, 119, 6, 0.25);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45), 0 0 40px rgba(217, 119, 6, 0.08);
+  background: rgba(20, 15, 11, 0.6);
+  border: 1px solid rgba(217, 119, 6, 0.22);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45), 0 0 40px rgba(217, 119, 6, 0.06);
 }
 
 .play-badge {
-  background: rgba(10, 17, 14, 0.72);
+  background: rgba(16, 12, 9, 0.72);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(217, 119, 6, 0.4);
-  box-shadow: 0 0 24px rgba(217, 119, 6, 0.35);
+  box-shadow: 0 0 24px rgba(217, 119, 6, 0.3);
 }
 
 /* ─── Glass Input (dark theme) ─── */
@@ -232,21 +232,21 @@ body {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(217, 119, 6, 0.18);
-  color: #f8f0e2;
+  color: #f3ede4;
   transition: all 0.2s ease;
 }
 .glass-input::placeholder {
-  color: rgba(248, 240, 226, 0.45);
+  color: rgba(243, 237, 228, 0.45);
 }
 .glass-input:focus {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(217, 119, 6, 0.45);
-  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.18);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.16);
   outline: none;
 }
 .glass-input option {
   background: #0f1613;
-  color: #f8f0e2;
+  color: #f3ede4;
 }
 
 /* ─── Glass Button ─── */
@@ -293,7 +293,7 @@ body {
 
 /* ─── Emerald Gradient Text ─── */
 .text-emerald-gradient {
-  background: linear-gradient(135deg, #d97706, #f3e1bf);
+  background: linear-gradient(135deg, #34d399, #a7f3d0);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -538,4 +538,343 @@ body {
   .campus-picker select {
     max-width: 8.5rem;
   }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   OPERATIONS CONSOLE DESIGN SYSTEM
+   Premium dark energy-ops aesthetic: charcoal + blue-green undertone,
+   electric cyan live-data accents, graphite panels, fine grid textures.
+   Legacy classes above are preserved for existing components.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ─── App background: deep charcoal with atmospheric depth ─── */
+.ops-app-bg {
+  background:
+    radial-gradient(1100px 520px at 78% -10%, rgba(217, 119, 6, 0.05), transparent 60%),
+    radial-gradient(900px 600px at -8% 108%, rgba(52, 211, 153, 0.045), transparent 55%),
+    #0e0c09;
+}
+
+/* Fine engineering grid texture */
+.grid-texture {
+  background-image:
+    linear-gradient(rgba(224, 197, 160, 0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224, 197, 160, 0.032) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.grid-texture-fine {
+  background-image:
+    linear-gradient(rgba(224, 197, 160, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224, 197, 160, 0.05) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* ─── Panel — elevated graphite surface with hairline border ─── */
+.ops-panel {
+  position: relative;
+  background: linear-gradient(170deg, rgba(19, 33, 40, 0.72), rgba(11, 18, 22, 0.88));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(224, 197, 160, 0.10);
+  border-radius: 0.9rem;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 16px 40px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.ops-panel:hover {
+  border-color: rgba(224, 197, 160, 0.17);
+}
+
+.ops-panel-flat {
+  background: rgba(11, 18, 22, 0.6);
+  border: 1px solid rgba(224, 197, 160, 0.09);
+  border-radius: 0.75rem;
+}
+
+/* Section header inside panels */
+.ops-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid rgba(224, 197, 160, 0.08);
+}
+
+/* ─── Technical micro label ─── */
+.tech-label {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(243, 237, 228, 0.42);
+}
+
+.tech-label-cyan { color: rgba(217, 119, 6, 0.75); }
+.tech-label-green { color: rgba(52, 211, 153, 0.75); }
+.tech-label-amber { color: rgba(251, 191, 36, 0.8); }
+.tech-label-red { color: rgba(248, 113, 113, 0.8); }
+
+/* Large mono numerals */
+.num {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* ─── Status indicators ─── */
+.status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+.status-dot-green {
+  background: #34d399;
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.7);
+  animation: statusPulse 2.4s ease-in-out infinite;
+}
+.status-dot-cyan {
+  background: #f59e0b;
+  box-shadow: 0 0 8px rgba(217, 119, 6, 0.7);
+  animation: statusPulse 2.4s ease-in-out infinite;
+}
+.status-dot-amber {
+  background: #fbbf24;
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.7);
+  animation: statusPulse 2.4s ease-in-out infinite;
+}
+.status-dot-red {
+  background: #f87171;
+  box-shadow: 0 0 10px rgba(248, 113, 113, 0.8);
+  animation: statusPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.86); }
+}
+
+/* ─── Buttons ─── */
+.ops-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 1px solid rgba(224, 197, 160, 0.14);
+  color: rgba(243, 237, 228, 0.85);
+  background: rgba(19, 33, 40, 0.65);
+  transition: all 0.18s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ops-btn:hover:not(:disabled) {
+  border-color: rgba(217, 119, 6, 0.4);
+  color: #fff;
+  background: rgba(217, 119, 6, 0.08);
+}
+.ops-btn:focus-visible {
+  outline: 2px solid rgba(217, 119, 6, 0.6);
+  outline-offset: 2px;
+}
+.ops-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ops-btn-primary {
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.95), rgba(180, 83, 9, 0.95));
+  border-color: rgba(217, 119, 6, 0.6);
+  color: #241a02;
+  text-shadow: none;
+  box-shadow: 0 0 20px rgba(217, 119, 6, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.ops-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, rgba(252, 211, 77, 0.98), rgba(217, 119, 6, 0.98));
+  border-color: rgba(252, 211, 77, 0.8);
+  color: #241a02;
+  box-shadow: 0 0 28px rgba(217, 119, 6, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.ops-btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: rgba(243, 237, 228, 0.6);
+}
+.ops-btn-ghost:hover:not(:disabled) {
+  color: #fff;
+  background: rgba(224, 197, 160, 0.08);
+  border-color: transparent;
+}
+
+/* ─── Inputs / selects on ops surfaces ─── */
+.ops-input {
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border-radius: 0.55rem;
+  background: rgba(7, 12, 15, 0.7);
+  border: 1px solid rgba(224, 197, 160, 0.13);
+  color: #f3ede4;
+  font-size: 0.78rem;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.ops-input::placeholder { color: rgba(243, 237, 228, 0.3); }
+.ops-input:focus {
+  outline: none;
+  border-color: rgba(217, 119, 6, 0.5);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.12);
+}
+.ops-input option { background: #191511; }
+.ops-input[type='range'] {
+  padding: 0;
+  height: 1.15rem;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.ops-input[type='range']::-webkit-slider-runnable-track {
+  height: 0.28rem;
+  border-radius: 9999px;
+  background: rgba(224, 197, 160, 0.16);
+}
+.ops-input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  margin-top: -0.32rem;
+  width: 0.92rem;
+  height: 0.92rem;
+  border-radius: 9999px;
+  background: #f59e0b;
+  border: 2px solid #2d1c07;
+  box-shadow: 0 0 10px rgba(217, 119, 6, 0.6);
+}
+.ops-input[type='range']::-moz-range-track {
+  height: 0.28rem;
+  border-radius: 9999px;
+  background: rgba(224, 197, 160, 0.16);
+}
+.ops-input[type='range']::-moz-range-thumb {
+  width: 0.92rem;
+  height: 0.92rem;
+  border-radius: 9999px;
+  background: #f59e0b;
+  border: 2px solid #2d1c07;
+  box-shadow: 0 0 10px rgba(217, 119, 6, 0.6);
+}
+
+/* ─── Sidebar nav items ─── */
+.ops-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.65rem;
+  margin: 0.1rem 0;
+  border-radius: 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgba(243, 237, 228, 0.58);
+  transition: all 0.16s ease;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.ops-nav-item:hover {
+  color: rgba(243, 237, 228, 0.95);
+  background: rgba(224, 197, 160, 0.07);
+}
+.ops-nav-item.active {
+  color: #eafcff;
+  background: linear-gradient(90deg, rgba(217, 119, 6, 0.14), rgba(217, 119, 6, 0.03));
+  box-shadow: inset 2px 0 0 #f59e0b;
+}
+.ops-nav-item:focus-visible {
+  outline: 2px solid rgba(217, 119, 6, 0.6);
+  outline-offset: -2px;
+}
+
+/* ─── Scrollbar (ops tint) ─── */
+.ops-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.ops-scroll::-webkit-scrollbar-track { background: transparent; }
+.ops-scroll::-webkit-scrollbar-thumb {
+  background: rgba(224, 197, 160, 0.18);
+  border-radius: 10px;
+}
+.ops-scroll::-webkit-scrollbar-thumb:hover { background: rgba(224, 197, 160, 0.32); }
+
+/* ─── Chips / badges ─── */
+.ops-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid rgba(224, 197, 160, 0.16);
+  color: rgba(243, 237, 228, 0.7);
+  background: rgba(224, 197, 160, 0.05);
+  white-space: nowrap;
+}
+.ops-chip-cyan {
+  border-color: rgba(217, 119, 6, 0.35);
+  color: rgba(252, 211, 77, 0.95);
+  background: rgba(217, 119, 6, 0.08);
+}
+.ops-chip-green {
+  border-color: rgba(52, 211, 153, 0.35);
+  color: rgba(110, 231, 183, 0.95);
+  background: rgba(52, 211, 153, 0.08);
+}
+.ops-chip-amber {
+  border-color: rgba(251, 191, 36, 0.4);
+  color: rgba(252, 211, 77, 0.95);
+  background: rgba(251, 191, 36, 0.08);
+}
+.ops-chip-red {
+  border-color: rgba(248, 113, 113, 0.45);
+  color: rgba(252, 165, 165, 0.95);
+  background: rgba(248, 113, 113, 0.1);
+}
+
+/* ─── Table rows / list dividers ─── */
+.ops-divide > * + * {
+  border-top: 1px solid rgba(224, 197, 160, 0.07);
+}
+
+/* Horizontal scroll guard for charts on mobile */
+.chart-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Reduced motion: disable decorative animation */
+@media (prefers-reduced-motion: reduce) {
+  .status-dot-green, .status-dot-cyan, .status-dot-amber, .status-dot-red {
+    animation: none;
+  }
+}
+
+/* ─── Embedded legacy pages: neutralise the old warm page-bg inside the
+       operations shell so surfaces stay on the cool charcoal theme ─── */
+.twin-host .page-bg,
+.settings-host .page-bg {
+  background: transparent;
+}
+.twin-host .page-bg::before,
+.settings-host .page-bg::before {
+  display: none;
 }

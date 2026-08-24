@@ -40,7 +40,7 @@ export function Hero() {
         className="fixed inset-0 -z-10"
         style={{
           background:
-            'linear-gradient(180deg, #0f1012 0%, #0f281e 16%, #0a0d0f 42%, #0d1f1a 66%, #101712 100%)',
+            'linear-gradient(180deg, #0a1014 0%, #0b1c20 16%, #0e0c09 42%, #0b171c 66%, #081014 100%)',
         }}
       />
       {/* ===== HERO SECTION ===== */}
@@ -52,20 +52,20 @@ export function Hero() {
         />
 
         {/* Soft overlay for text legibility */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,235,190,0.26),_transparent_38%),linear-gradient(180deg,rgba(18,12,8,0.08),rgba(16,15,14,0.12)_58%,rgba(14,12,10,0.22)_100%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-b from-transparent via-[#20160f]/26 to-[#0f1012]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(190,240,250,0.16),_transparent_38%),linear-gradient(180deg,rgba(8,14,17,0.08),rgba(10,16,19,0.12)_58%,rgba(8,13,16,0.22)_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-b from-transparent via-[#0b1417]/26 to-[#0a1014]" />
         <div
           className="absolute inset-x-0 bottom-0 h-40 pointer-events-none"
           style={{
-            background: 'linear-gradient(180deg, rgba(15, 16, 18, 0) 0%, rgba(112, 72, 28, 0.18) 44%, rgba(16, 16, 18, 0.88) 100%)',
+            background: 'linear-gradient(180deg, rgba(10, 16, 20, 0) 0%, rgba(23, 74, 88, 0.18) 44%, rgba(9, 15, 18, 0.9) 100%)',
             clipPath: 'polygon(0 38%, 12% 28%, 24% 40%, 37% 22%, 50% 36%, 63% 18%, 78% 34%, 89% 26%, 100% 36%, 100% 100%, 0 100%)',
           }}
         />
 
-        {/* Parallax Accents: Sunset & Sky mix */}
-        <BackgroundGlow color="orange" size="620px" top="-10%" left="50%" opacity={0.2} blur="120px" />
-        <BackgroundGlow color="sky" size="380px" top="10%" left="-5%" opacity={0.12} blur="100px" />
-        <BackgroundGlow color="sunlight" size="520px" top="40%" left="70%" opacity={0.1} blur="110px" />
+        {/* Parallax Accents: Cyan & Sky mix */}
+        <BackgroundGlow color="cyan" size="620px" top="-10%" left="50%" opacity={0.14} blur="120px" />
+        <BackgroundGlow color="sky" size="380px" top="10%" left="-5%" opacity={0.1} blur="100px" />
+        <BackgroundGlow color="sunlight" size="520px" top="40%" left="70%" opacity={0.08} blur="110px" />
 
         {/* Nav Bar — floating forest-glass pill */}
         <nav className="relative z-30 mt-4 px-4 sm:px-6">
@@ -87,7 +87,7 @@ export function Hero() {
                     to={to}
                     className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-[0.1em] text-white/85 hover:text-amber-200 hover:bg-white/10 transition-all duration-300"
                   >
-                    <Icon size={15} className="text-vpp-accent-gold/90" />
+                    <Icon size={15} className="text-amber-300/90" />
                     {label}
                   </Link>
                 ))}
@@ -105,7 +105,7 @@ export function Hero() {
                   to="/signup"
                   className="hidden lg:inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
                   style={{
-                    background: 'linear-gradient(135deg, #d97706, #f59e0b)',
+                    background: 'linear-gradient(135deg, #b45309, #f59e0b)',
                     boxShadow: '0 6px 20px rgba(217, 119, 6, 0.35)',
                   }}
                 >
@@ -135,7 +135,7 @@ export function Hero() {
                     onClick={() => setMenuOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold uppercase tracking-[0.1em] text-white/85 hover:text-amber-200 hover:bg-white/10 transition-all duration-200"
                   >
-                    <Icon size={16} className="text-vpp-accent-gold/90" />
+                    <Icon size={16} className="text-amber-300/90" />
                     {label}
                   </Link>
                 ))}
@@ -151,7 +151,7 @@ export function Hero() {
                   onClick={() => setMenuOpen(false)}
                   className="mt-2 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-white transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                   style={{
-                    background: 'linear-gradient(135deg, #d97706, #f59e0b)',
+                    background: 'linear-gradient(135deg, #b45309, #f59e0b)',
                     boxShadow: '0 6px 20px rgba(217, 119, 6, 0.35)',
                   }}
                 >
@@ -211,7 +211,7 @@ export function Hero() {
               to="/energy-flow"
               className="text-white/90 px-8 py-3.5 rounded-full text-sm font-semibold flex items-center gap-2 transition-all duration-300 hover:border-white/60 hover:bg-white/[0.06] hover:text-white"
               style={{
-                border: '1.5px solid rgba(255, 237, 208, 0.28)',
+                border: '1.5px solid rgba(190, 235, 245, 0.28)',
                 backdropFilter: 'blur(2px)',
               }}
             >

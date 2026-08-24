@@ -29,8 +29,9 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// On 401 from a protected endpoint, clear the stale token and send the
-// user to the login page (auth endpoints themselves are exempt).
+// On 401 from a protected endpoint, clear the stale token. Only redirect
+// to login when the user is inside the authenticated app area — public
+// pages (landing, auth) must never be hijacked by an expired token.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -40,7 +41,12 @@ api.interceptors.response.use(
     if (status === 401 && !isAuthEndpoint) {
       window.localStorage.removeItem(AUTH_TOKEN_KEY);
       const hash = window.location.hash;
-      if (!hash.startsWith('#/login') && !hash.startsWith('#/signup')) {
+      const inProtectedApp =
+        hash.startsWith('#/app') ||
+        hash.startsWith('#/dashboard') ||
+        hash.startsWith('#/energy-flow') ||
+        hash.startsWith('#/decisions');
+      if (inProtectedApp) {
         window.location.hash = '#/login';
       }
     }

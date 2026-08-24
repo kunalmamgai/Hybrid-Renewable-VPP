@@ -1,6 +1,7 @@
 /**
  * LandingSections — scroll-triggered reveal sections below the hero.
- * Includes: Desert Transition, How It Works, Live Stats, Compliance Badges, CTA Footer.
+ * Includes: Desert Transition, How It Works (+ operations photo band),
+ * Live Stats (composited over field photography), CTA Footer.
  * Uses Framer Motion for professional scroll-triggered animations.
  */
 import { useEffect, useRef, useState } from 'react';
@@ -20,6 +21,8 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { SuryaMark } from '../common/SuryaMark';
+
+const publicAsset = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`;
 
 // ─── Scroll Reveal Wrapper (Framer Motion) ───
 export function RevealSection({ children, className = '', delay = 0 }: {
@@ -74,7 +77,7 @@ function AnimatedCounter({ target, suffix = '', prefix = '', duration = 2000, de
       : Math.round(count).toLocaleString();
 
   return (
-    <div ref={ref} className="text-3xl md:text-5xl font-extrabold text-white tracking-tight">
+    <div ref={ref} className="text-3xl md:text-5xl font-extrabold text-white tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">
       {prefix}{display}{suffix}
     </div>
   );
@@ -86,12 +89,13 @@ export function BackgroundGlow({ color = 'emerald', size = '300px', top = '0%', 
     emerald: 'bg-vpp-emerald',
     teal: 'bg-vpp-accent-teal',
     orange: 'bg-vpp-accent-orange',
+    cyan: 'bg-amber-400',
     sky: 'bg-hero-sunlight',
     sunlight: 'bg-hero-sunlight',
   };
-  
+
   return (
-    <motion.div 
+    <motion.div
       animate={animate ? { scale: [1, 1.1, 1], opacity: [opacity, opacity * 1.3, opacity] } : {}}
       transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       className={`absolute pointer-events-none rounded-full ${colorMap[color as keyof typeof colorMap]}`}
@@ -125,7 +129,7 @@ export function HowItWorksSection() {
       desc: 'Supply & load forecast with confidence',
     },
     {
-      icon: <Cog size={22} className="text-vpp-accent-gold" />,
+      icon: <Cog size={22} className="text-amber-300" />,
       title: 'Optimization Engine',
       desc: 'Cost-weighted plan for every building',
     },
@@ -141,6 +145,27 @@ export function HowItWorksSection() {
     },
   ];
 
+  const opsPhotos = [
+    {
+      src: publicAsset('assets/engineer-field.jpg'),
+      alt: 'Engineer inspecting renewable energy equipment',
+      label: 'In the field',
+      caption: 'Sensors and assets commissioned per building',
+    },
+    {
+      src: publicAsset('assets/control-analytics.jpg'),
+      alt: 'Energy analytics dashboards in an operations room',
+      label: 'In the command center',
+      caption: 'Every dispatch visible on one console',
+    },
+    {
+      src: publicAsset('assets/energy-industrial.jpg'),
+      alt: 'Industrial energy infrastructure',
+      label: 'On the network',
+      caption: 'Grid constraints respected in real time',
+    },
+  ];
+
   return (
     <section className="relative py-20 px-6 overflow-hidden">
       <BackgroundGlow color="teal" size="500px" top="20%" left="-10%" opacity={0.08} blur="140px" />
@@ -148,7 +173,7 @@ export function HowItWorksSection() {
 
       <div className="relative max-w-6xl mx-auto">
         <RevealSection className="text-center mb-12">
-          <span className="text-[10px] font-bold text-vpp-accent-gold uppercase tracking-[0.25em]">How It Works</span>
+          <span className="tech-label tech-label-cyan !text-[10px] tracking-[0.25em]">How It Works</span>
           <h2 className="text-3xl md:text-5xl font-extrabold text-white mt-4 tracking-tight leading-tight">
             From Weather to <span className="text-sunset-gradient">Smart Dispatch</span>
           </h2>
@@ -160,17 +185,17 @@ export function HowItWorksSection() {
         <RevealSection delay={0.15}>
           <div className="vpp-sheet relative p-8 md:p-12">
             {/* faint connector line behind the icons */}
-            <div className="hidden lg:block absolute top-[4.9rem] left-12 right-12 h-px bg-gradient-to-r from-transparent via-vpp-accent-gold/20 to-transparent" />
+            <div className="hidden lg:block absolute top-[4.9rem] left-12 right-12 h-px bg-gradient-to-r from-transparent via-amber-400/20 to-transparent" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-0">
               {steps.map((step, i) => (
                 <div
                   key={i}
                   className="relative flex items-center gap-4 lg:flex-col lg:items-center lg:text-center lg:px-2"
                 >
-                  {/* pulsing gold connector dot */}
+                  {/* pulsing cyan connector dot */}
                   {i < steps.length - 1 && (
                     <span
-                      className="flow-dot hidden lg:block absolute top-7 -right-1.5 z-10 w-2 h-2 rounded-full bg-vpp-accent-gold"
+                      className="flow-dot hidden lg:block absolute top-7 -right-1.5 z-10 w-2 h-2 rounded-full bg-amber-400"
                       style={{ animationDelay: `${i * 0.35}s` }}
                     />
                   )}
@@ -186,6 +211,27 @@ export function HowItWorksSection() {
             </div>
           </div>
         </RevealSection>
+
+        {/* Operations photo band — the people & infrastructure behind the loop */}
+        <RevealSection delay={0.2}>
+          <div className="grid gap-4 sm:grid-cols-3 mt-4 lg:mt-5">
+            {opsPhotos.map(photo => (
+              <figure key={photo.label} className="glass-video-frame group relative overflow-hidden rounded-2xl h-52 md:h-60">
+                <img
+                  src={photo.src}
+                  alt={photo.alt}
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover brightness-[0.92] saturate-[1.08] transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0b1410]/85 via-[#0b1410]/15 to-transparent pointer-events-none" />
+                <figcaption className="absolute bottom-0 inset-x-0 p-4">
+                  <div className="tech-label tech-label-cyan !text-[9px] tracking-[0.22em]">{photo.label}</div>
+                  <p className="mt-1 text-[12px] text-white/75 font-light leading-snug">{photo.caption}</p>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </RevealSection>
       </div>
     </section>
   );
@@ -194,13 +240,14 @@ export function HowItWorksSection() {
 export function LiveStatsSection() {
   const stats = [
     {
-      icon: <IndianRupee size={20} className="text-vpp-accent-gold" />,
+      icon: <IndianRupee size={20} className="text-amber-300" />,
       value: 12400,
       prefix: 'INR ',
       suffix: '',
       decimals: 0,
       label: 'Cost Savings',
       sub: 'Lifetime logged savings',
+      photo: publicAsset('assets/solar-closeup.jpg'),
     },
     {
       icon: <Target size={20} className="text-vpp-accent-teal" />,
@@ -210,6 +257,7 @@ export function LiveStatsSection() {
       decimals: 0,
       label: 'Forecast Accuracy',
       sub: '5-min ahead AI predictions',
+      photo: publicAsset('assets/control-analytics.jpg'),
     },
     {
       icon: <BatteryCharging size={20} className="text-vpp-emerald" />,
@@ -219,6 +267,7 @@ export function LiveStatsSection() {
       decimals: 0,
       label: 'Grid Independence',
       sub: 'Of demand covered on-site',
+      photo: publicAsset('assets/wind-farm.jpg'),
     },
     {
       icon: <Leaf size={20} className="text-vpp-accent-orange" />,
@@ -228,6 +277,7 @@ export function LiveStatsSection() {
       decimals: 1,
       label: 'CO₂ Avoided',
       sub: 'Vs. grid-only operation',
+      photo: publicAsset('assets/solar-farm-aerial.jpg'),
     },
   ];
 
@@ -238,28 +288,40 @@ export function LiveStatsSection() {
 
       <div className="relative max-w-6xl mx-auto">
         <RevealSection className="text-center mb-12">
-          <span className="text-[10px] font-bold text-vpp-accent-gold uppercase tracking-[0.25em]">Live Performance</span>
+          <span className="tech-label tech-label-cyan !text-[10px] tracking-[0.25em]">Live Performance</span>
           <h2 className="text-3xl md:text-5xl font-extrabold text-white mt-4 tracking-tight leading-tight">
             Numbers That <span className="text-sunset-gradient">Speak</span>
           </h2>
         </RevealSection>
 
-        {/* One connected HUD strip — hairline dividers, no floating boxes */}
+        {/* Stats composited over field photography */}
         <RevealSection delay={0.15}>
-          <div className="vpp-sheet grid grid-cols-2 lg:grid-cols-4 gap-px overflow-hidden">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
             {stats.map((stat) => (
-              <div key={stat.label} className="bg-[#0f1613]/80 p-8 md:p-10 text-center group">
-                <div className="flex items-center justify-center mb-4 text-white/30 group-hover:text-vpp-accent-gold transition-colors duration-300">
-                  {stat.icon}
-                </div>
-                <AnimatedCounter
-                  target={stat.value}
-                  prefix={stat.prefix}
-                  suffix={stat.suffix}
-                  decimals={stat.decimals}
+              <div key={stat.label} className="group relative overflow-hidden rounded-2xl border border-white/10 min-h-[190px] md:min-h-[220px] flex flex-col items-center justify-center text-center p-6">
+                <img
+                  src={stat.photo}
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover brightness-[0.55] saturate-[1.05] transition-all duration-700 group-hover:brightness-[0.68] group-hover:scale-105"
                 />
-                <p className="text-sm font-semibold text-white/80 mt-3">{stat.label}</p>
-                <p className="text-[11px] text-white/30 mt-1 font-light">{stat.sub}</p>
+                {/* readability scrim */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#08100c]/90 via-[#0b1410]/45 to-[#0b1410]/30 pointer-events-none" />
+
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className="flex items-center justify-center mb-4 w-11 h-11 rounded-xl bg-black/35 backdrop-blur-md border border-amber-300/20 text-amber-300 group-hover:scale-110 transition-transform duration-300">
+                    {stat.icon}
+                  </div>
+                  <AnimatedCounter
+                    target={stat.value}
+                    prefix={stat.prefix}
+                    suffix={stat.suffix}
+                    decimals={stat.decimals}
+                  />
+                  <p className="text-sm font-semibold text-white mt-3 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)]">{stat.label}</p>
+                  <p className="text-[11px] text-white/55 mt-1 font-light drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]">{stat.sub}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -277,7 +339,7 @@ export function CTAFooter() {
 
       <div className="relative max-w-4xl mx-auto text-center">
         <RevealSection>
-          <span className="text-[10px] font-bold text-vpp-accent-gold uppercase tracking-[0.25em]">Get Started</span>
+          <span className="tech-label tech-label-cyan !text-[10px] tracking-[0.25em]">Get Started</span>
           <h2 className="text-3xl md:text-6xl font-extrabold text-white mt-6 tracking-tight leading-tight">
             Ready to Put Your Campus<br />
             on <span className="text-sunset-gradient">Autopilot</span>?
@@ -289,16 +351,16 @@ export function CTAFooter() {
           <div className="mt-12 flex flex-wrap items-center justify-center gap-6">
             <Link
               to="/signup"
-              className="text-white px-10 py-4 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shadow-lg shadow-vpp-accent-gold/20"
+              className="text-white px-10 py-4 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shadow-lg shadow-amber-600/25"
               style={{
-                background: 'linear-gradient(135deg, #ff9f1c, #d97706)',
+                background: 'linear-gradient(135deg, #b45309, #f59e0b)',
               }}
             >
               Get Started
               <ArrowRight size={16} />
             </Link>
             <Link
-              to="/dashboard"
+              to="/app"
               className="text-white/90 px-10 py-4 rounded-full text-sm font-bold transition-all duration-300 border border-white/20 backdrop-blur-md hover:bg-white/10 hover:text-white"
             >
               Explore Platform
@@ -323,10 +385,10 @@ export function CTAFooter() {
           </Link>
 
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-xs text-white/45">
-            <Link to="/dashboard" className="hover:text-amber-200 transition-colors duration-300">Platform</Link>
-            <Link to="/energy-flow" className="hover:text-amber-200 transition-colors duration-300">Live Demo</Link>
-            <Link to="/decisions" className="hover:text-amber-200 transition-colors duration-300">Impact</Link>
-            <Link to="/settings" className="hover:text-amber-200 transition-colors duration-300">Settings</Link>
+            <Link to="/app" className="hover:text-amber-200 transition-colors duration-300">Platform</Link>
+            <Link to="/app/twin" className="hover:text-amber-200 transition-colors duration-300">Live Demo</Link>
+            <Link to="/app/optimizer" className="hover:text-amber-200 transition-colors duration-300">Impact</Link>
+            <Link to="/app/settings" className="hover:text-amber-200 transition-colors duration-300">Settings</Link>
           </div>
 
           <p className="text-[10px] text-white/25 uppercase tracking-[0.3em] font-medium">
@@ -340,7 +402,7 @@ export function CTAFooter() {
 
 export function ScrollIndicator() {
   return (
-    <motion.div 
+    <motion.div
       animate={{ y: [0, 8, 0] }}
       transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
       className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
