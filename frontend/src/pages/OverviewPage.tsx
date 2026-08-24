@@ -39,7 +39,7 @@ function trendOf(series: number[]): number | undefined {
 }
 
 export default function OverviewPage() {
-  const { latestDecisions, reliability, cycleCount } = useVppData();
+  const { latestDecisions, reliability, cycleCount, connected } = useVppData();
   const m = useCampusMetrics();
   const stats = useApiStats();
 
@@ -103,7 +103,19 @@ export default function OverviewPage() {
             AI-powered orchestration of renewable generation, storage, grid demand and carbon.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 ops-chip ops-chip-green !py-[3px]" aria-label="System operational">
+            <span className="status-dot-green" aria-hidden="true" />
+            SYSTEM OPERATIONAL
+          </div>
+          <div
+            className={`flex items-center gap-1.5 ops-chip !py-[3px] ${connected ? 'ops-chip-cyan' : 'ops-chip-red'}`}
+            role="status"
+            aria-label={connected ? 'Live telemetry connected' : 'Telemetry offline'}
+          >
+            <span className={connected ? 'status-dot-cyan' : 'status-dot-red'} aria-hidden="true" />
+            {connected ? 'LIVE' : 'OFFLINE'}
+          </div>
           <span className="ops-chip num">CYCLE #{cycleCount}</span>
           <button
             type="button"

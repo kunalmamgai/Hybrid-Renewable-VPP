@@ -802,12 +802,14 @@ body {
   outline-offset: -2px;
 }
 
-/* ─── Horizontal navbar icon tabs ─── */
+/* ─── Horizontal navbar tabs (icon + label) ─── */
 .ops-tab {
   position: relative;
-  display: grid;
-  place-items: center;
-  width: 2.4rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  min-width: 2.4rem;
+  padding: 0 0.6rem;
   height: 2.4rem;
   border-radius: 0.6rem;
   color: rgba(243, 237, 228, 0.48);
