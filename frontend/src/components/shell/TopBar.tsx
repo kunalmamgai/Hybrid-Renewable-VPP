@@ -1,17 +1,20 @@
 /**
- * TopBar — global status strip: system health, live/simulation indicator,
- * site selector, clock, notifications, AI assistant and profile.
+ * TopBar — the single horizontal navigation bar.
+ * Brand · 12 icon-only section tabs (tooltips on hover/focus) · system
+ * status, live telemetry badge, site selector, clock, notifications,
+ * AI assistant and profile — all in one row.
+ * Phones use the bottom nav + drawer instead of the tab strip.
  */
 import { useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Menu, MapPin, Bell, Sparkles, ChevronDown, LogOut, Radio,
+  Menu, MapPin, Bell, Sparkles, ChevronDown, LogOut, Radio, WifiOff,
 } from 'lucide-react';
+import { SuryaMark } from '../common/SuryaMark';
 import { useAuth } from '../../context/AuthContext';
 import { useAlerts } from '../../context/AlertsContext';
 import { useVppData } from '../../context/VppDataContext';
-import { WifiOff } from 'lucide-react';
 import { CAMPUS_OPTIONS } from '../../data/campusCatalog';
 import { NAV_ITEMS } from './nav';
 
@@ -32,11 +35,25 @@ function useClock(): string {
   });
 }
 
+/** LIVE / OFFLINE telemetry badge driven by the WebSocket state. */
+function LiveBadge() {
+  const { connected } = useVppData();
+  return (
+    <div
+      className={`hidden sm:flex items-center gap-1.5 ops-chip !py-[3px] ${connected ? 'ops-chip-cyan' : 'ops-chip-red'}`}
+      role="status"
+      aria-label={connected ? 'Live telemetry connected' : 'Telemetry offline'}
+    >
+      {connected ? <Radio size={11} /> : <WifiOff size={11} />}
+      {connected ? 'LIVE' : 'OFFLINE'}
+    </div>
+  );
+}
+
 export function TopBar({ onOpenMobileNav, onOpenCopilot }: TopBarProps) {
   const { user, signOut } = useAuth();
-  const { activeCount } = useAlerts();
+  const { activeCount, counts } = useAlerts();
   const navigate = useNavigate();
-  const location = useLocation();
   const clock = useClock();
 
   const [siteOpen, setSiteOpen] = useState(false);
@@ -61,16 +78,12 @@ export function TopBar({ onOpenMobileNav, onOpenCopilot }: TopBarProps) {
     };
   }, []);
 
-  const current = NAV_ITEMS.find(n =>
-    n.end ? location.pathname === n.to : location.pathname.startsWith(n.to)
-  );
-  const pageTitle = current?.label ?? 'Overview';
-
   const initials = (user?.full_name || user?.email || '?')
     .split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  const alertBadge = counts.critical + counts.warning;
 
   return (
-    <header className="sticky top-0 z-20 h-14 shrink-0 flex items-center gap-2 sm:gap-3 px-3 sm:px-5 bg-ops-bg/85 backdrop-blur-xl border-b border-ops-line">
+    <header className="sticky top-0 z-20 h-[60px] shrink-0 flex items-center gap-2 px-2.5 sm:px-4 bg-ops-bg/90 backdrop-blur-xl border-b border-ops-line">
       {/* Mobile hamburger */}
       <button
         type="button"
@@ -81,21 +94,53 @@ export function TopBar({ onOpenMobileNav, onOpenCopilot }: TopBarProps) {
         <Menu size={18} />
       </button>
 
-      {/* Page title + system status */}
-      <div className="min-w-0 flex items-center gap-3">
-        <h1 className="hidden lg:block font-display text-[13px] font-bold tracking-wide text-white truncate">
-          {pageTitle}
-        </h1>
-        <div className="hidden sm:flex items-center gap-2 ops-chip ops-chip-green !py-[3px]">
-          <span className="status-dot-green" aria-hidden="true" />
-          SYSTEM OPERATIONAL
-        </div>
+      {/* Brand */}
+      <NavLink to="/app" className="flex items-center gap-2 mr-1 shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400/60 rounded-lg" aria-label="SURYA overview">
+        <SuryaMark size={30} className="shrink-0" />
+        <span className="hidden lg:inline font-display font-bold text-[14px] tracking-wide text-white">SURYA</span>
+      </NavLink>
+
+      {/* Section icon tabs — horizontal, scrollable if cramped */}
+      <nav
+        aria-label="Primary"
+        className="hidden md:flex items-center gap-1 min-w-0 overflow-x-auto no-scrollbar py-1"
+      >
+        {NAV_ITEMS.map((item, i) => {
+          const tipAlign =
+            i === 0 ? 'tip-start' : i === NAV_ITEMS.length - 1 ? 'tip-end' : '';
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) => `ops-tab group/tab ${isActive ? 'active' : ''}`}
+              aria-label={item.label}
+              title={item.label}
+            >
+              <item.icon size={17} />
+              <span role="tooltip" className={`ops-tab-tip ${tipAlign}`}>
+                {item.label}
+                {item.to === '/app/alerts' && alertBadge > 0 && (
+                  <span className="ml-1.5 inline-flex items-center justify-center min-w-[1rem] h-[1rem] px-1 rounded-full bg-red-500/25 border border-red-400/40 text-red-300 text-[9px] align-middle">
+                    {alertBadge}
+                  </span>
+                )}
+              </span>
+            </NavLink>
+          );
+        })}
+      </nav>
+
+      <div className="flex-1 min-w-2" />
+
+      {/* System status */}
+      <div className="hidden lg:flex items-center gap-2 ops-chip ops-chip-green !py-[3px]" aria-label="System operational">
+        <span className="status-dot-green" aria-hidden="true" />
+        SYSTEM OPERATIONAL
       </div>
 
       {/* Live indicator */}
       <LiveBadge />
-
-      <div className="flex-1" />
 
       {/* Site selector */}
       <div className="relative hidden md:block" ref={siteRef}>
@@ -107,7 +152,7 @@ export function TopBar({ onOpenMobileNav, onOpenCopilot }: TopBarProps) {
           className="ops-btn !py-[6px]"
         >
           <MapPin size={13} className="text-amber-300/80" />
-          VIT Bhopal
+          <span className="hidden xl:inline">VIT Bhopal</span>
           <ChevronDown size={13} className={`text-white/40 transition-transform ${siteOpen ? 'rotate-180' : ''}`} />
         </button>
         <AnimatePresence>
@@ -170,7 +215,7 @@ export function TopBar({ onOpenMobileNav, onOpenCopilot }: TopBarProps) {
           aria-haspopup="menu"
           aria-expanded={profileOpen}
           aria-label="User menu"
-          className="w-8 h-8 rounded-full grid place-items-center bg-gradient-to-br from-amber-600/40 to-emerald-500/40 border border-amber-300/30 text-[11px] font-bold text-white hover:border-amber-300/60 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400/60"
+          className="w-8 h-8 rounded-full grid place-items-center bg-gradient-to-br from-amber-500/40 to-emerald-500/40 border border-amber-300/30 text-[11px] font-bold text-white hover:border-amber-300/60 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400/60"
         >
           {initials}
         </button>
@@ -209,20 +254,5 @@ export function TopBar({ onOpenMobileNav, onOpenCopilot }: TopBarProps) {
         </AnimatePresence>
       </div>
     </header>
-  );
-}
-
-/** LIVE / OFFLINE telemetry badge driven by the WebSocket state. */
-function LiveBadge() {
-  const { connected } = useVppData();
-  return (
-    <div
-      className={`flex items-center gap-1.5 ops-chip !py-[3px] ${connected ? 'ops-chip-cyan' : 'ops-chip-red'}`}
-      role="status"
-      aria-label={connected ? 'Live telemetry connected' : 'Telemetry offline'}
-    >
-      {connected ? <Radio size={11} /> : <WifiOff size={11} />}
-      {connected ? 'LIVE' : 'OFFLINE'}
-    </div>
   );
 }
