@@ -321,7 +321,7 @@ export function LiveEnergyFlow() {
                 {selectedCampusInfo ? `${selectedCampusInfo.shortName} • Digital Twin` : `${CAMPUS_OPTIONS.length}-campus portfolio`}
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-md">Live Energy Flow</h1>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-md">Live Energy Flow</h2>
             <p className="text-sm text-white/50 mt-1.5 max-w-2xl">
               Explore the campus in 3D, inspect every energy asset, and switch to the network view for real-time dispatch routing.
             </p>
