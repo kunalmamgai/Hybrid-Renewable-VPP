@@ -96,9 +96,9 @@ export default function OverviewPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="tech-label mb-1.5">VPP COMMAND CENTER</div>
-          <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white leading-tight">
+          <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white leading-tight">
             HYBRID RENEWABLE VPP
-          </h2>
+          </h1>
           <p className="text-[12px] text-white/45 mt-1 max-w-xl">
             AI-powered orchestration of renewable generation, storage, grid demand and carbon.
           </p>

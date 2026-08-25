@@ -143,7 +143,7 @@ export default function RenewablesPage() {
       <div className="space-y-5">
         <div>
           <div className="tech-label mb-1.5">GENERATION ASSETS</div>
-          <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">Renewable Generation</h2>
+          <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">Renewable Generation</h1>
           <p className="text-[12px] text-white/45 mt-1 max-w-2xl">Live solar and wind output across the campus microgrid.</p>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -162,7 +162,7 @@ export default function RenewablesPage() {
     <div className="space-y-5">
       <div>
         <div className="tech-label mb-1.5">GENERATION ASSETS</div>
-        <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">Renewable Generation</h2>
+        <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">Renewable Generation</h1>
         <p className="text-[12px] text-white/45 mt-1 max-w-2xl">Live solar and wind output across the campus microgrid.</p>
       </div>
 

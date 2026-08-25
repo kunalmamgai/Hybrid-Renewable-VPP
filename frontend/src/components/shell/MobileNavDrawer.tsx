@@ -51,7 +51,7 @@ export function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
                 type="button"
                 aria-label="Close navigation"
                 onClick={onClose}
-                className="ml-auto p-1.5 rounded-md text-white/50 hover:text-white hover:bg-white/10"
+                className="ml-auto min-w-10 min-h-10 grid place-items-center rounded-md text-white/70 hover:text-white hover:bg-white/10"
               >
                 <X size={16} />
               </button>

@@ -214,7 +214,7 @@ export default function AlertsPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="tech-label mb-1.5">ALERT CENTER</div>
-          <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">Alerts</h2>
+          <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">Alerts</h1>
           <p className="text-[12px] text-white/45 mt-1 max-w-2xl">
             Live operational alerts derived from campus telemetry and your configured thresholds.
             Acknowledge to claim triage, snooze to defer, resolve to clear.

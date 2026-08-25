@@ -10,7 +10,7 @@ function errorMessage(error: unknown): string {
   if (error instanceof AxiosError) {
     const detail = (error.response?.data as { detail?: string } | undefined)?.detail;
     if (detail) return detail;
-    if (!error.response) return 'Unable to reach the server. Make sure the local API is running.';
+    if (!error.response) return 'The secure energy service is waking up or temporarily unavailable. Please try again in a moment.';
   }
   return 'Something went wrong. Please try again.';
 }
@@ -193,7 +193,7 @@ export function AuthPage({ mode }: { mode: 'login' | 'signup' }) {
             type="submit"
             className="w-full rounded-full bg-gradient-to-r from-amber-600 to-amber-400 px-5 py-3 text-sm font-bold text-white shadow-[0_10px_28px_rgba(217,119,6,0.28)] hover:brightness-110 disabled:cursor-wait disabled:opacity-60 transition-all"
           >
-            {submitting ? 'Please wait…' : isSignup ? 'Create account' : 'Sign in'}
+            {submitting ? 'Connecting securely…' : isSignup ? 'Create account' : 'Sign in'}
           </button>
         </form>
 

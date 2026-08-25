@@ -114,7 +114,7 @@ export default function BatteryPage() {
       <div className="space-y-5">
         <div>
           <div className="tech-label mb-1.5">STORAGE</div>
-          <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">Battery Intelligence</h2>
+          <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">Battery Intelligence</h1>
           <p className="text-[12px] text-white/45 mt-1 max-w-2xl">
             State of charge, power flow and pack health across the campus battery bank.
           </p>
@@ -133,7 +133,7 @@ export default function BatteryPage() {
       {/* ── Header ── */}
       <div>
         <div className="tech-label mb-1.5">STORAGE</div>
-        <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">Battery Intelligence</h2>
+        <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">Battery Intelligence</h1>
         <p className="text-[12px] text-white/45 mt-1 max-w-2xl">
           State of charge, power flow and pack health across the {(CAMPUS_BATTERY_CAPACITY_KWH / 1000).toFixed(1)} MWh campus battery bank.
         </p>

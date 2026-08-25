@@ -14,12 +14,37 @@ import type {
   ForceCycleResponse,
 } from '../types';
 
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+const API_REQUEST_TIMEOUT_MS = 30_000;
+const API_COLD_START_TIMEOUT_MS = 120_000;
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
-  timeout: 10000,
+  baseURL: API_BASE_URL,
+  timeout: API_REQUEST_TIMEOUT_MS,
 });
 
 export const AUTH_TOKEN_KEY = 'surya_access_token';
+export const AUTH_USER_KEY = 'surya_auth_user';
+export const AUTH_UNAUTHORIZED_EVENT = 'surya:unauthorized';
+
+let apiReadyPromise: Promise<void> | null = null;
+
+/** Wake a sleeping production API once, then share the readiness request. */
+export const prepareApi = (): Promise<void> => {
+  if (!apiReadyPromise) {
+    apiReadyPromise = api
+      .get('/health', {
+        timeout: API_COLD_START_TIMEOUT_MS,
+        validateStatus: (status) => status >= 200 && status < 500,
+      })
+      .then(() => undefined)
+      .catch((error: unknown) => {
+        apiReadyPromise = null;
+        throw error;
+      });
+  }
+  return apiReadyPromise;
+};
 
 api.interceptors.request.use((config) => {
   const token = window.localStorage.getItem(AUTH_TOKEN_KEY);
@@ -29,26 +54,19 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// On 401 from a protected endpoint, clear the stale token. Only redirect
-// to login when the user is inside the authenticated app area — public
-// pages (landing, auth) must never be hijacked by an expired token.
+// Keep navigation inside React. A direct hash mutation here caused protected
+// pages to flash blank and bounce between /login and /app when several API
+// requests completed at once.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
     const url: string = error?.config?.url || '';
-    const isAuthEndpoint = url.includes('/api/v1/auth/');
-    if (status === 401 && !isAuthEndpoint) {
+    const isCredentialEndpoint = /\/api\/v1\/auth\/(login|signup|google)$/.test(url);
+    if (status === 401 && !isCredentialEndpoint) {
       window.localStorage.removeItem(AUTH_TOKEN_KEY);
-      const hash = window.location.hash;
-      const inProtectedApp =
-        hash.startsWith('#/app') ||
-        hash.startsWith('#/dashboard') ||
-        hash.startsWith('#/energy-flow') ||
-        hash.startsWith('#/decisions');
-      if (inProtectedApp) {
-        window.location.hash = '#/login';
-      }
+      window.localStorage.removeItem(AUTH_USER_KEY);
+      window.dispatchEvent(new Event(AUTH_UNAUTHORIZED_EVENT));
     }
     return Promise.reject(error);
   }
@@ -73,6 +91,7 @@ export const signUp = async (payload: {
   email: string;
   password: string;
 }): Promise<AuthResponse> => {
+  await prepareApi();
   const response = await api.post<AuthResponse>('/api/v1/auth/signup', payload);
   return response.data;
 };
@@ -81,11 +100,13 @@ export const signIn = async (payload: {
   email: string;
   password: string;
 }): Promise<AuthResponse> => {
+  await prepareApi();
   const response = await api.post<AuthResponse>('/api/v1/auth/login', payload);
   return response.data;
 };
 
 export const signInWithGoogle = async (credential: string): Promise<AuthResponse> => {
+  await prepareApi();
   const response = await api.post<AuthResponse>('/api/v1/auth/google', { credential });
   return response.data;
 };

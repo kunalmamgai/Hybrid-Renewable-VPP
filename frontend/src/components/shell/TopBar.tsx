@@ -49,13 +49,13 @@ export function TopBar({ onOpenMobileNav, onOpenCopilot }: TopBarProps) {
   const alertBadge = counts.critical + counts.warning;
 
   return (
-    <header className="sticky top-0 z-20 h-[60px] shrink-0 flex items-center gap-2 px-2.5 sm:px-4 bg-ops-bg/90 backdrop-blur-xl border-b border-ops-line">
+    <header className="sticky top-0 z-20 h-16 shrink-0 flex items-center gap-2 px-2.5 sm:px-4 bg-ops-bg/95 backdrop-blur-xl border-b border-ops-line">
       {/* Mobile hamburger */}
       <button
         type="button"
         aria-label="Open navigation"
         onClick={onOpenMobileNav}
-        className="md:hidden p-2 rounded-md text-white/60 hover:text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400/60"
+        className="md:hidden min-w-10 min-h-10 grid place-items-center rounded-md text-white/75 hover:text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400/60"
       >
         <Menu size={18} />
       </button>
@@ -108,7 +108,7 @@ export function TopBar({ onOpenMobileNav, onOpenCopilot }: TopBarProps) {
         type="button"
         onClick={() => navigate('/app/alerts')}
         aria-label={`Notifications — ${activeCount} active`}
-        className="relative p-2 rounded-md text-white/60 hover:text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400/60"
+        className="relative min-w-10 min-h-10 grid place-items-center rounded-md text-white/75 hover:text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400/60"
       >
         <Bell size={17} />
         {activeCount > 0 && (
@@ -119,7 +119,7 @@ export function TopBar({ onOpenMobileNav, onOpenCopilot }: TopBarProps) {
       </button>
 
       {/* Ask Energy AI */}
-      <button type="button" onClick={onOpenCopilot} className="ops-btn ops-btn-primary !py-[6px]">
+      <button type="button" onClick={onOpenCopilot} className="ops-btn ops-btn-primary min-h-10 !py-[6px]">
         <Sparkles size={13} />
         <span className="hidden sm:inline">Ask Energy AI</span>
       </button>
@@ -132,7 +132,7 @@ export function TopBar({ onOpenMobileNav, onOpenCopilot }: TopBarProps) {
           aria-haspopup="menu"
           aria-expanded={profileOpen}
           aria-label="User menu"
-          className="w-8 h-8 rounded-full grid place-items-center bg-gradient-to-br from-amber-500/40 to-emerald-500/40 border border-amber-300/30 text-[11px] font-bold text-white hover:border-amber-300/60 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400/60"
+          className="w-10 h-10 rounded-full grid place-items-center bg-gradient-to-br from-amber-500/40 to-emerald-500/40 border border-amber-300/30 text-[11px] font-bold text-white hover:border-amber-300/60 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400/60"
         >
           {initials}
         </button>

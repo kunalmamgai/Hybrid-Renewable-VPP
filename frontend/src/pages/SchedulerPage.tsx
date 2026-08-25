@@ -224,7 +224,7 @@ export default function SchedulerPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="tech-label mb-1.5">OPTIMIZATION</div>
-          <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">AI Scheduler</h2>
+          <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">AI Scheduler</h1>
           <p className="text-[12px] text-white/45 mt-1 max-w-2xl">
             A 24-hour operating plan derived live from the forecast engine, decision log and reliability constraints.
           </p>

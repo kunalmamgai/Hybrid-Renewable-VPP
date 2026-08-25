@@ -69,24 +69,6 @@ export function CopilotDock({ open, onOpenChange }: CopilotDockProps) {
 
   return (
     <>
-      {/* Floating launcher */}
-      <AnimatePresence>
-        {!open && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.85, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.85, y: 8 }}
-            type="button"
-            onClick={() => onOpenChange(true)}
-            aria-label="Ask Energy AI"
-            className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-40 flex items-center gap-2 pl-3.5 pr-4 py-2.5 rounded-full bg-gradient-to-r from-amber-600 to-orange-600 text-[#241a02] font-bold text-[12px] shadow-ops-cyan-glow hover:brightness-110 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-200"
-          >
-            <Sparkles size={15} />
-            Ask Energy AI
-          </motion.button>
-        )}
-      </AnimatePresence>
-
       {/* Panel */}
       <AnimatePresence>
         {open && (
