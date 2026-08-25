@@ -167,6 +167,7 @@ export function Hero() {
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-16 pb-4 md:px-12 md:py-8 text-center -mt-4 md:-mt-8">
           {/* Headline — 3 lines, bold, white, large */}
           <h1
+            aria-label="Charged before the clouds rolled in"
             className="text-white font-extrabold leading-[1.08] tracking-tight drop-shadow-xl"
             style={{
               fontSize: 'clamp(2.75rem, 5.5vw, 4.5rem)',
