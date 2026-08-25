@@ -1,6 +1,8 @@
 fastapi>=0.115.0
 uvicorn[standard]>=0.30.0
 sqlalchemy>=2.0.0
+asyncpg>=0.29.0
+alembic>=1.13.0
 pydantic>=2.9.0
 pydantic-settings>=2.4.0
 aiosqlite>=0.20.0
@@ -8,7 +10,7 @@ reportlab>=4.2.0
 PyJWT>=2.10.0
 pwdlib[argon2]>=0.3.0
 google-auth>=2.38.0
-requests>=2.32.0
+requests>=2.32.0  # required by google.auth.transport.requests (Google sign-in)
 email-validator>=2.2.0
 
 # Development

@@ -186,9 +186,9 @@ export function LiveEnergyFlow() {
   const activeBuildings = buildings.length > 0 ? buildings : DEMO_BUILDINGS;
   const demoMode = (import.meta.env.PROD && !import.meta.env.VITE_WS_URL) || buildings.length === 0;
   const selectedCampusInfo = CAMPUS_OPTIONS.find((campus) => campus.id === selectedCampus);
-  const simulatorBaseUrl = import.meta.env.DEV
-    ? 'http://localhost:5174/'
-    : `${import.meta.env.BASE_URL}simulator/index.html`;
+  // The twin is bundled into public/simulator (built via `npm run build:twin`)
+  // so it is served identically by the dev server and production.
+  const simulatorBaseUrl = `${import.meta.env.BASE_URL}simulator/index.html`;
   const simulatorUrl = `${simulatorBaseUrl}?embed=1${selectedCampus === 'all' ? '' : `#${selectedCampus}`}`;
 
   useEffect(() => {

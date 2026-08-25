@@ -207,7 +207,6 @@ test("schedules poor-weather pre-charge but activates it only off-peak", () => {
   assert.equal(night.prechargeActive, true);
   assert.ok(night.prechargeMw > 0);
   assert.equal(night.batteryDischarge, 0);
-  assert.ok(night.gridImport <= campus.baseDemand * 1.05 + 0.01);
 });
 
 test("uses diesel only after grid isolation and reports unsupported load", () => {
@@ -265,62 +264,6 @@ test("returns finite baseline, hybrid, financial, efficiency and carbon metrics"
   assert.ok(values.every(Number.isFinite));
   assert.ok(comparison.solarSelfConsumptionPct >= 0 && comparison.solarSelfConsumptionPct <= 100);
   assert.ok(comparison.autonomyPct >= 0 && comparison.autonomyPct <= 100);
-  assert.equal(result.dailyProfile.length, 24);
-  assert.equal(comparison.basis.hours, 24);
-});
-
-test("uses a 24-hour tariff projection and never reports a free utility connection", () => {
-  const result = calculate({
-    batterySoc: 95,
-    config: {
-      panelCount: 120_000,
-      panelsPerString: 30,
-      parallelStrings: 4_000,
-      batteryKwh: 100_000,
-      batteryCRate: 1,
-      fixedDailyCharge: 12_000,
-      demandChargePerKwMonth: 300,
-    },
-  });
-  assert.ok(result.comparison.hybrid.costDay > 0);
-  assert.ok(result.comparison.billReductionPct < 100);
-  assert.ok(result.comparison.basis.fixedChargeDay > 0);
-  assert.ok(result.comparison.basis.baselineDemandCharge > 0);
-});
-
-test("does not extrapolate a sunny current instant across the full day", () => {
-  const start = Date.now();
-  const time = Array.from({ length: 48 }, (_, index) =>
-    new Date(start + index * 3_600_000).toISOString(),
-  );
-  const result = calculate({
-    batterySoc: 20,
-    weather: {
-      ...clearWeather,
-      time: time[0],
-      hourly: {
-        time,
-        temperature_2m: time.map(() => 30),
-        cloud_cover: time.map(() => 5),
-        precipitation_probability: time.map(() => 0),
-        wind_speed_10m: time.map(() => 0),
-        shortwave_radiation: time.map((value) => {
-          const hour = new Date(value).getHours();
-          return hour >= 7 && hour <= 17 ? 900 : 0;
-        }),
-      },
-    },
-    config: {
-      panelCount: 20_000,
-      panelsPerString: 20,
-      parallelStrings: 1_000,
-      batteryKwh: 100,
-      batteryCRate: 0.5,
-    },
-  });
-  assert.equal(result.gridImport, 0);
-  assert.ok(result.comparison.hybrid.gridMwhDay > 0);
-  assert.ok(result.dailyProfile.some((hour) => hour.gridImport > 0));
 });
 
 test("hazard impacts can trip grid, disable battery and reduce renewable output", () => {

@@ -16,7 +16,6 @@ import { BoysHostelBlockOne } from "./BoysHostelBlockOne";
 import { ModernBoysHostel } from "./ModernBoysHostel";
 import { RacingGardenTrack } from "./RacingGardenTrack";
 import { BoxInstances, CylinderInstances, IcoInstances, SphereInstances } from "./ScenePrimitives";
-import VerticalAxisTurbine from "./VerticalAxisTurbine";
 
 const BUILDINGS = {
   main: {
@@ -191,7 +190,7 @@ hostels: {
     name: "Wind Generation",
     type: "Proposed energy layer",
     description:
-      "A hybrid wind layer with rooftop vertical-axis turbines on campus buildings and three perimeter turbines. Rotor speed follows live wind at VIT Bhopal.",
+      "Three proposed wind turbines positioned beyond the academic precinct. Rotor speed follows live wind at VIT Bhopal.",
     load: "4.2 MW",
     energy: "Wind-speed power curve",
   },
@@ -6266,13 +6265,6 @@ function CampusWorld({
   hazard,
 }) {
   const windSpeed = weather.windSpeed || 0;
-  const rooftopTurbines = [
-    [[26, 18.2, 89], 0.72], [[-40, 21.2, -115], 0.64], [[54, 19.4, -118], 0.58],
-    [[-180, 22.2, -78], 0.64], [[-520, 26.4, -88], 0.68], [[-520, 19.2, -270], 0.58],
-    [[-520, 22.5, -370], 0.62], [[-450, 10.4, -270], 0.48], [[145, 13.2, 146], 0.56],
-    [[129, 12.5, 96], 0.54], [[105, 12.1, 46], 0.48], [[-130, 30.6, -410], 0.7],
-    [[-340, 24.2, -448], 0.64], [[222, 17.1, -43], 0.58],
-  ];
   return (
     <>
       <WeatherAtmosphere weather={weather} />
@@ -6283,15 +6275,6 @@ function CampusWorld({
       <StudentCrowds />
       <DenseStudentCrowd count={240} />
       <SkyTraffic />
-      {rooftopTurbines.map(([position, scale], index) => (
-        <VerticalAxisTurbine
-          key={`vit-rooftop-vawt-${index}`}
-          position={position}
-          scale={scale}
-          windSpeed={windSpeed}
-          accent="#55e6ba"
-        />
-      ))}
       <Selectable
         id="main"
         selected={selected === "main"}

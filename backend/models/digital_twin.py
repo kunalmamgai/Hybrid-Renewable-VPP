@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 from sqlalchemy import Column, DateTime, Float, ForeignKey, String, func
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+from backend.models.base import Base
 
 
 class BuildingTwin(Base):

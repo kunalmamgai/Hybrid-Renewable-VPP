@@ -44,7 +44,7 @@ export function AuthorityStrip() {
       <div className="relative max-w-6xl mx-auto">
         {/* Header */}
         <RevealSection className="text-center mb-10">
-          <span className="text-[10px] font-bold text-vpp-accent-gold uppercase tracking-[0.25em]">
+          <span className="tech-label tech-label-cyan !text-[10px] tracking-[0.25em]">
             Trusted Technology
           </span>
           <h2 className="text-3xl md:text-5xl font-extrabold text-white mt-4 tracking-tight leading-tight">
@@ -57,7 +57,7 @@ export function AuthorityStrip() {
           <div className="flex flex-wrap items-center justify-center gap-x-9 gap-y-5">
             {authorityItems.map((item, i) => (
               <div key={i} className="flex items-center gap-2.5 text-white/60 hover:text-amber-200 transition-colors duration-300">
-                <span className="text-vpp-accent-gold/80">{item.icon}</span>
+                <span className="text-amber-300/80">{item.icon}</span>
                 <span className="text-xs font-semibold text-white/85 whitespace-nowrap">{item.label}</span>
                 <span className="hidden xl:block text-[10px] text-white/35 font-light">{item.sub}</span>
               </div>
@@ -70,7 +70,7 @@ export function AuthorityStrip() {
           <div className="vpp-sheet grid grid-cols-2 md:grid-cols-6 gap-px overflow-hidden">
             {stats.map((stat) => (
               <div key={stat.label} className="bg-[#0f1613]/80 p-6 text-center group">
-                <div className="flex items-center justify-center mb-3 text-white/20 group-hover:text-vpp-accent-gold transition-colors duration-300">
+                <div className="flex items-center justify-center mb-3 text-white/20 group-hover:text-amber-300 transition-colors duration-300">
                   {stat.icon}
                 </div>
                 <div className="text-xl md:text-2xl font-extrabold text-white tracking-tight">{stat.value}</div>
@@ -85,13 +85,13 @@ export function AuthorityStrip() {
         {/* Bottom quote / testimonial */}
         <RevealSection delay={0.3} className="mt-16 text-center">
           <div className="max-w-3xl mx-auto relative">
-            <div className="text-6xl text-vpp-accent-gold/10 absolute -top-10 -left-4 font-serif italic">"</div>
+            <div className="text-6xl text-amber-300/10 absolute -top-10 -left-4 font-serif italic">"</div>
             <p className="text-white/60 text-lg md:text-xl italic leading-relaxed font-light">
               The system predicted a 3-hour solar deficit and pre-charged our battery to 92% before
               the clouds rolled in. Not a single critical load was affected — and we saved INR 2,400
               that afternoon alone.
             </p>
-            <p className="text-vpp-accent-gold/60 text-[11px] mt-6 font-bold uppercase tracking-[0.3em]">
+            <p className="text-amber-300/60 text-[11px] mt-6 font-bold uppercase tracking-[0.3em]">
               — Campus Energy Manager, Rajasthan DTE
             </p>
           </div>

@@ -3,10 +3,12 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class DecisionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     decision_id: str
     timestamp: datetime
     decision_type: str

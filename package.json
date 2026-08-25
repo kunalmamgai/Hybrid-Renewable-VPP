@@ -13,7 +13,7 @@
     "install:all": "npm install && npm --prefix frontend install && npm --prefix simulator install",
     "build": "npm run build:web && npm run build:twin",
     "build:web": "npm --prefix frontend run build",
-    "build:twin": "npm --prefix simulator run build -- --outDir ../frontend/dist/simulator --emptyOutDir false",
+    "build:twin": "npm --prefix simulator run build -- --outDir ../frontend/public/simulator --emptyOutDir false",
     "check": "npm run test:simulator && npm run build",
     "test:simulator": "npm --prefix simulator test",
     "test": "pytest backend/tests/ -v",

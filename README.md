@@ -1,57 +1,127 @@
-# SURYA Hybrid Renewable VPP
+# SURYA — Hybrid Renewable Virtual Power Plant
 
-SURYA is a hybrid renewable virtual power plant platform with a live VIT Bhopal campus digital twin. The **Live Demo → Live Energy Flow** workspace includes:
+**S**mart **U**nified **R**enewable **Y**ield **A**utomation — orchestrating solar, wind,
+battery, and grid as one dispatchable entity for multi-building campuses.
 
-- an interactive 3D campus simulator with live weather, buildings, roads, people and vehicles;
-- live simulator telemetry surfaced in the SURYA dashboard;
-- a switchable solar/wind/battery/building/grid network view;
-- a FastAPI VPP backend for dispatch, forecasting and decision history;
-- a self-contained demonstration mode for static public hosting.
+SURYA runs a continuous decision loop that reads sensor data, updates a digital twin of
+every building, and optimizes dispatch (solar + wind + battery + grid) against weighted
+cost and carbon objectives — with an immutable audit trail of every automated decision.
 
-## Run locally
+## Features
 
-Requirements: Node.js 22+, Python 3.11+ and the Python packages in `requirements.txt`.
+- **Hybrid orchestration** — solar PV, wind turbines, battery storage, and grid as one VPP
+- **AI decision loop** — 8-module optimizer (forecast → reliability guard → dispatch ×
+  battery × VNM × load-shift), scored by configurable cost/carbon weights
+- **Digital twin** — live per-building state persisted to the database
+- **VNM/GNM optimizer** — RERC Third Amendment Regulations (2025) net-metering credits.
+- **Statutory export** — CSV/PDF cost & carbon savings reports
+- **Realtime dashboard** — React + WebSocket push updates
+- **3D campus twins** — standalone three.js visualization (`simulator/`)
+- **Auth** — JWT (email/password + Google sign-in), Argon2 password hashing
+
+## Project Structure
+
+```
+backend/            FastAPI backend (Python)
+  api/              REST route modules (auth, decisions, export, health, settings)
+  adapters/         Hardware abstraction (simulated adapter + site config)
+  models/           SQLAlchemy ORM models + Pydantic schemas
+  services/         Decision manager, scheduler, optimizer modules
+  simulator/        Physics curves (solar, wind, battery, demand)
+  ws/               WebSocket connection manager
+frontend/           React 18 + TypeScript + Vite dashboard ("SURYA")
+simulator/          Standalone React 19 + three.js 3D campus digital-twin site
+docs/               Architecture documentation
+```
+
+## Quickstart
+
+### Backend
+
+```bash
+pip install -r requirements.txt
+copy .env.example .env   # then set JWT_SECRET_KEY (see .env.example)
+
+# API server on http://localhost:8000 (docs at /docs)
+uvicorn backend.main:app --reload
+```
+
+Sign up at `/signup` in the frontend, or `POST /api/v1/auth/signup` — all `/api/v1`
+routes require a Bearer token.
+
+**Database:** SQLite (default) auto-creates its schema for development. For
+PostgreSQL, set `DATABASE_URL=postgresql+asyncpg://user:pass@host/db` and run
+`alembic upgrade head` before starting the server — the server refuses to boot in
+production against an unmigrated database. After changing any model, generate and
+apply a migration:
+
+```bash
+alembic revision --autogenerate -m "describe change"
+alembic upgrade head
+```
+
+### Frontend
 
 ```bash
 npm run install:all
-pip install -r requirements.txt
-npm run dev
+npm run dev            # API + web dashboard + 3D twin concurrently
 ```
 
-Open `http://localhost:5173/#/energy-flow`. The command starts the API, website and campus twin together. The simulator runs internally on port `5174`.
+Web dashboard: http://localhost:5173 · 3D twin: http://localhost:5174
 
-## Authentication
-
-Email/password sign-up works locally after the normal setup above. Passwords are stored as Argon2 hashes, and the API issues signed, expiring access tokens.
-
-To enable **Continue with Google**:
-
-1. In [Google Auth Platform](https://console.cloud.google.com/auth/clients), create an OAuth 2.0 client of type **Web application**.
-2. Add `http://localhost:5173` under **Authorized JavaScript origins**.
-3. Copy the Web client ID into both values in the root `.env` file:
-
-```env
-GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-```
-
-4. Restart `npm run dev` after changing `.env`.
-
-The frontend receives a Google ID credential and sends it to the backend, which verifies its signature, audience, issuer and expiry before signing the user into SURYA. No Google client secret is required for this sign-in flow.
-
-## Verify the project
+## Deployment (Docker)
 
 ```bash
-npm run check
-npm test
+# 1. Set a strong secret in your shell or root .env:
+JWT_SECRET_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
+
+# 2. Bring up Postgres + backend + frontend
+docker compose up --build
 ```
 
-`npm run check` tests the simulator and creates one production site in `frontend/dist`, including the complete simulator at `frontend/dist/simulator`.
+- Backend: http://localhost:8000 (`/health` for healthchecks) — schema migrations
+  run automatically at container start via `alembic upgrade head`
+- Frontend: http://localhost:8080 (nginx, SPA fallback)
+- The frontend build bakes `VITE_API_URL` / `VITE_WS_URL` at image build time —
+  set them to your public backend origin when deploying beyond localhost.
 
-## Public GitHub Pages deployment
+CI: `.github/workflows/backend-ci.yml` runs ruff + pytest on every push/PR.
 
-1. Create a **public** GitHub repository and push this project to `main` or `master`.
-2. In **Settings → Pages**, choose **GitHub Actions** as the source once.
-3. The included workflow tests, builds and deploys the website and simulator together.
+## Simulation & Operations
 
-No frontend API key is required. Static hosting automatically uses the built-in demonstration data; configure `VITE_WS_URL` when deploying the FastAPI/WebSocket backend separately for fully live VPP decisions.
+```bash
+# Fast-forward a full 24h day through the physics simulator
+python -m backend.simulator.run_simulation --duration 24h --interval 5
+
+# Run the decision scheduler standalone (without the HTTP API)
+python -m backend.services.scheduler --mode continuous
+
+# Tests & lint
+npm run test            # pytest (backend/tests/)
+npm run lint            # ruff
+```
+
+## Configuration
+
+All configuration is environment-driven — see `.env.example` for the full list with
+defaults. Key variables:
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `ENVIRONMENT` | `development` | `production` enforces a strong `JWT_SECRET_KEY` at startup |
+| `CORS_ORIGINS` | *(empty)* | Comma-separated origin allowlist (required in production) |
+| `JWT_SECRET_KEY` | *(insecure default)* | Token signing key — generate via `secrets.token_hex(32)` |
+| `DATABASE_URL` | SQLite | SQLAlchemy async connection string |
+| `SIMULATOR_TIME_SCALE` | `60.0` | Simulated minutes per real second |
+| `COST_WEIGHT` / `CARBON_WEIGHT` | `0.7` / `0.3` | Optimizer objective weights |
+
+## Security Notes
+
+- All `/api/v1/*` endpoints require authentication; WebSocket `/ws` requires a valid
+  token (`?token=<JWT>`).
+- Auth endpoints are rate-limited per client IP.
+- In production (`ENVIRONMENT=production`) the server refuses to boot without a strong
+  JWT secret.
+- Set `CORS_ORIGINS` to your deployed frontend origin(s) when deploying.
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for system design detail.

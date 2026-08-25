@@ -1,17 +1,19 @@
 """FastAPI application entry point."""
 import logging
-import sys
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select
 
-from backend.adapters.simulated import (
-    SimulatedAdapter,
-    SimulatedBuilding,
-    SimulatedConfig,
+from backend.adapters.simulated import SimulatedAdapter, SimulatedConfig
+from backend.adapters.site_config import default_buildings
+from backend.api.middleware import (
+    RequestContextMiddleware,
+    configure_logging,
+    unhandled_exception_handler,
 )
+from backend.api.routes_auth import decode_access_token
 from backend.api.routes_auth import router as auth_router
 from backend.api.routes_decisions import router as decisions_router
 from backend.api.routes_export import router as export_router
@@ -23,66 +25,12 @@ from backend.services.decision_manager import DecisionManager
 from backend.services.scheduler import SchedulerService
 from backend.ws.websocket_manager import ConnectionManager
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    stream=sys.stdout,
-)
+configure_logging()
 logger = logging.getLogger(__name__)
 
 manager = ConnectionManager()
 scheduler: SchedulerService | None = None
 adapter: SimulatedAdapter | None = None
-
-
-def _create_default_buildings() -> list[SimulatedBuilding]:
-    """Standard campus configuration matching the PS requirements."""
-    return [
-        SimulatedBuilding(
-            building_id="academic_block",
-            name="Academic Block A",
-            criticality_tier="critical",
-            solar_capacity_kw=150.0,
-            wind_capacity_kw=60.0,
-            battery_capacity_kwh=300.0,
-            battery_soc_initial_pct=50.0,
-            tariff_inr_per_unit=9.0,
-            vnm_sharing_ratio=0.3,
-        ),
-        SimulatedBuilding(
-            building_id="hostel_block",
-            name="Girls Hostel",
-            criticality_tier="critical",
-            solar_capacity_kw=80.0,
-            wind_capacity_kw=30.0,
-            battery_capacity_kwh=150.0,
-            battery_soc_initial_pct=60.0,
-            tariff_inr_per_unit=9.0,
-            vnm_sharing_ratio=0.4,
-        ),
-        SimulatedBuilding(
-            building_id="admin_block",
-            name="Admin Block",
-            criticality_tier="non_critical",
-            solar_capacity_kw=40.0,
-            wind_capacity_kw=20.0,
-            battery_capacity_kwh=100.0,
-            battery_soc_initial_pct=40.0,
-            tariff_inr_per_unit=9.0,
-            vnm_sharing_ratio=0.2,
-        ),
-        SimulatedBuilding(
-            building_id="lab_block",
-            name="Science Lab Complex",
-            criticality_tier="critical",
-            solar_capacity_kw=60.0,
-            wind_capacity_kw=25.0,
-            battery_capacity_kwh=150.0,
-            battery_soc_initial_pct=45.0,
-            tariff_inr_per_unit=9.0,
-            vnm_sharing_ratio=0.15,
-        ),
-    ]
 
 
 async def _seed_default_config():
@@ -137,6 +85,14 @@ async def _seed_building_config():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Fail fast on insecure configuration in production
+    if settings.is_production and settings.jwt_secret_is_insecure:
+        raise RuntimeError(
+            "Refusing to start: JWT_SECRET_KEY must be set to a strong random "
+            "value (>= 32 characters) when ENVIRONMENT=production. Generate one with: "
+            'python -c "import secrets; print(secrets.token_hex(32))"'
+        )
+
     # Initialize database
     await init_db()
 
@@ -149,7 +105,7 @@ async def lifespan(app: FastAPI):
         interval_seconds=300.0,
         scenario=settings.simulator_default_scenario,
     )
-    adapter = SimulatedAdapter(config=config, buildings=_create_default_buildings())
+    adapter = SimulatedAdapter(config=config, buildings=default_buildings())
     app.state.adapter = adapter
 
     # Initialize scheduler with full DecisionManager (Phase 1)
@@ -182,13 +138,20 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+_allowed_origins = settings.cors_origin_list
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=_allowed_origins or ["*"],
+    # Browsers reject credentials with wildcard origins; only send the
+    # credential flag when an explicit allowlist is configured.
+    allow_credentials=bool(_allowed_origins),
+    allow_methods=["GET", "POST", "PUT", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
 )
+# Request correlation IDs + access logging (outermost)
+app.add_middleware(RequestContextMiddleware)
+# Safe generic 500s with request_id instead of leaking tracebacks
+app.add_exception_handler(Exception, unhandled_exception_handler)
 
 app.include_router(health_router)
 app.include_router(decisions_router)
@@ -201,7 +164,13 @@ from fastapi import WebSocket
 
 
 @app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
+async def websocket_endpoint(websocket: WebSocket, token: str = ""):
+    # Reject unauthenticated connections (token supplied as ?token=<JWT>)
+    if decode_access_token(token) is None:
+        await websocket.accept()
+        await websocket.close(code=4401)
+        logger.warning("Rejected WebSocket connection: invalid or missing token")
+        return
     await manager.connect(websocket)
     try:
         while True:

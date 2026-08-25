@@ -14,38 +14,10 @@ import type {
   ForceCycleResponse,
 } from '../types';
 
-const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
-const API_REQUEST_TIMEOUT_MS = 30_000;
-const API_COLD_START_TIMEOUT_MS = 120_000;
-
 const api = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: API_REQUEST_TIMEOUT_MS,
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  timeout: 10000,
 });
-
-let apiReadyPromise: Promise<void> | null = null;
-
-/**
- * Wake the API before sending an authentication request. Render free services can
- * take 50 seconds or more to resume, so a shared readiness request prevents every
- * sign-in attempt from failing at the old 10-second client timeout.
- */
-export const prepareApi = (): Promise<void> => {
-  if (!apiReadyPromise) {
-    apiReadyPromise = api
-      .get('/health', {
-        timeout: API_COLD_START_TIMEOUT_MS,
-        validateStatus: (status) => status >= 200 && status < 500,
-      })
-      .then(() => undefined)
-      .catch((error: unknown) => {
-        apiReadyPromise = null;
-        throw error;
-      });
-  }
-
-  return apiReadyPromise;
-};
 
 export const AUTH_TOKEN_KEY = 'surya_access_token';
 
@@ -56,6 +28,31 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// On 401 from a protected endpoint, clear the stale token. Only redirect
+// to login when the user is inside the authenticated app area — public
+// pages (landing, auth) must never be hijacked by an expired token.
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    const url: string = error?.config?.url || '';
+    const isAuthEndpoint = url.includes('/api/v1/auth/');
+    if (status === 401 && !isAuthEndpoint) {
+      window.localStorage.removeItem(AUTH_TOKEN_KEY);
+      const hash = window.location.hash;
+      const inProtectedApp =
+        hash.startsWith('#/app') ||
+        hash.startsWith('#/dashboard') ||
+        hash.startsWith('#/energy-flow') ||
+        hash.startsWith('#/decisions');
+      if (inProtectedApp) {
+        window.location.hash = '#/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export type AuthUser = {
   id: string;
@@ -76,7 +73,6 @@ export const signUp = async (payload: {
   email: string;
   password: string;
 }): Promise<AuthResponse> => {
-  await prepareApi();
   const response = await api.post<AuthResponse>('/api/v1/auth/signup', payload);
   return response.data;
 };
@@ -85,13 +81,11 @@ export const signIn = async (payload: {
   email: string;
   password: string;
 }): Promise<AuthResponse> => {
-  await prepareApi();
   const response = await api.post<AuthResponse>('/api/v1/auth/login', payload);
   return response.data;
 };
 
 export const signInWithGoogle = async (credential: string): Promise<AuthResponse> => {
-  await prepareApi();
   const response = await api.post<AuthResponse>('/api/v1/auth/google', { credential });
   return response.data;
 };
@@ -128,12 +122,27 @@ export const getExportStats = async (): Promise<ExportStats> => {
   return resp.data;
 };
 
-export const downloadCSV = (): void => {
-  window.open(`${API_BASE_URL}/api/v1/export/csv`, '_blank');
+const triggerBlobDownload = (blob: Blob, filename: string): void => {
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
 };
 
-export const downloadPDF = (): void => {
-  window.open(`${API_BASE_URL}/api/v1/export/pdf`, '_blank');
+// Downloads go through axios (not window.open) so the Authorization
+// header is sent — the export endpoints require authentication.
+export const downloadCSV = async (): Promise<void> => {
+  const resp = await api.get<Blob>('/api/v1/export/csv', { responseType: 'blob' });
+  triggerBlobDownload(resp.data, 'statutory_export.csv');
+};
+
+export const downloadPDF = async (): Promise<void> => {
+  const resp = await api.get<Blob>('/api/v1/export/pdf', { responseType: 'blob' });
+  triggerBlobDownload(resp.data, 'statutory_report.pdf');
 };
 
 // ============================================================

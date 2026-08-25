@@ -11,67 +11,14 @@ import argparse
 import asyncio
 import logging
 
-from backend.adapters.simulated import (
-    SimulatedAdapter,
-    SimulatedBuilding,
-    SimulatedConfig,
-)
+from backend.adapters.simulated import SCENARIOS, SimulatedAdapter, SimulatedConfig
+from backend.adapters.site_config import default_buildings
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 logger = logging.getLogger(__name__)
-
-
-def default_buildings() -> list[SimulatedBuilding]:
-    """Standard campus configuration: 4 representative buildings."""
-    return [
-        SimulatedBuilding(
-            building_id="academic_block",
-            name="Academic Block A",
-            criticality_tier="critical",
-            solar_capacity_kw=150.0,
-            wind_capacity_kw=60.0,
-            battery_capacity_kwh=300.0,
-            battery_soc_initial_pct=50.0,
-            tariff_inr_per_unit=9.0,
-            vnm_sharing_ratio=0.3,
-        ),
-        SimulatedBuilding(
-            building_id="hostel_block",
-            name="Girls Hostel",
-            criticality_tier="critical",
-            solar_capacity_kw=80.0,
-            wind_capacity_kw=30.0,
-            battery_capacity_kwh=150.0,
-            battery_soc_initial_pct=60.0,
-            tariff_inr_per_unit=9.0,
-            vnm_sharing_ratio=0.4,
-        ),
-        SimulatedBuilding(
-            building_id="admin_block",
-            name="Admin Block",
-            criticality_tier="non_critical",
-            solar_capacity_kw=40.0,
-            wind_capacity_kw=20.0,
-            battery_capacity_kwh=100.0,
-            battery_soc_initial_pct=40.0,
-            tariff_inr_per_unit=9.0,
-            vnm_sharing_ratio=0.2,
-        ),
-        SimulatedBuilding(
-            building_id="lab_block",
-            name="Science Lab Complex",
-            criticality_tier="critical",
-            solar_capacity_kw=60.0,
-            wind_capacity_kw=25.0,
-            battery_capacity_kwh=150.0,
-            battery_soc_initial_pct=45.0,
-            tariff_inr_per_unit=9.0,
-            vnm_sharing_ratio=0.15,
-        ),
-    ]
 
 
 async def run_simulation(duration_hours: int = 24, interval_minutes: int = 5, scenario: str = "mvp_day"):
@@ -154,7 +101,7 @@ def main():
     parser.add_argument("--duration", type=str, default="24h", help="Duration (e.g., 24h, 1h, 0.5h)")
     parser.add_argument("--interval", type=int, default=5, help="Interval in minutes")
     parser.add_argument("--scenario", type=str, default="mvp_day",
-                        choices=["mvp_day", "cloudy_still_afternoon", "wind_fills_solar_gap", "shortfall_protects_hostel"])
+                        choices=list(SCENARIOS.keys()))
     args = parser.parse_args()
 
     # Parse duration

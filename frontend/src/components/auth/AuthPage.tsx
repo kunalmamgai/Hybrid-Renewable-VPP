@@ -10,7 +10,7 @@ function errorMessage(error: unknown): string {
   if (error instanceof AxiosError) {
     const detail = (error.response?.data as { detail?: string } | undefined)?.detail;
     if (detail) return detail;
-    if (!error.response) return 'Unable to reach the authentication server. Please try again in a moment.';
+    if (!error.response) return 'Unable to reach the server. Make sure the local API is running.';
   }
   return 'Something went wrong. Please try again.';
 }
@@ -70,7 +70,7 @@ export function AuthPage({ mode }: { mode: 'login' | 'signup' }) {
   if (user) return <Navigate to={destination} replace />;
 
   return (
-    <main className="min-h-screen relative overflow-hidden bg-[#080d0b] flex items-center justify-center px-4 py-10">
+    <main className="min-h-screen relative overflow-hidden bg-[#0e0c09] flex items-center justify-center px-4 py-10">
       <div
         className="absolute inset-0 bg-cover bg-center opacity-25"
         style={{ backgroundImage: `url(${import.meta.env.BASE_URL}hero-bg.jpg)` }}
@@ -82,7 +82,7 @@ export function AuthPage({ mode }: { mode: 'login' | 'signup' }) {
         <span className="font-bold text-lg tracking-tight">SURYA</span>
       </Link>
 
-      <section className="relative z-10 w-full max-w-md rounded-[1.75rem] border border-amber-500/20 bg-[#0c1511]/80 backdrop-blur-2xl p-6 sm:p-8 shadow-[0_28px_90px_rgba(0,0,0,0.5)]">
+      <section className="relative z-10 w-full max-w-md rounded-[1.75rem] border border-amber-500/20 bg-[#191511]/80 backdrop-blur-2xl p-6 sm:p-8 shadow-[0_28px_90px_rgba(0,0,0,0.5)]">
         <div className="flex items-center gap-2 text-emerald-300/80 text-xs uppercase tracking-[0.18em] font-semibold">
           <Leaf size={14} /> Secure platform access
         </div>

@@ -1,26 +1,28 @@
 /**
- * App — root routing configuration for the VPP Platform.
- * Routes: Hero → Mission Control → Live Energy Flow → AI Decision Center → Settings
- * Uses Framer Motion for smooth page transitions (fade + slide).
+ * App — root routing configuration for the SURYA operations console.
+ * Landing hero (/) is unchanged; authenticated users enter the VPP control
+ * platform under /app with 12 operational sections.
  */
-import { HashRouter as Router, Navigate, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
-import { lazy, Suspense, type CSSProperties, type ReactNode } from 'react';
-import { NavBar } from './components/NavBar';
+import { HashRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
+import { Component, lazy, Suspense, type CSSProperties, type ReactNode } from 'react';
 import { Hero } from './components/landing/Hero';
 import { VppDataProvider } from './context/VppDataContext';
+import { MetricsProvider } from './context/MetricsContext';
+import { AlertsProvider } from './context/AlertsContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AuthPage } from './components/auth/AuthPage';
 
-const MissionControl = lazy(() =>
-  import('./components/dashboard/MissionControl').then(m => ({ default: m.MissionControl }))
-);
-const LiveEnergyFlow = lazy(() =>
-  import('./components/dashboard/LiveEnergyFlow').then(m => ({ default: m.LiveEnergyFlow }))
-);
-const AIDecisionCenter = lazy(() =>
-  import('./components/dashboard/AIDecisionCenter').then(m => ({ default: m.AIDecisionCenter }))
-);
+const AppShell = lazy(() => import('./components/shell/AppShell').then(m => ({ default: m.AppShell })));
+
+const OverviewPage = lazy(() => import('./pages/OverviewPage'));
+const DigitalTwinPage = lazy(() => import('./pages/DigitalTwinPage'));
+const OptimizerPage = lazy(() => import('./pages/OptimizerPage'));
+const RenewablesPage = lazy(() => import('./pages/RenewablesPage'));
+const BatteryPage = lazy(() => import('./pages/BatteryPage'));
+const GridPage = lazy(() => import('./pages/GridPage'));
+const SchedulerPage = lazy(() => import('./pages/SchedulerPage'));
+const AlertsPage = lazy(() => import('./pages/AlertsPage'));
+const ReportsPage = lazy(() => import('./pages/ReportsPage'));
 const FacilitiesSettings = lazy(() =>
   import('./components/dashboard/FacilitiesSettings').then(m => ({ default: m.FacilitiesSettings }))
 );
@@ -33,96 +35,69 @@ function PageFallback() {
   );
 }
 
-// Page transition variants
-const pageVariants = {
-  initial: {
-    opacity: 0,
-    y: 12,
-  },
-  enter: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: [0.25, 0.46, 0.45, 0.94], // easeOutQuart
-    },
-  },
-  exit: {
-    opacity: 0,
-    y: -12,
-    transition: {
-      duration: 0.3,
-      ease: [0.25, 0.46, 0.45, 0.94],
-    },
-  },
-};
-
-// Route-to-layout mapping
-const routeConfigs: Record<string, { needsNav: boolean }> = {
-  '/': { needsNav: false },
-  '/dashboard': { needsNav: true },
-  '/energy-flow': { needsNav: true },
-  '/decisions': { needsNav: true },
-  '/settings': { needsNav: true },
-};
-
-function AnimatedRoute({ children }: { children: ReactNode }) {
-  const location = useLocation();
-  return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={location.pathname}
-        variants={pageVariants}
-        initial="initial"
-        animate="enter"
-        exit="exit"
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
-  );
+/** Per-page error boundary keeps one broken section from taking down the console. */
+class SectionBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
+  state = { error: null as Error | null };
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="ops-panel p-6 text-center">
+          <p className="text-[13px] font-semibold text-red-300 mb-1">Section failed to load</p>
+          <p className="text-[11px] text-white/45">{this.state.error.message}</p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
 function AppRoutes() {
-  const location = useLocation();
   const { user, loading } = useAuth();
-  const config = routeConfigs[location.pathname] || { needsNav: false };
-  const isProtected = Boolean(routeConfigs[location.pathname]?.needsNav);
-  const isKnownRoute = location.pathname === '/'
-    || location.pathname === '/login'
-    || location.pathname === '/signup'
-    || isProtected;
 
-  if (loading) {
-    return <PageFallback />;
-  }
-
-  if (!isKnownRoute) return <Navigate to="/" replace />;
-  if (location.pathname === '/login') return <AuthPage mode="login" />;
-  if (location.pathname === '/signup') return <AuthPage mode="signup" />;
-  if (isProtected && !user) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
-  }
+  if (loading) return <PageFallback />;
 
   return (
-    <>
-      {/* NavBar stays outside AnimatedRoute so sticky positioning works
-          (a transformed ancestor breaks position: sticky) and it does not
-          re-animate on every route change. */}
-      {config.needsNav && <NavBar />}
-      <AnimatedRoute>
-        {config.needsNav ? (
-          <Suspense fallback={<PageFallback />}>
-            {location.pathname === '/dashboard' && <MissionControl />}
-            {location.pathname === '/energy-flow' && <LiveEnergyFlow />}
-            {location.pathname === '/decisions' && <AIDecisionCenter />}
-            {location.pathname === '/settings' && <FacilitiesSettings />}
+    <Routes>
+      <Route path="/" element={<Hero />} />
+      <Route path="/login" element={<AuthPage mode="login" />} />
+      <Route path="/signup" element={<AuthPage mode="signup" />} />
+
+      {/* Legacy deep-link redirects */}
+      <Route path="/dashboard" element={user ? <Navigate to="/app" replace /> : <Navigate to="/login" replace state={{ from: '/app' }} />} />
+      <Route path="/energy-flow" element={user ? <Navigate to="/app/twin" replace /> : <Navigate to="/login" replace state={{ from: '/app/twin' }} />} />
+      <Route path="/decisions" element={user ? <Navigate to="/app/optimizer" replace /> : <Navigate to="/login" replace state={{ from: '/app/optimizer' }} />} />
+
+      <Route
+        path="/app"
+        element={user ? (
+          <Suspense fallback={<div className="min-h-screen ops-app-bg" />}>
+            <AppShell />
           </Suspense>
         ) : (
-          <Hero />
+          <Navigate to="/login" replace state={{ from: '/app' }} />
         )}
-      </AnimatedRoute>
-    </>
+      >
+        <Route index element={<SectionBoundary><Suspense fallback={<PageFallback />}><OverviewPage /></Suspense></SectionBoundary>} />
+        <Route path="twin" element={<SectionBoundary><Suspense fallback={<PageFallback />}><DigitalTwinPage /></Suspense></SectionBoundary>} />
+        {/* Removed sections redirect back to Overview */}
+        <Route path="forecast" element={<Navigate to="/app" replace />} />
+        <Route path="carbon" element={<Navigate to="/app" replace />} />
+        <Route path="gantt" element={<Navigate to="/app" replace />} />
+        <Route path="optimizer" element={<SectionBoundary><Suspense fallback={<PageFallback />}><OptimizerPage /></Suspense></SectionBoundary>} />
+        <Route path="renewables" element={<SectionBoundary><Suspense fallback={<PageFallback />}><RenewablesPage /></Suspense></SectionBoundary>} />
+        <Route path="battery" element={<SectionBoundary><Suspense fallback={<PageFallback />}><BatteryPage /></Suspense></SectionBoundary>} />
+        <Route path="grid" element={<SectionBoundary><Suspense fallback={<PageFallback />}><GridPage /></Suspense></SectionBoundary>} />
+        <Route path="scheduler" element={<SectionBoundary><Suspense fallback={<PageFallback />}><SchedulerPage /></Suspense></SectionBoundary>} />
+        <Route path="alerts" element={<SectionBoundary><Suspense fallback={<PageFallback />}><AlertsPage /></Suspense></SectionBoundary>} />
+        <Route path="reports" element={<SectionBoundary><Suspense fallback={<PageFallback />}><ReportsPage /></Suspense></SectionBoundary>} />
+        <Route path="settings" element={<SectionBoundary><Suspense fallback={<PageFallback />}><div className="settings-host"><FacilitiesSettings /></div></Suspense></SectionBoundary>} />
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
@@ -135,9 +110,13 @@ function App() {
     <Router>
       <AuthProvider>
         <VppDataProvider>
-          <div className="min-h-screen" style={appStyle}>
-            <AppRoutes />
-          </div>
+          <MetricsProvider>
+            <AlertsProvider>
+              <div className="min-h-screen" style={appStyle}>
+                <AppRoutes />
+              </div>
+            </AlertsProvider>
+          </MetricsProvider>
         </VppDataProvider>
       </AuthProvider>
     </Router>

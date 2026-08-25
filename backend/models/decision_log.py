@@ -5,9 +5,8 @@ import json
 import uuid
 
 from sqlalchemy import Column, DateTime, Float, String, Text, func
-from sqlalchemy.orm import declarative_base
 
-Base = declarative_base()
+from backend.models.base import Base
 
 
 class DecisionLog(Base):

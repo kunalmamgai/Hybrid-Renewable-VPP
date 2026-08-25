@@ -5,7 +5,6 @@ import * as THREE from "three";
 import { WeatherAtmosphere } from "./CampusScene";
 import { HazardSceneEffect, ProposedCampusAssets } from "./EngineeringSceneAssets";
 import { getRegionalProfile } from "./regionalCampusProfiles";
-import VerticalAxisTurbine from "./VerticalAxisTurbine";
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -373,7 +372,6 @@ function MnitPrabhaBhawan({ building, selected, onSelect, proposalVisible }) {
       ))}
 
       {proposalVisible && <InstancedBoxes items={roofSolar} color="#164970" metalness={0.7} roughness={0.2} />}
-      <VerticalAxisTurbine position={[-27, 27, -8]} scale={0.7} windSpeed={18} accent="#ffb15c" />
       <Html position={[0, 21.8, 2.45]} center transform distanceFactor={12}>
         <div className="regional-building-sign">MALAVIYA NATIONAL INSTITUTE OF TECHNOLOGY JAIPUR</div>
       </Html>
@@ -661,12 +659,6 @@ function MnitDistinctBuilding({ building, selected, onSelect, proposalVisible })
       </mesh>
       {architecture}
       {proposalVisible && supportsRoofSolar && <InstancedBoxes items={rooftopSolar} color="#164970" metalness={0.7} roughness={0.2} />}
-      <VerticalAxisTurbine
-        position={[width * 0.32, height + 1.35, -depth * 0.24]}
-        scale={clamp(Math.min(width, depth) / 50, 0.48, 0.74)}
-        windSpeed={18}
-        accent="#ffb15c"
-      />
       <Html position={[0, labelHeight, 0]} center distanceFactor={135}>
         <button className={`regional-label ${selected === name ? "is-selected" : ""}`} onClick={() => onSelect(name)}>{name}</button>
       </Html>
@@ -992,12 +984,6 @@ function CampusBuilding({ building, campus, selected, onSelect, proposalVisible 
       {isClinical && <HospitalCross position={[width * 0.34, height * 0.62, depth / 2 + 0.85]} scale={0.82} />}
       {isLandmark && <LandmarkArchitecture campus={campus} width={width} depth={depth} height={height} palette={palette} />}
       {proposalVisible && <InstancedBoxes items={rooftopSolar} color="#154972" metalness={0.7} roughness={0.2} />}
-      <VerticalAxisTurbine
-        position={[width * 0.36, height + 1.12, -depth * 0.26]}
-        scale={clamp(Math.min(width, depth) / 50, 0.48, 0.78)}
-        windSpeed={18}
-        accent={campus.accent}
-      />
 
       <mesh position={[0, 2.1, depth / 2 + 1.9]}><boxGeometry args={[width * 0.28, 4.2, 3.8]} /><meshStandardMaterial color={palette.trim} /></mesh>
       <Html position={[0, isLandmark ? height * 0.72 : height + 6.4, isLandmark ? depth / 2 + 2.4 : 0]} center distanceFactor={isLandmark ? 13 : 135} transform={isLandmark}>

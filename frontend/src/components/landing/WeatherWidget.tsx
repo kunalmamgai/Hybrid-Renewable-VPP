@@ -144,7 +144,7 @@ export function WeatherWidget() {
         </div>
         {/* Humidity */}
         <div className="px-3 py-2.5 text-center">
-          <Droplets size={12} className="mx-auto text-cyan-300/60 mb-1" />
+          <Droplets size={12} className="mx-auto text-amber-300/60 mb-1" />
           <div className="text-sm font-bold text-white/90">{data.humidity}%</div>
           <div className="text-[8px] text-white/35 uppercase tracking-wider">Humidity</div>
         </div>

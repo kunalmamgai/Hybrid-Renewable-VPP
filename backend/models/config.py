@@ -2,9 +2,8 @@
 from __future__ import annotations
 
 from sqlalchemy import Boolean, Column, Float, String
-from sqlalchemy.orm import declarative_base
 
-Base = declarative_base()
+from backend.models.base import Base
 
 
 class AlertThreshold(Base):

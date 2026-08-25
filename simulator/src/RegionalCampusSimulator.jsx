@@ -326,7 +326,7 @@ export default function RegionalCampusSimulator({ campus, onBack, embedded = fal
 
       <div className="metrics-row">
         <RegionalMetric icon={Sun} label="Solar generation" value={power(energy.solar)} detail={`${campus.solarMw} MWp installed`} tone="cyan" />
-        <RegionalMetric icon={Wind} label="Wind generation" value={power(energy.wind)} detail={`${campus.windMw} MW capacity • rooftop VAWTs`} tone="green" />
+        <RegionalMetric icon={Wind} label="Wind generation" value={power(energy.wind)} detail={`${campus.windMw} MW capacity`} tone="green" />
         <RegionalMetric icon={Building2} label="Campus demand" value={power(energy.demand)} detail={`${occupancy}% occupancy${planningProposals.length ? ` • ${planningProposals.length} proposal${planningProposals.length > 1 ? "s" : ""}` : ""}`} tone="amber" />
         <RegionalMetric icon={Zap} label="Renewable share" value={`${energy.share.toFixed(0)}%`} detail={`${power(energy.renewable)} available`} tone="magenta" />
       </div>

@@ -10,7 +10,6 @@ import {
 import {
   AUTH_TOKEN_KEY,
   getCurrentUser,
-  prepareApi,
   signIn as requestSignIn,
   signInWithGoogle as requestGoogleSignIn,
   signUp as requestSignUp,
@@ -36,11 +35,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const acceptAuth = useCallback((response: AuthResponse) => {
     window.localStorage.setItem(AUTH_TOKEN_KEY, response.access_token);
     setUser(response.user);
-  }, []);
-
-  useEffect(() => {
-    // Start waking a sleeping production API as soon as the authentication UI mounts.
-    void prepareApi().catch(() => undefined);
   }, []);
 
   useEffect(() => {
@@ -70,7 +64,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(() => {
     window.localStorage.removeItem(AUTH_TOKEN_KEY);
-    window.google?.accounts.id.disableAutoSelect?.();
     setUser(null);
   }, []);
 
