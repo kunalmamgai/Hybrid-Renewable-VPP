@@ -340,7 +340,10 @@ export function CTAFooter() {
       <div className="relative max-w-4xl mx-auto text-center">
         <RevealSection>
           <span className="tech-label tech-label-cyan !text-[10px] tracking-[0.25em]">Get Started</span>
-          <h2 className="text-3xl md:text-6xl font-extrabold text-white mt-6 tracking-tight leading-tight">
+          <h2
+            aria-label="Ready to put your campus on autopilot?"
+            className="text-3xl md:text-6xl font-extrabold text-white mt-6 tracking-tight leading-tight"
+          >
             Ready to Put Your Campus<br />
             on <span className="text-sunset-gradient">Autopilot</span>?
           </h2>
