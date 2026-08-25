@@ -11,6 +11,7 @@ import { MetricsProvider } from './context/MetricsContext';
 import { AlertsProvider } from './context/AlertsContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AuthPage } from './components/auth/AuthPage';
+import { SuryaMark } from './components/common/SuryaMark';
 
 const AppShell = lazy(() => import('./components/shell/AppShell').then(m => ({ default: m.AppShell })));
 
@@ -27,11 +28,36 @@ const FacilitiesSettings = lazy(() =>
   import('./components/dashboard/FacilitiesSettings').then(m => ({ default: m.FacilitiesSettings }))
 );
 
-function PageFallback() {
+function PageFallback({ fullPage = false, message = 'Loading workspace…' }: { fullPage?: boolean; message?: string }) {
   return (
-    <div className="flex items-center justify-center min-h-[50vh]">
-      <div className="animate-pulse text-sm text-white/50">Loading…</div>
+    <div
+      className={`ops-app-bg flex items-center justify-center px-6 ${fullPage ? 'min-h-screen' : 'min-h-[50vh]'}`}
+      role="status"
+      aria-live="polite"
+    >
+      <div className="flex flex-col items-center text-center">
+        <SuryaMark size={46} className="drop-shadow-[0_0_18px_rgba(245,158,11,0.35)]" />
+        <div className="mt-4 font-display text-sm font-bold tracking-[0.18em] text-white">SURYA</div>
+        <div className="mt-2 text-xs text-white/60">{message}</div>
+        <div className="mt-4 h-1 w-32 overflow-hidden rounded-full bg-white/10">
+          <div className="h-full w-1/2 animate-pulse rounded-full bg-gradient-to-r from-amber-600 to-amber-300" />
+        </div>
+      </div>
     </div>
+  );
+}
+
+function ProtectedConsole() {
+  return (
+    <VppDataProvider>
+      <MetricsProvider>
+        <AlertsProvider>
+          <Suspense fallback={<PageFallback message="Opening the command center…" />}>
+            <AppShell />
+          </Suspense>
+        </AlertsProvider>
+      </MetricsProvider>
+    </VppDataProvider>
   );
 }
 
@@ -57,7 +83,7 @@ class SectionBoundary extends Component<{ children: ReactNode }, { error: Error 
 function AppRoutes() {
   const { user, loading } = useAuth();
 
-  if (loading) return <PageFallback />;
+  if (loading) return <PageFallback fullPage message="Restoring your secure session…" />;
 
   return (
     <Routes>
@@ -73,9 +99,7 @@ function AppRoutes() {
       <Route
         path="/app"
         element={user ? (
-          <Suspense fallback={<div className="min-h-screen ops-app-bg" />}>
-            <AppShell />
-          </Suspense>
+          <ProtectedConsole />
         ) : (
           <Navigate to="/login" replace state={{ from: '/app' }} />
         )}
@@ -109,15 +133,9 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <VppDataProvider>
-          <MetricsProvider>
-            <AlertsProvider>
-              <div className="min-h-screen" style={appStyle}>
-                <AppRoutes />
-              </div>
-            </AlertsProvider>
-          </MetricsProvider>
-        </VppDataProvider>
+        <div className="min-h-screen" style={appStyle}>
+          <AppRoutes />
+        </div>
       </AuthProvider>
     </Router>
   );

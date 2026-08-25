@@ -87,7 +87,7 @@ export function WeatherWidget() {
 
   return (
     <div
-      className="relative z-30 w-56 md:w-64 rounded-2xl border overflow-hidden transition-all duration-500"
+      className="relative z-30 w-[min(22rem,calc(100vw-2rem))] sm:w-64 rounded-2xl border overflow-hidden transition-all duration-500"
       style={{
         background: 'rgba(15, 26, 21, 0.45)',
         backdropFilter: 'blur(20px)',
@@ -139,7 +139,7 @@ export function WeatherWidget() {
         {/* Wind */}
         <div className="px-3 py-2.5 text-center border-r border-white/[0.06]">
           <Wind size={12} className="mx-auto text-teal-300/60 mb-1" />
-          <div className="text-sm font-bold text-white/90">{formatWindSpeed(data.windSpeed)}</div>
+          <div className="whitespace-nowrap text-xs sm:text-sm font-bold text-white/90">{formatWindSpeed(data.windSpeed)}</div>
           <div className="text-[8px] text-white/35 uppercase tracking-wider">Wind</div>
         </div>
         {/* Humidity */}
@@ -154,7 +154,7 @@ export function WeatherWidget() {
       <div className="px-4 py-2 flex items-center gap-2"
            style={{ background: 'rgba(16, 185, 129, 0.08)' }}>
         <Thermometer size={10} className="text-emerald-400/60 shrink-0" />
-        <span className="text-[9px] text-emerald-400/70 leading-snug">
+        <span className="text-[10px] text-emerald-300/85 leading-snug">
           {data.cloudCover > 50
             ? 'AI: Solar deficit expected — pre-charging battery'
             : data.windSpeed > 15

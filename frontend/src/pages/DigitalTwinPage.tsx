@@ -44,9 +44,9 @@ export default function DigitalTwinPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="tech-label mb-1.5">DIGITAL TWIN</div>
-          <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">
+          <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">
             Interactive Energy Infrastructure
-          </h2>
+          </h1>
           <p className="text-[12px] text-white/45 mt-1 max-w-2xl">
             Explore every asset live, or run what-if scenarios against the physics model to predict cost, reliability, carbon and battery-health impacts.
           </p>

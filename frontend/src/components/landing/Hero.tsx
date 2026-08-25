@@ -44,7 +44,7 @@ export function Hero() {
         }}
       />
       {/* ===== HERO SECTION ===== */}
-      <section className="relative min-h-screen flex flex-col overflow-hidden">
+      <section className="relative min-h-[100svh] flex flex-col overflow-hidden">
         {/* Full-bleed hero image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -164,8 +164,7 @@ export function Hero() {
         </nav>
 
         {/* Main Hero Content */}
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 md:px-12 text-center"
-             style={{ marginTop: '-2rem' }}>
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-16 pb-4 md:px-12 md:py-8 text-center -mt-4 md:-mt-8">
           {/* Headline — 3 lines, bold, white, large */}
           <h1
             className="text-white font-extrabold leading-[1.08] tracking-tight drop-shadow-xl"
@@ -193,12 +192,12 @@ export function Hero() {
 
           {/* CTA buttons */}
           <div
-            className="mt-10 md:mt-12 flex flex-wrap items-center justify-center gap-4"
+            className="mt-8 md:mt-12 flex w-full max-w-xs flex-col items-stretch justify-center gap-3 sm:max-w-none sm:w-auto sm:flex-row sm:items-center sm:gap-4"
             style={{ animation: 'fadeSlideUp 0.8s ease-out 0.9s both' }}
           >
             <Link
               to="/signup"
-              className="text-white px-8 py-3.5 rounded-full text-sm font-semibold flex items-center gap-2 transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
+              className="min-h-12 justify-center text-white px-8 py-3.5 rounded-full text-sm font-semibold flex items-center gap-2 transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
               style={{
                 background: 'linear-gradient(135deg, #1f120b, #0d1012)',
                 boxShadow: '0 10px 24px rgba(0,0,0,0.28)',
@@ -209,7 +208,7 @@ export function Hero() {
             </Link>
             <Link
               to="/energy-flow"
-              className="text-white/90 px-8 py-3.5 rounded-full text-sm font-semibold flex items-center gap-2 transition-all duration-300 hover:border-white/60 hover:bg-white/[0.06] hover:text-white"
+              className="min-h-12 justify-center text-white/90 px-8 py-3.5 rounded-full text-sm font-semibold flex items-center gap-2 transition-all duration-300 hover:border-white/60 hover:bg-white/[0.06] hover:text-white"
               style={{
                 border: '1.5px solid rgba(190, 235, 245, 0.28)',
                 backdropFilter: 'blur(2px)',
@@ -222,7 +221,7 @@ export function Hero() {
         </div>
 
         {/* Live Weather — bottom-right */}
-        <div className="absolute bottom-8 right-6 md:bottom-10 md:right-10 z-20">
+        <div className="relative z-20 self-center mt-6 mb-16 md:absolute md:bottom-10 md:right-10 md:mt-0 md:mb-0">
           <WeatherWidget />
         </div>
 

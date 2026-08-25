@@ -3,7 +3,7 @@
  * animated page outlet, mobile bottom navigation + drawer and the AI copilot.
  */
 import { useEffect, useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Boxes, BrainCircuit, LayoutDashboard, BellRing } from 'lucide-react';
 import { TopBar } from './TopBar';
@@ -57,24 +57,24 @@ export function AppShell() {
         className="md:hidden fixed bottom-0 inset-x-0 z-30 flex items-stretch bg-ops-surface/95 backdrop-blur-xl border-t border-ops-line pb-[env(safe-area-inset-bottom)]"
       >
         {BOTTOM_NAV.map(item => (
-          <button
+          <NavLink
             key={item.to}
-            type="button"
-            onClick={() => window.location.hash = item.to}
-            className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-[9px] font-semibold uppercase tracking-wider transition-colors ${
+            to={item.to}
+            end={item.end}
+            className={`min-h-14 flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-semibold uppercase tracking-wider transition-colors ${
               (item.end ? location.pathname === item.to : location.pathname.startsWith(item.to))
-                ? 'text-amber-300' : 'text-white/40'
+                ? 'text-amber-300' : 'text-white/65'
             }`}
           >
-            <item.icon size={18} />
+            <item.icon size={20} />
             {item.label}
-          </button>
+          </NavLink>
         ))}
         <button
           type="button"
           onClick={() => setDrawerOpen(true)}
           aria-label="More sections"
-          className="flex-1 flex flex-col items-center gap-0.5 py-2 text-[9px] font-semibold uppercase tracking-wider text-white/40"
+          className="min-h-14 flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-semibold uppercase tracking-wider text-white/65"
         >
           <span className="flex gap-[3px] items-end h-[18px]" aria-hidden="true">
             <i className="w-[3px] h-[6px] rounded-sm bg-current" />

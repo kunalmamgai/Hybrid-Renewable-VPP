@@ -129,9 +129,9 @@ export default function OptimizerPage() {
       {/* ── Header ── */}
       <div>
         <div className="tech-label mb-1.5">AI ENERGY OPTIMIZER</div>
-        <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">
+        <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">
           Optimizer
-        </h2>
+        </h1>
         <p className="text-[12px] text-white/45 mt-1 max-w-2xl">
           Composite cost-and-carbon optimization across solar, wind, battery and flexible loads —
           with full explainability for every recommendation.

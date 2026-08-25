@@ -116,7 +116,7 @@ export default function GridPage() {
       <div className="space-y-5">
         <div>
           <div className="tech-label mb-1.5">GRID INTERFACE</div>
-          <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">Grid Intelligence</h2>
+          <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">Grid Intelligence</h1>
           <p className="text-[12px] text-white/45 mt-1 max-w-2xl">
             Import/export balance, tariff context and stability posture at the point of common coupling.
           </p>
@@ -135,7 +135,7 @@ export default function GridPage() {
       {/* ── Header ── */}
       <div>
         <div className="tech-label mb-1.5">GRID INTERFACE</div>
-        <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">Grid Intelligence</h2>
+        <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">Grid Intelligence</h1>
         <p className="text-[12px] text-white/45 mt-1 max-w-2xl">
           Import/export balance, tariff context and stability posture at the point of common coupling ·
           grid emission factor {AVG_GRID_EMISSION_KG_PER_KWH} kg CO₂/kWh.
