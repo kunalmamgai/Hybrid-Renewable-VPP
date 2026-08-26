@@ -568,7 +568,7 @@ function VitBhopalSimulator({ onBack, embedded = false }) {
           icon={Wind}
           label="Wind generation"
           value={formatPower(energy.wind)}
-          detail={`${weather.windSpeed.toFixed(0)} km/h live wind`}
+          detail={`${weather.windSpeed.toFixed(0)} km/h live wind • rooftop VAWTs`}
           accent="green"
         />
         <Metric

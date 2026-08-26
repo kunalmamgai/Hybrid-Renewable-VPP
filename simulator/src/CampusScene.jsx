@@ -16,6 +16,7 @@ import { BoysHostelBlockOne } from "./BoysHostelBlockOne";
 import { ModernBoysHostel } from "./ModernBoysHostel";
 import { RacingGardenTrack } from "./RacingGardenTrack";
 import { BoxInstances, CylinderInstances, IcoInstances, SphereInstances } from "./ScenePrimitives";
+import { RooftopTurbineArray } from "./VerticalAxisTurbine";
 
 const BUILDINGS = {
   main: {
@@ -211,6 +212,25 @@ hostels: {
     energy: "Utility import and export",
   },
 };
+
+const VIT_ROOFTOP_VAWT_GROUPS = [
+  { id: "main", position: [26, 18.2, 89], width: 82, depth: 22, count: 8, scale: 1.05 },
+  { id: "girls-1", position: [-40, 21.2, -115], width: 64, depth: 20, count: 6, scale: 1 },
+  { id: "chancellor", position: [54, 19.4, -118], width: 45, depth: 18, count: 4, scale: 0.92 },
+  { id: "girls-2", position: [-180, 22.2, -78], width: 70, depth: 22, count: 6, scale: 1 },
+  { id: "boys-1", position: [-520, 26.4, -88], width: 80, depth: 22, count: 8, scale: 1.05 },
+  { id: "boys-2-5", position: [-520, 19.2, -270], width: 78, depth: 42, count: 8, scale: 1 },
+  { id: "modern-hostel", position: [-520, 22.5, -370], width: 84, depth: 22, count: 8, scale: 1.05 },
+  { id: "boys-mess", position: [-450, 10.4, -270], width: 42, depth: 18, count: 4, scale: 0.88 },
+  { id: "labs", position: [145, 13.2, 146], width: 54, depth: 20, count: 6, scale: 0.94 },
+  { id: "architecture", position: [129, 12.5, 96], width: 48, depth: 18, count: 4, scale: 0.92 },
+  { id: "underbelly", position: [105, 12.1, 46], width: 38, depth: 16, count: 4, scale: 0.84 },
+  { id: "academic-2", position: [-130, 30.6, -410], width: 92, depth: 24, count: 8, scale: 1.08 },
+  { id: "special", position: [-340, 24.2, -448], width: 76, depth: 22, count: 6, scale: 1 },
+  { id: "hall", position: [222, 17.1, -43], width: 62, depth: 22, count: 6, scale: 0.96 },
+  { id: "gate-2", position: [294, 10.2, -143], width: 30, depth: 10, count: 2, scale: 0.78 },
+  { id: "main-gate", position: [82, 15.2, 246], width: 38, depth: 12, count: 2, scale: 0.82 },
+];
 
 const CAMERA_PRESETS = {
   overview: { position: [420, 330, 520], target: [-8, 0, -88] },
@@ -6275,6 +6295,18 @@ function CampusWorld({
       <StudentCrowds />
       <DenseStudentCrowd count={240} />
       <SkyTraffic />
+      {VIT_ROOFTOP_VAWT_GROUPS.map((group) => (
+        <RooftopTurbineArray
+          key={group.id}
+          position={group.position}
+          width={group.width}
+          depth={group.depth}
+          count={group.count}
+          scale={group.scale}
+          windSpeed={windSpeed}
+          accent="#55e6ba"
+        />
+      ))}
       <Selectable
         id="main"
         selected={selected === "main"}

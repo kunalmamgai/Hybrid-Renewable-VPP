@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { WeatherAtmosphere } from "./CampusScene";
 import { HazardSceneEffect, ProposedCampusAssets } from "./EngineeringSceneAssets";
 import { getRegionalProfile } from "./regionalCampusProfiles";
+import { RooftopTurbineArray } from "./VerticalAxisTurbine";
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -372,6 +373,7 @@ function MnitPrabhaBhawan({ building, selected, onSelect, proposalVisible }) {
       ))}
 
       {proposalVisible && <InstancedBoxes items={roofSolar} color="#164970" metalness={0.7} roughness={0.2} />}
+      <RooftopTurbineArray width={78} depth={34} roofHeight={27} count={6} scale={1.05} accent="#ffb15c" />
       <Html position={[0, 21.8, 2.45]} center transform distanceFactor={12}>
         <div className="regional-building-sign">MALAVIYA NATIONAL INSTITUTE OF TECHNOLOGY JAIPUR</div>
       </Html>
@@ -659,6 +661,14 @@ function MnitDistinctBuilding({ building, selected, onSelect, proposalVisible })
       </mesh>
       {architecture}
       {proposalVisible && supportsRoofSolar && <InstancedBoxes items={rooftopSolar} color="#164970" metalness={0.7} roughness={0.2} />}
+      <RooftopTurbineArray
+        width={width * 0.82}
+        depth={depth * 0.72}
+        roofHeight={height + 1.4}
+        count={width >= 65 ? 6 : 4}
+        scale={0.96}
+        accent="#ffb15c"
+      />
       <Html position={[0, labelHeight, 0]} center distanceFactor={135}>
         <button className={`regional-label ${selected === name ? "is-selected" : ""}`} onClick={() => onSelect(name)}>{name}</button>
       </Html>
@@ -912,6 +922,19 @@ function CampusBuilding({ building, campus, selected, onSelect, proposalVisible 
           <meshStandardMaterial color="#3f844a" roughness={1} />
         </mesh>
         <Line points={[[-width * 0.28, 0.3, 0], [width * 0.28, 0.3, 0]]} color="#f0ead7" lineWidth={1} />
+        <mesh position={[width * 0.3, 2.8, -depth * 0.34]} castShadow receiveShadow>
+          <boxGeometry args={[22, 5.6, 11]} />
+          <meshStandardMaterial color="#d8d0bc" roughness={0.78} />
+        </mesh>
+        <RooftopTurbineArray
+          position={[width * 0.3, 0, -depth * 0.34]}
+          width={20}
+          depth={9}
+          roofHeight={5.8}
+          count={4}
+          scale={0.82}
+          accent={campus.accent}
+        />
         <Html position={[0, 7, 0]} center distanceFactor={125}>
           <button className="regional-label" onClick={() => onSelect(name)}>{name}</button>
         </Html>
@@ -984,6 +1007,14 @@ function CampusBuilding({ building, campus, selected, onSelect, proposalVisible 
       {isClinical && <HospitalCross position={[width * 0.34, height * 0.62, depth / 2 + 0.85]} scale={0.82} />}
       {isLandmark && <LandmarkArchitecture campus={campus} width={width} depth={depth} height={height} palette={palette} />}
       {proposalVisible && <InstancedBoxes items={rooftopSolar} color="#154972" metalness={0.7} roughness={0.2} />}
+      <RooftopTurbineArray
+        width={width * 0.82}
+        depth={depth * 0.74}
+        roofHeight={height + 1.25}
+        count={width >= 65 ? 6 : 4}
+        scale={0.98}
+        accent={campus.accent}
+      />
 
       <mesh position={[0, 2.1, depth / 2 + 1.9]}><boxGeometry args={[width * 0.28, 4.2, 3.8]} /><meshStandardMaterial color={palette.trim} /></mesh>
       <Html position={[0, isLandmark ? height * 0.72 : height + 6.4, isLandmark ? depth / 2 + 2.4 : 0]} center distanceFactor={isLandmark ? 13 : 135} transform={isLandmark}>
