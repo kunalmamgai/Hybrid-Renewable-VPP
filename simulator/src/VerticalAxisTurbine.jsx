@@ -90,12 +90,13 @@ export function RooftopTurbineArray({
   depth = 26,
   roofHeight = 0,
   count,
+  rows: requestedRows,
   scale = 1,
   windSpeed = 18,
   accent = "#55e6ba",
 }) {
-  const columns = count ? Math.max(1, Math.ceil(count / 2)) : width >= 66 ? 3 : 2;
-  const rows = count === 1 ? 1 : 2;
+  const rows = requestedRows || (count === 1 ? 1 : 2);
+  const columns = count ? Math.max(1, Math.ceil(count / rows)) : width >= 66 ? 3 : 2;
   const total = count || columns * rows;
   const xStep = columns === 1 ? 0 : Math.min(18, width * 0.58 / (columns - 1));
   const zStep = rows === 1 ? 0 : Math.min(12, depth * 0.48);

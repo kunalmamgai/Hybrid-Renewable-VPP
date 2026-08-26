@@ -214,22 +214,54 @@ hostels: {
 };
 
 const VIT_ROOFTOP_VAWT_GROUPS = [
-  { id: "main", position: [26, 18.2, 89], width: 82, depth: 22, count: 8, scale: 1.05 },
-  { id: "girls-1", position: [-40, 21.2, -115], width: 64, depth: 20, count: 6, scale: 1 },
-  { id: "chancellor", position: [54, 19.4, -118], width: 45, depth: 18, count: 4, scale: 0.92 },
-  { id: "girls-2", position: [-180, 22.2, -78], width: 70, depth: 22, count: 6, scale: 1 },
-  { id: "boys-1", position: [-520, 26.4, -88], width: 80, depth: 22, count: 8, scale: 1.05 },
-  { id: "boys-2-5", position: [-520, 19.2, -270], width: 78, depth: 42, count: 8, scale: 1 },
-  { id: "modern-hostel", position: [-520, 22.5, -370], width: 84, depth: 22, count: 8, scale: 1.05 },
+  // Academic Block 1 is a collection of separate wings. Keep every array on a real slab.
+  { id: "main-west", position: [-37, 25.1, 99], width: 12, depth: 10, count: 2, rows: 1, scale: 0.9 },
+  { id: "main-mid-west", position: [-12, 21.85, 98], width: 28, depth: 10, count: 2, rows: 1, scale: 0.92 },
+  { id: "main-mid-east", position: [34, 21.85, 98], width: 28, depth: 10, count: 2, rows: 1, scale: 0.92 },
+  { id: "main-east", position: [61, 25.1, 99], width: 12, depth: 10, count: 2, rows: 1, scale: 0.9 },
+  { id: "main-rear", position: [17, 18.0, 71], width: 68, depth: 9, count: 4, rows: 1, scale: 0.94 },
+  { id: "girls-1", position: [-40, 22.95, -115], width: 54, depth: 12, count: 4, scale: 0.94 },
+  // The Chancellor Residence steps up through several roof levels.
+  { id: "chancellor-core", position: [54, 37.95, -113.6], width: 7, depth: 5, count: 1, scale: 0.72 },
+  { id: "chancellor-north", position: [54, 36.65, -134.8], width: 5, depth: 7, count: 1, scale: 0.72 },
+  { id: "chancellor-east", position: [35.2, 31.55, -126.6], width: 10, depth: 8, count: 1, scale: 0.75 },
+  { id: "chancellor-south-east", position: [29.8, 30.15, -96.2], width: 15, depth: 12, count: 2, rows: 1, scale: 0.76 },
+  { id: "chancellor-south-west", position: [78.2, 25.75, -96.2], width: 13, depth: 12, count: 2, rows: 1, scale: 0.76 },
+  // Girls Hostel Block 2 is a U-shaped complex with two raised stair towers.
+  { id: "girls-2-spine", position: [-180, 21.4, -42], width: 164, depth: 14, count: 6, rows: 1, scale: 0.9 },
+  { id: "girls-2-west", position: [-216, 21.4, -85.5], width: 18, depth: 54, count: 4, scale: 0.9 },
+  { id: "girls-2-east", position: [-144, 21.4, -85.5], width: 18, depth: 54, count: 4, scale: 0.9 },
+  { id: "girls-2-west-tower", position: [-216, 23.6, -43], width: 10, depth: 20, count: 1, scale: 0.78 },
+  { id: "girls-2-east-tower", position: [-144, 23.6, -43], width: 10, depth: 20, count: 1, scale: 0.78 },
+  { id: "boys-1", position: [-520, 25.95, -88], width: 126, depth: 15, count: 8, scale: 0.98 },
+  // Boys Hostel Blocks 2-5 are four distinct U-shaped buildings, not one broad roof.
+  { id: "boys-2", position: [-542, 20.15, -299], width: 24, depth: 8, count: 2, rows: 1, scale: 0.88 },
+  { id: "boys-3", position: [-498, 20.15, -281], width: 24, depth: 8, count: 2, rows: 1, scale: 0.88 },
+  { id: "boys-4", position: [-542, 20.15, -259], width: 24, depth: 8, count: 2, rows: 1, scale: 0.88 },
+  { id: "boys-5", position: [-498, 20.15, -241], width: 24, depth: 8, count: 2, rows: 1, scale: 0.88 },
+  { id: "modern-hostel", position: [-520, 28.55, -370], width: 92, depth: 15, count: 8, scale: 0.98 },
   { id: "boys-mess", position: [-450, 10.4, -270], width: 42, depth: 18, count: 4, scale: 0.88 },
-  { id: "labs", position: [145, 13.2, 146], width: 54, depth: 20, count: 6, scale: 0.94 },
-  { id: "architecture", position: [129, 12.5, 96], width: 48, depth: 18, count: 4, scale: 0.92 },
-  { id: "underbelly", position: [105, 12.1, 46], width: 38, depth: 16, count: 4, scale: 0.84 },
-  { id: "academic-2", position: [-130, 30.6, -410], width: 92, depth: 24, count: 8, scale: 1.08 },
-  { id: "special", position: [-340, 24.2, -448], width: 76, depth: 22, count: 6, scale: 1 },
-  { id: "hall", position: [222, 17.1, -43], width: 62, depth: 22, count: 6, scale: 0.96 },
-  { id: "gate-2", position: [294, 10.2, -143], width: 30, depth: 10, count: 2, scale: 0.78 },
-  { id: "main-gate", position: [82, 15.2, 246], width: 38, depth: 12, count: 2, scale: 0.82 },
+  // The Lab is L-shaped, so each leg gets its own compact roof array.
+  { id: "labs-east-west", position: [123, 13.35, 155], width: 38, depth: 13, count: 4, scale: 0.9 },
+  { id: "labs-north-south", position: [136, 13.35, 130], width: 12, depth: 27, count: 4, scale: 0.9 },
+  { id: "architecture", position: [129, 13.35, 96], width: 38, depth: 12, count: 4, scale: 0.9 },
+  // Academic Block 2 has two centre bars and two taller end towers.
+  { id: "academic-2-rear", position: [-130, 28.95, -439], width: 90, depth: 9, count: 4, rows: 1, scale: 0.92 },
+  { id: "academic-2-front", position: [-130, 28.95, -393], width: 92, depth: 14, count: 4, rows: 1, scale: 0.92 },
+  { id: "academic-2-west", position: [-200, 31.45, -413], width: 22, depth: 52, count: 4, scale: 0.94 },
+  { id: "academic-2-east", position: [-60, 31.45, -413], width: 22, depth: 52, count: 4, scale: 0.94 },
+  // Special Block is circular; one turbine sits on each selected ring segment.
+  { id: "special-north", position: [-340, 25.85, -428], width: 1, depth: 1, count: 1, scale: 0.82 },
+  { id: "special-north-east", position: [-310, 25.85, -440], width: 1, depth: 1, count: 1, scale: 0.82 },
+  { id: "special-south-east", position: [-310, 25.85, -500], width: 1, depth: 1, count: 1, scale: 0.82 },
+  { id: "special-south", position: [-340, 25.85, -512], width: 1, depth: 1, count: 1, scale: 0.82 },
+  { id: "special-south-west", position: [-370, 25.85, -500], width: 1, depth: 1, count: 1, scale: 0.82 },
+  { id: "special-north-west", position: [-370, 25.85, -440], width: 1, depth: 1, count: 1, scale: 0.82 },
+  // The hall has two pitched roof planes, rotated north-south in world space.
+  { id: "hall-west-roof", position: [212.7, 14.55, -43], width: 8, depth: 48, count: 3, rows: 3, scale: 0.86 },
+  { id: "hall-east-roof", position: [231.3, 14.55, -43], width: 8, depth: 48, count: 3, rows: 3, scale: 0.86 },
+  { id: "gate-2", position: [289.8, 4.85, -146.7], width: 3, depth: 3, count: 1, scale: 0.64 },
+  { id: "main-gate", position: [87, 7.45, 247], width: 12, depth: 8, count: 2, rows: 1, scale: 0.68 },
 ];
 
 const CAMERA_PRESETS = {
@@ -6302,6 +6334,7 @@ function CampusWorld({
           width={group.width}
           depth={group.depth}
           count={group.count}
+          rows={group.rows}
           scale={group.scale}
           windSpeed={windSpeed}
           accent="#55e6ba"
