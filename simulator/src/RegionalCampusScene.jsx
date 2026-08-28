@@ -373,7 +373,7 @@ function MnitPrabhaBhawan({ building, selected, onSelect, proposalVisible }) {
       ))}
 
       {proposalVisible && <InstancedBoxes items={roofSolar} color="#164970" metalness={0.7} roughness={0.2} />}
-      <RooftopTurbineArray width={78} depth={34} roofHeight={27} count={6} scale={1.05} accent="#ffb15c" />
+      <RooftopTurbineArray width={52} depth={24} roofHeight={27} count={3} rows={1} scale={1.05} accent="#ffb15c" />
       <Html position={[0, 21.8, 2.45]} center transform distanceFactor={12}>
         <div className="regional-building-sign">MALAVIYA NATIONAL INSTITUTE OF TECHNOLOGY JAIPUR</div>
       </Html>
@@ -665,7 +665,8 @@ function MnitDistinctBuilding({ building, selected, onSelect, proposalVisible })
         width={width * 0.82}
         depth={depth * 0.72}
         roofHeight={height + 1.4}
-        count={width >= 65 ? 6 : 4}
+        count={3}
+        rows={1}
         scale={0.96}
         accent="#ffb15c"
       />
@@ -931,7 +932,8 @@ function CampusBuilding({ building, campus, selected, onSelect, proposalVisible 
           width={20}
           depth={9}
           roofHeight={5.8}
-          count={4}
+          count={3}
+          rows={1}
           scale={0.82}
           accent={campus.accent}
         />
@@ -1011,7 +1013,8 @@ function CampusBuilding({ building, campus, selected, onSelect, proposalVisible 
         width={width * 0.82}
         depth={depth * 0.74}
         roofHeight={height + 1.25}
-        count={width >= 65 ? 6 : 4}
+        count={3}
+        rows={1}
         scale={0.98}
         accent={campus.accent}
       />
