@@ -4950,6 +4950,7 @@ function DenseStudentCrowd({ count = 240 }) {
   const point = useMemo(() => new THREE.Vector3(), []);
   const tangent = useMemo(() => new THREE.Vector3(), []);
   const normal = useMemo(() => new THREE.Vector3(), []);
+  const lastCrowdUpdateRef = useRef(0);
 
   useLayoutEffect(() => {
     if (
@@ -4986,6 +4987,8 @@ function DenseStudentCrowd({ count = 240 }) {
   }, [students]);
 
   useFrame(({ clock }) => {
+    if (clock.elapsedTime - lastCrowdUpdateRef.current < 1 / 30) return;
+    lastCrowdUpdateRef.current = clock.elapsedTime;
     if (
       !headRef.current ||
       !torsoRef.current ||
@@ -5043,7 +5046,7 @@ function DenseStudentCrowd({ count = 240 }) {
         <sphereGeometry args={[1, 8, 6]} />
         <meshBasicMaterial color="#cf916c" toneMapped={false} />
       </instancedMesh>
-      <instancedMesh ref={torsoRef} args={[null, null, count]} frustumCulled={false} castShadow>
+      <instancedMesh ref={torsoRef} args={[null, null, count]} frustumCulled={false}>
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial color="#5793b6" toneMapped={false} />
       </instancedMesh>
@@ -5552,8 +5555,8 @@ export function WeatherAtmosphere({ weather }) {
         position={[110, 135, -85]}
         intensity={isNight ? 0.12 : Math.max(0.35, sunStrength * (1 - weather.cloudCover / 150))}
         color={isNight ? "#87a8da" : "#fff0cb"}
-        castShadow
-        shadow-mapSize={[1024, 1024]}
+        castShadow={!isNight}
+        shadow-mapSize={[512, 512]}
         shadow-camera-left={-390}
         shadow-camera-right={390}
         shadow-camera-top={320}
@@ -6126,9 +6129,10 @@ function NightLights({ enabled }) {
     [129, 9, 96],
     [105, 7, 46],
   ];
+  const activeLights = lights.filter((_, index) => index % 8 === 0);
   return (
     <group>
-      {lights.map(([x, y, z], index) => (
+      {activeLights.map(([x, y, z], index) => (
         <pointLight
           key={`night-light-${index}`}
           position={[x, y, z]}
@@ -6304,8 +6308,7 @@ function CampusWorld({
       <RoadNetwork />
       <ChancellorDrainage />
       <RoadTraffic />
-      <StudentCrowds />
-      <DenseStudentCrowd count={240} />
+      <DenseStudentCrowd count={72} />
       <SkyTraffic />
       {VIT_ROOFTOP_VAWT_GROUPS.map((group) => (
         <RooftopTurbineArray
@@ -6606,7 +6609,7 @@ export function CampusScene({
   return (
     <Canvas
       shadows="basic"
-      dpr={[1, 1.35]}
+      dpr={[0.6, 0.8]}
       camera={{ position: CAMERA_PRESETS.overview.position, fov: 43, near: 0.1, far: 1400 }}
       gl={{ antialias: true, powerPreference: "high-performance" }}
       performance={{ min: 0.55 }}

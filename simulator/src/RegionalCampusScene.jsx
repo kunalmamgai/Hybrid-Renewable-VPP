@@ -1965,7 +1965,7 @@ export default function RegionalCampusScene({
   return (
     <Canvas
       shadows="basic"
-      dpr={[1, 1.35]}
+      dpr={[0.6, 0.8]}
       camera={{ position: overview.position, fov: 43, near: 0.1, far: 1300 }}
       gl={{ antialias: true, powerPreference: "high-performance" }}
       performance={{ min: 0.55 }}
