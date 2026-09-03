@@ -13,6 +13,7 @@ from backend.api.middleware import (
     configure_logging,
     unhandled_exception_handler,
 )
+from backend.api.routes_ai import router as ai_router
 from backend.api.routes_auth import decode_access_token
 from backend.api.routes_auth import router as auth_router
 from backend.api.routes_decisions import router as decisions_router
@@ -158,6 +159,7 @@ app.include_router(decisions_router)
 app.include_router(export_router)
 app.include_router(settings_router)
 app.include_router(auth_router)
+app.include_router(ai_router)
 
 # WebSocket endpoint
 from fastapi import WebSocket

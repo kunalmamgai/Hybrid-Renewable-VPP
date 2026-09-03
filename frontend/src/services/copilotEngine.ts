@@ -29,6 +29,8 @@ export const SUGGESTED_QUESTIONS: SuggestedQuestion[] = [
   { q: 'What is causing the carbon spike?', match: /carbon|emission|co2/i },
   { q: 'Simulate a 20% increase in demand.', match: /simulate|increase in demand|\+?20%/i },
   { q: "Explain today's energy schedule.", match: /schedule|plan|timeline/i },
+  { q: 'Find anomalies in the current system.', match: /anomal|unusual|problem/i },
+  { q: 'Give me the three best actions right now.', match: /best actions|recommend/i },
 ];
 
 function topDecision(ctx: CopilotContext): Decision | null {

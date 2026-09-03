@@ -39,6 +39,12 @@ class Settings(BaseSettings):
     alert_battery_critical: float = 15.0
     alert_grid_import_high: float = 500.0
 
+    # Optional live Energy AI. Keep this server-side; never expose it through a
+    # VITE_* variable or commit a real key to the repository.
+    groq_api_key: str = ""
+    groq_model: str = "openai/gpt-oss-20b"
+    energy_ai_rate_per_minute: int = 10
+
     # Optimization weights
     cost_weight: float = 0.7
     carbon_weight: float = 0.3

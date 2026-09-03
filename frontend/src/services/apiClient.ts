@@ -245,3 +245,27 @@ export const forceCycle = async (): Promise<ForceCycleResponse> => {
   const resp = await api.post<ForceCycleResponse>('/api/v1/settings/force-cycle');
   return resp.data;
 };
+
+// ============================================================
+// Live Energy AI — the provider key remains on the backend
+// ============================================================
+
+export interface EnergyAiChatTurn {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface EnergyAiResponse {
+  answer: string;
+  provider: string;
+  model: string;
+}
+
+export const askEnergyAi = async (payload: {
+  question: string;
+  context: Record<string, unknown>;
+  history: EnergyAiChatTurn[];
+}): Promise<EnergyAiResponse> => {
+  const resp = await api.post<EnergyAiResponse>('/api/v1/ai/chat', payload);
+  return resp.data;
+};

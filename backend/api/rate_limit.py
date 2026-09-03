@@ -40,9 +40,16 @@ class SlidingWindowLimiter:
 
 
 auth_rate_limiter = SlidingWindowLimiter(settings.rate_limit_auth_per_minute)
+energy_ai_rate_limiter = SlidingWindowLimiter(settings.energy_ai_rate_per_minute)
 
 
 async def rate_limit_auth(request: Request) -> None:
     """FastAPI dependency: rate-limit by client IP (for login/signup/google)."""
     client_ip = request.client.host if request.client else "unknown"
     auth_rate_limiter.hit(client_ip)
+
+
+async def rate_limit_energy_ai(request: Request) -> None:
+    """Protect the free model allowance from accidental request bursts."""
+    client_ip = request.client.host if request.client else "unknown"
+    energy_ai_rate_limiter.hit(client_ip)
